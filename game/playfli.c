@@ -30,6 +30,46 @@ byte pal[0x300];
 byte *source_ptr;
 long int timer_delay, timer_stop;
 
+void init_timer()
+{
+  outp(0x43,0x34);
+  outp(0x40,0);
+  outp(0x40,0);
+}
+
+void deinit_timer()
+{
+  outp(0x43,0x36);
+  outp(0x40,0);
+  outp(0x40,0);
+}
+
+long int read_timer()
+{
+  word w;
+  byte lsb, msb;
+  memcpy(&w,0x46C,2);
+  outp(0x43,0);
+  lsb=inp(0x40);
+  msb=inp(0x40);
+  return(((w<<16)&(0x7FFFFFFF))+(0xFFFF-((msb<<8)+lsb)));
+}
+
+void start_timer()
+{
+  long int t;
+  t=read_timer();
+  if ((t+timer_delay)>=0x80000000) timer_stop=t+timer_delay-0x80000000;
+  else timer_stop=t+timer_delay;
+}
+
+void wait_timer()
+{
+  long int t;
+  do t=read_timer(); while (t<timer_stop);
+}
+
+
 void graph_mode()
 {
   union REGS regs;
@@ -257,41 +297,3 @@ int check_escape()
   if (inp(0x60)==1) return(1); else return(0);
 }
 
-void init_timer()
-{
-  outp(0x43,0x34);
-  outp(0x40,0);
-  outp(0x40,0);
-}
-
-void deinit_timer()
-{
-  outp(0x43,0x36);
-  outp(0x40,0);
-  outp(0x40,0);
-}
-
-long int read_timer()
-{
-  word w;
-  byte lsb, msb;
-  memcpy(&w,0x46C,2);
-  outp(0x43,0);
-  lsb=inp(0x40);
-  msb=inp(0x40);
-  return(((w<<16)&(0x7FFFFFFF))+(0xFFFF-((msb<<8)+lsb)));
-}
-
-void start_timer()
-{
-  long int t;
-  t=read_timer();
-  if ((t+timer_delay)>=0x80000000) timer_stop=t+timer_delay-0x80000000;
-  else timer_stop=t+timer_delay;
-}
-
-void wait_timer()
-{
-  long int t;
-  do t=read_timer(); while (t<timer_stop);
-}
