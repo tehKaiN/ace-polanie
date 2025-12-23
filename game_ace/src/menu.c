@@ -1,5 +1,4 @@
 #include "menu.h"
-#include "polanie.h"
 #include <ace/utils/extview.h>
 #include <ace/managers/system.h>
 #include <ace/managers/mouse.h>
@@ -8,6 +7,10 @@
 #include <ace/managers/blit.h>
 #include <ace/utils/disk_file.h>
 #include <ace/utils/string.h>
+#include "polanie.h"
+#include "battle.h"
+#include "track.h"
+#include "gfx.h"
 
 #define MENU_SAVE_SLOT_COUNT 4
 
@@ -18,11 +21,6 @@ static tState s_sStateLoad;
 static tState s_sStateCampaign;
 // static tState s_sStateSave;
 // static tState s_sStateOptions;
-
-static void menuCopyBackToFront(void) {
-	blitCopyAligned(g_pVpManager->pBack, 0, 0, g_pVpManager->pFront, 0, 0, 320, 120);
-	blitCopyAligned(g_pVpManager->pBack, 0, 120, g_pVpManager->pFront, 0, 120, 320, 120);
-}
 
 static void menuDrawButton(tUwRect sRect, const char *szText) {
 	blitRect(g_pVpManager->pBack, sRect.uwX, sRect.uwY, sRect.uwWidth, sRect.uwHeight, 1);
@@ -36,6 +34,15 @@ static void menuDrawButton(tUwRect sRect, const char *szText) {
 }
 
 static void menuGsCreate(void) {
+  // PlayTrack(TRACK_MENU);
+
+	g_pVp->pPalette[0] = 0x000;
+	g_pVp->pPalette[1] = 0xF00;
+	g_pVp->pPalette[16] = 0xFFF;
+	g_pVp->pPalette[17] = 0xFFF;
+	g_pVp->pPalette[18] = 0xFFF;
+	g_pVp->pPalette[19] = 0xFFF;
+
 	s_pStateMachineMenu = stateManagerCreate();
 	statePush(s_pStateMachineMenu, &s_sStateMain);
 
@@ -82,12 +89,12 @@ static const tUwRect s_sRectMainExit = {
 };
 
 static void menuMainCreate(void) {
-	blitRect(g_pVpManager->pBack, 0, 0, 320, 240, 0);
+	blitRect(g_pVpManager->pBack, 0, 0, 320, 200, 0);
 	menuDrawButton(s_sRectMainNewGame, "Nowa gra");
 	menuDrawButton(s_sRectMainLoadGame, "Wczytaj gre");
 	menuDrawButton(s_sRectMainExit, "Koniec");
 
-	menuCopyBackToFront();
+	gfxCopyBackToFront();
 }
 
 static void menuMainLoop(void) {
@@ -131,7 +138,7 @@ static const tUwRect s_pSaveButtonRects[] = {
 static void menuLoadCreate(void) {
 	// DownPalette(2);
   // LoadExtendedPalette(1);
-	blitRect(g_pVpManager->pBack, 0, 0, 320, 240, 0);
+	blitRect(g_pVpManager->pBack, 0, 0, 320, 200, 0);
   // ShowPicture(1, 0);
   // ShowPicture(16, 100);
   // PressButton(1, 1);
@@ -158,7 +165,7 @@ static void menuLoadCreate(void) {
 	systemUnuse();
 
 	menuDrawButton(s_pSaveButtonRects[4], "Koniec");
-	menuCopyBackToFront();
+	gfxCopyBackToFront();
 }
 
 static void menuLoadLoop(void) {
@@ -170,10 +177,10 @@ static void menuLoadLoop(void) {
 		if (keyUse(KEY_1 + i) + (isLmbPressed && inRect(uwX, uwY, s_pSaveButtonRects[i]))) {
 			// PressButton(1, 0);
 			// delay(300);
-			// gameStartFromSlot(i);
+			battleLoadFromSlot(i);
 			// endGame = 0;
 			// show = 1;
-			// PlayTrack(2);
+			// PlayTrack(TRACK_MENU);
 			return;
 		}
 	}
@@ -208,7 +215,7 @@ tUwRect s_sCampaignFirstFaceRect = {.uwX = 250, .uwY = 24, .uwWidth = 20, .uwHei
 
 static void menuCampaignCreate(void) {
   // DownPalette(1);
-	blitRect(g_pVpManager->pBack, 0, 0, 320, 240, 0);
+	blitRect(g_pVpManager->pBack, 0, 0, 320, 200, 0);
   // ShowPicture(10, 0);
   // ShowPicture(24, 100);
   // LoadExtendedPalette(10);
@@ -235,7 +242,7 @@ static void menuCampaignCreate(void) {
 		menuDrawButton(sFaceRect, "");
 	}
 
-	menuCopyBackToFront();
+	gfxCopyBackToFront();
 }
 
 static void menuCampaignLoop(void) {
@@ -247,7 +254,7 @@ static void menuCampaignLoop(void) {
 	UWORD uwX = mouseGetX(MOUSE_PORT_1);
 	UWORD uwY = mouseGetY(MOUSE_PORT_1);
 
-	// static const UBYTE s_ubStartLevels[] = {15, 26, 31, 36, 42, 47};
+	static const UBYTE s_ubStartLevels[] = {15, 26, 31, 36, 42, 47};
 
 	for(UBYTE i = 0; i < MENU_CAMPAIGN_COUNT; ++i) {
 		if (inRect(uwX, uwY, s_sCampaignRects[i])) {
@@ -263,7 +270,7 @@ static void menuCampaignLoop(void) {
 				// 	play(ss); // odtwarza flica Intro Daniel
 				// SND.EndPlayWav();
 
-				// PlayTrack(3);
+				// PlayTrack(TRACK_TXT);
 				// ShowText(1, 3); // show start
 				// for (i = 0; i < 25; i++) {
 				// 	prowintion[i] = prowintionInit[i];
@@ -275,10 +282,10 @@ static void menuCampaignLoop(void) {
 			}
 
 			// UBYTE ubCampaignIndex = i + 1;
-			// UBYTE ubLevelIndex = s_ubStartLevels[i];
-			// gameStartNewLevel(ubLevelIndex); // Battle(1);
+			UBYTE ubLevelIndex = s_ubStartLevels[i];
+			battleStartNewLevel(ubLevelIndex); // Battle(1);
 			// endGame = 0;
-			// PlayTrack(2);
+			// PlayTrack(TRACK_MENU);
 			return;
 		}
 	}

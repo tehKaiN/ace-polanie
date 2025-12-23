@@ -1,0 +1,35 @@
+#pragma once
+
+#include "gfx.h"
+
+typedef enum tMoverPhase {
+	MOVER_PHASE_STAND,
+	MOVER_PHASE_WALK1,
+	MOVER_PHASE_WALK2,
+	MOVER_PHASE_ACTION1,
+	MOVER_PHASE_ACTION2,
+	MOVER_PHASE_COUNT
+} tMoverPhase;
+
+typedef enum tMoverKind {
+	MOVER_KIND_COW = 0,
+	MOVER_KIND_AXE = 1,
+	MOVER_KIND_HUNTER = 2,
+	MOVER_KIND_PRIESTESS = 3,
+	MOVER_KIND_PRIEST = 4,
+	MOVER_KIND_SWORD = 5,
+	MOVER_KIND_PIKE = 6,
+	MOVER_KIND_KNIGHT = 7,
+	MOVER_KIND_BEAR = 8,
+	MOVER_KIND_BEAST = 9,
+	MOVER_KIND_FARMER = 10,
+	MOVER_KIND_MAGE = 11,
+	MOVER_KIND_XBOW = 12,
+	MOVER_KIND_COUNT = 13
+} tMoverKind;
+
+void moverCreate(void);
+
+void moverDestroy(void);
+
+extern tImage movers[MOVER_PHASE_COUNT][MOVER_KIND_COUNT][3][3]; // faza:typ:dx:dy

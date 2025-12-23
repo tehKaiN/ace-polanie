@@ -23,17 +23,14 @@ void genericCreate(void) {
 	g_pFont = fontCreateFromPath("data/uni54.fnt");
 	g_pTextBitmap = fontCreateTextBitMap(320, g_pFont->uwHeight);
 
-	s_pView = viewCreate(0, TAG_END);
+	s_pView = viewCreate(0,
+		TAG_VIEW_WINDOW_HEIGHT, 200,
+	TAG_END);
+
 	g_pVp = vPortCreate(0,
 		TAG_VPORT_BPP, 5,
 		TAG_VPORT_VIEW, s_pView,
 	TAG_END);
-	g_pVp->pPalette[0] = 0x000;
-	g_pVp->pPalette[1] = 0xF00;
-	g_pVp->pPalette[16] = 0xFFF;
-	g_pVp->pPalette[17] = 0xFFF;
-	g_pVp->pPalette[18] = 0xFFF;
-	g_pVp->pPalette[19] = 0xFFF;
 
 	g_pVpManager = simpleBufferCreate(0,
 		TAG_SIMPLEBUFFER_BITMAP_FLAGS, BMF_INTERLEAVED|BMF_CLEAR,

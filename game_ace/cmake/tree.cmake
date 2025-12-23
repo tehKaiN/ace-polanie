@@ -1,0 +1,43 @@
+file(MAKE_DIRECTORY ${GEN_DIR}/tree)
+
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/game1.png
+	GENERATED_FILE_LIST "TILES_TREE_LIST"
+	DESTINATIONS
+	${GEN_DIR}/tree/0.png  235  22 16 14
+	${GEN_DIR}/tree/7.png  235  78 16 14
+
+	${GEN_DIR}/tree/1.png  251  22 16 14
+	${GEN_DIR}/tree/8.png  251  78 16 14
+
+	${GEN_DIR}/tree/2.png  235  36 16 14
+	${GEN_DIR}/tree/9.png  235  92 16 14
+
+	${GEN_DIR}/tree/3.png  251  36 16 14
+	${GEN_DIR}/tree/10.png 251  92 16 14
+
+	${GEN_DIR}/tree/4.png  235  50 16 14
+	${GEN_DIR}/tree/11.png 235 106 16 14
+
+	${GEN_DIR}/tree/5.png  251  50 16 14
+	${GEN_DIR}/tree/12.png 251 106 16 14
+
+	${GEN_DIR}/tree/6.png  251  64 16 14
+	${GEN_DIR}/tree/13.png 251 120 16 14
+)
+
+convertTileset(
+	TARGET ${GAME_EXECUTABLE} SIZE 16 HEIGHT 14 PALETTE ${GAME_PLT_PATH}
+	INTERLEAVED SOURCE ${GEN_DIR}/tree DESTINATION ${GEN_DIR}/tree.png
+	TILE_PATHS ${TILES_TREE_LIST}
+)
+
+convertBitmaps(
+	INTERLEAVED TARGET ${GAME_EXECUTABLE} PALETTE ${GAME_PLT_PATH}
+	MASK_COLOR "#000000"
+	SOURCES
+		${GEN_DIR}/tree.png
+	DESTINATIONS
+		${DATA_DIR}/tree.bm
+	MASKS
+		${DATA_DIR}/tree_mask.bm
+)

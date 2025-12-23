@@ -1,0 +1,37 @@
+file(MAKE_DIRECTORY ${GEN_DIR}/fire)
+
+extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/game1.png
+	GENERATED_FILE_LIST "TILES_FIRE_LIST"
+	DESTINATIONS
+	${GEN_DIR}/fire/0.png    11 176 16 14
+	${GEN_DIR}/fire/1.png    27 176 16 14
+	${GEN_DIR}/fire/2.png    45 176 16 14
+	${GEN_DIR}/fire/3.png    61 176 16 14
+	${GEN_DIR}/fire/4.png    79 176 16 14
+	${GEN_DIR}/fire/5.png    95 176 16 14
+	${GEN_DIR}/fire/6.png   111 176 16 14
+	${GEN_DIR}/fire/7.png   127 176 16 14
+	${GEN_DIR}/fire/8.png   143 176 16 14
+	${GEN_DIR}/fire/9.png   159 176 16 14
+	${GEN_DIR}/fire/10.png  175 176 16 14
+	${GEN_DIR}/fire/11.png  191 176 16 14
+	${GEN_DIR}/fire/12.png  207 176 16 14
+	${GEN_DIR}/fire/13.png  223 176 16 14
+)
+
+convertTileset(
+	TARGET ${GAME_EXECUTABLE} SIZE 16 HEIGHT 14 PALETTE ${GAME_PLT_PATH}
+	INTERLEAVED SOURCE ${GEN_DIR}/fire DESTINATION ${GEN_DIR}/fire.png
+	TILE_PATHS ${TILES_FIRE_LIST}
+)
+
+convertBitmaps(
+	INTERLEAVED TARGET ${GAME_EXECUTABLE} PALETTE ${GAME_PLT_PATH}
+	MASK_COLOR "#000000"
+	SOURCES
+		${GEN_DIR}/fire.png
+	DESTINATIONS
+		${DATA_DIR}/fire.bm
+	MASKS
+		${DATA_DIR}/fire_mask.bm
+)

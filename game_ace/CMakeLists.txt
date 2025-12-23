@@ -63,9 +63,31 @@ set(GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 file(MAKE_DIRECTORY ${DATA_DIR})
 file(MAKE_DIRECTORY ${GEN_DIR})
+# file(MAKE_DIRECTORY ${GEN_DIR}/ramka)
+# file(MAKE_DIRECTORY ${GEN_DIR}/drewno)
 
-file(GLOB COPY_FILES ${RES_DIR}/copied/* ${RES_DIR}/music/*)
+file(GLOB COPY_FILES ${RES_DIR}/copied/*)
 file(COPY ${COPY_FILES} DESTINATION ${DATA_DIR})
+
+set(GAME_PLT_PATH ${RES_DIR}/polanie.gpl)
+convertPalette(${GAME_EXECUTABLE} ${GAME_PLT_PATH} ${DATA_DIR}/battle.plt)
+convertBitmaps(INTERLEAVED TARGET ${GAME_EXECUTABLE} PALETTE ${GAME_PLT_PATH}
+	SOURCES
+		${RES_DIR}/game1.png
+	DESTINATIONS
+		${DATA_DIR}/battle_ui.bm
+)
+
+include(cmake/mouse.cmake)
+include(cmake/button.cmake)
+include(cmake/button_bg.cmake)
+include(cmake/tree.cmake)
+include(cmake/hit.cmake)
+include(cmake/dead.cmake)
+include(cmake/fire.cmake)
+include(cmake/picture.cmake)
+include(cmake/movers.cmake)
+include(cmake/missiles.cmake)
 
 # Version stuff
 string(TIMESTAMP YEAR "%y")
