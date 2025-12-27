@@ -31,7 +31,7 @@ void pictureCreate(void) {
 	}
 
 	uwOffsY = 0;
-	for(tPictureKind ePic = PICTURE_KIND_TREE_0; ePic < PICTURE_KIND_TREE_6; ++ePic) {
+	for(tPictureKind ePic = PICTURE_KIND_TREE_0_BOTTOM; ePic < PICTURE_KIND_TREE_6_TOP; ++ePic) {
 		picture[ePic].pBitmap = s_sPairTree.pFrames;
 		picture[ePic].pMask = s_sPairTree.pMasks;
 		picture[ePic].uwWidth = 32;

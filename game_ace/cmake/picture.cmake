@@ -16,13 +16,21 @@ extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/game1.png
 extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/game1.png
 	GENERATED_FILE_LIST "TILES_PICTURE_LIST_TREE"
 	DESTINATIONS
-	${GEN_DIR}/picture_tree/0.png  11 120 32 14 # 113: TREE_0
-	${GEN_DIR}/picture_tree/1.png  43 120 32 14 # 114: TREE_1
-	${GEN_DIR}/picture_tree/2.png  75 120 32 14 # 115: TREE_2
-	${GEN_DIR}/picture_tree/3.png 107 120 32 14 # 116: TREE_3
-	${GEN_DIR}/picture_tree/4.png 139 120 32 14 # 117: TREE_4
-	${GEN_DIR}/picture_tree/5.png 171 120 32 14 # 118: TREE_5
-	${GEN_DIR}/picture_tree/6.png 203 120 32 14 # 119: TREE_6
+	${GEN_DIR}/picture_tree/0.png   11 120 32 14 # 113: TREE_0_BOTTOM
+	${GEN_DIR}/picture_tree/1.png   43 120 32 14 # 114: TREE_1_BOTTOM
+	${GEN_DIR}/picture_tree/2.png   75 120 32 14 # 115: TREE_2_BOTTOM
+	${GEN_DIR}/picture_tree/3.png  107 120 32 14 # 116: TREE_3_BOTTOM
+	${GEN_DIR}/picture_tree/4.png  139 120 32 14 # 117: TREE_4_BOTTOM
+	${GEN_DIR}/picture_tree/5.png  171 120 32 14 # 118: TREE_5_BOTTOM
+	${GEN_DIR}/picture_tree/6.png  203 120 32 14 # 119: TREE_6_BOTTOM
+
+	${GEN_DIR}/picture_tree/7.png   11 106 32 14 # 120: TREE_0_TOP
+	${GEN_DIR}/picture_tree/8.png   43 106 32 14 # 121: TREE_1_TOP
+	${GEN_DIR}/picture_tree/9.png   75 106 32 14 # 122: TREE_2_TOP
+	${GEN_DIR}/picture_tree/10.png 107 106 32 14 # 123: TREE_3_TOP
+	${GEN_DIR}/picture_tree/11.png 139 106 32 14 # 124: TREE_4_TOP
+	${GEN_DIR}/picture_tree/12.png 171 106 32 14 # 125: TREE_5_TOP
+	${GEN_DIR}/picture_tree/13.png 203 106 32 14 # 126: TREE_6_TOP
 )
 
 extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/game1.png

@@ -149,9 +149,87 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 	// }
 }
 
-void worldShowTrees(UWORD uwX, UWORD uwY) {
-	(void)uwX;
-	(void)uwY;
+void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
+  for (UBYTE ubY = uwTopY; ubY < uwTopY + 14; ubY++) {
+    for (UBYTE ubX = uwLeftX; ubX < uwLeftX + 16; ubX++) {
+      if (placeN[ubX][ubY]) {
+        if (placeG[ubX][ubY] > 112 && placeG[ubX][ubY] < 120) // drzewo zywe
+        {
+          if (placeN[ubX][ubY] < 190) {
+            if (ubY < uwTopY + 13)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 8, Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // drzewo dol
+            if (ubY > uwTopY)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 8, Ye[ubY - 1 - uwTopY], &picture[placeG[ubX][ubY] + 7]); //
+            // fire gora
+            if (ubY > uwTopY && placeN[ubX][ubY] > 74 && placeN[ubX][ubY] < 91)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY] + 8, &fire[(fireCounter + ubX + ubY + 1) & 3]); // fire big
+            if (ubY > uwTopY && placeN[ubX][ubY] > 70 && placeN[ubX][ubY] < 75)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY] - 7, &fire[8 + ((fireCounter + ubX + ubY) & 3)]); // fire small
+            if (ubY > uwTopY && placeN[ubX][ubY] > 70 && placeN[ubX][ubY] < 75)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY] + 4, &fire[(fireCounter + ubX + ubY) & 3]); // fire big
+          }
+          if (placeN[ubX][ubY] > 194 && placeN[ubX][ubY] < 201) { // drzewo brazowe
+            if (ubY > uwTopY) {
+              gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - 1 - uwTopY], &tree[4]); //
+              if (ubX > uwLeftX)
+                gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY], &tree[5]); //
+            }
+            if (ubY < uwTopY + 13)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[6]); //
+          }                                                  // 1 faza przewrotu
+          if (placeN[ubX][ubY] > 190 && placeN[ubX][ubY] < 195) {
+            if (ubX > uwLeftX)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[3]); //
+            if (ubY < uwTopY + 13)
+              gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - uwTopY], &tree[2]); //
+          } // 2 faza przewrotu
+        }
+
+        if (placeG[ubX][ubY] == 71 || placeG[ubX][ubY] == 73) // drzewo spalone
+        {
+          if (placeN[ubX][ubY] < 190) {
+            if (ubY < uwTopY + 13)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // drzewo dol
+            if (ubY > uwTopY)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY], &picture[placeG[ubX][ubY] - 1]); //
+          }
+          if (placeN[ubX][ubY] > 194 && placeN[ubX][ubY] < 201) { // drzewo brazowe
+            if (ubY > uwTopY) {
+              gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - 1 - uwTopY], &tree[11]); //
+              if (ubX > uwLeftX)
+                gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY], &tree[12]); //
+            }
+            if (ubY < uwTopY + 13)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[13]); //
+          } // 1 faza przewrotu
+          if (placeN[ubX][ubY] > 190 && placeN[ubX][ubY] < 195) {
+            if (ubX > uwLeftX)
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[10]); //
+            if (ubY < uwTopY + 13)
+              gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - uwTopY], &tree[9]); //
+          } // 2 faza przewrotu
+        }
+
+        ///////////// fire /////////////
+        if (ubY < uwTopY + 13 && placeN[ubX][ubY] > 90 && placeN[ubX][ubY] < 101) // fire big
+        {
+          gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[((fireCounter + ubX + ubY) & 3)]);
+        }
+        if (ubY < uwTopY + 13 && placeN[ubX][ubY] > 72 && placeN[ubX][ubY] < 91) // fire med
+        {
+          if (placeG[ubX][ubY] < 113 || placeG[ubX][ubY] > 119)
+            gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[12]);
+          gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[4 + ((fireCounter + ubX + ubY) & 3)]);
+        }
+        if (ubY < uwTopY + 13 && placeN[ubX][ubY] >= 70 && placeN[ubX][ubY] < 73) // fire small
+        {
+          if (placeG[ubX][ubY] < 113 || placeG[ubX][ubY] > 119)
+            gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[12]);
+          gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[8 + ((fireCounter + ubX + ubY) & 3)]);
+        }
+      }
+    }
+  }
 }
 
 void worldPlaceRoad(UWORD x, UWORD y, ULONG typ) // typ=35-droga  266-palisada
