@@ -15,12 +15,14 @@ void worldPlaceWater(UWORD x, UWORD y, ULONG t);
 
 void worldDump(void);
 
+void worldRevealAll(void);
+
 extern int drzewa;
 extern int drzewa0;
 extern UWORD place[WORLD_SIZE_X][WORLD_SIZE_Y];
 extern UBYTE placeN[WORLD_SIZE_X][WORLD_SIZE_Y];
 extern UWORD attack[WORLD_SIZE_X][WORLD_SIZE_Y];
-extern ULONG placeG[WORLD_SIZE_X][WORLD_SIZE_Y];
+extern UWORD placeG[WORLD_SIZE_X][WORLD_SIZE_Y];
 extern UBYTE xleczenie;
 extern UBYTE yleczenie;
 extern UWORD xpastw;

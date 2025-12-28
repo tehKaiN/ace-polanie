@@ -1,6 +1,7 @@
 #include "battle.h"
 #include <ace/utils/palette.h>
 #include <ace/utils/disk_file.h>
+#include <ace/utils/endian.h>
 #include <ace/managers/key.h>
 #include <ace/managers/mouse.h>
 #include <ace/managers/system.h>
@@ -1394,8 +1395,10 @@ static void battleInitNewLevel(UWORD uwLevel) {
 
 	for (UBYTE j = 0; j < MaxY; j++)
 		for (UBYTE i = 0; i < MaxX; i++) {
-			// placeN[i][j]=1;//usunac
-			typ = fileRead(pFileMaps, &placeG[i][j], sizeof(placeG[i][j]));
+			ULONG ulReadG;
+			typ = fileRead(pFileMaps, &ulReadG, sizeof(ulReadG));
+			ulReadG = endianLittle32(ulReadG);
+			placeG[i][j] = ulReadG;
 
 			if (placeG[i][j] < 8)
 				placeG[i][j] = 8;
@@ -1733,6 +1736,8 @@ static void battleGsCreate(void) {
 	// select.nrm = 1;
 	// select.IFF = 2;
 	// mouseCommand = 1;
+
+	worldRevealAll();
 
 	// castle[0].Run();
 	// castle[1].Run();

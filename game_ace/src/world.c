@@ -35,7 +35,6 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 	// kol[3] = LightYellow;
 	for (UBYTE ubY = uwTopY; ubY < uwTopY + 13; ubY++) {
 		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + 16; ubX++) {
-			placeN[ubX][ubY] = 1; // DEBUG
 			if (placeN[ubX][ubY]) {
 				if (placeG[ubX][ubY] <= 8) {
 					UBYTE k = (ubX + ubY * 5) & 0x0f;
@@ -104,11 +103,13 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 		}
 	}
 
+	// Draw dry earth
 	for (UBYTE ubY = uwTopY; ubY < uwTopY + 13; ubY++) {
 		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + 16; ubX++) {
 			if (22 <= placeG[ubX][ubY] && placeG[ubX][ubY] <= 24)
-				if (placeN[ubX][ubY])
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 3, Ye[ubY - uwTopY] - 2, &picture[placeG[ubX][ubY]]); // sucha ziemia
+				if (placeN[ubX][ubY]) {
+					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 3, Ye[ubY - uwTopY] - 2, &picture[placeG[ubX][ubY]]);
+				}
 		}
 	}
 
@@ -116,7 +117,7 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 	for (UBYTE ubY = uwTopY; ubY < uwTopY + 13; ubY++) {
 		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + 16; ubX++) {
 			if (!(placeN[ubX][ubY])) {
-				gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 9, Ye[ubY - uwTopY] - 7, &shadow); // przykryj
+				gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 9, Ye[ubY - uwTopY] - 7, &shadow);
 			}
 		}
 	}
@@ -232,8 +233,8 @@ void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
   }
 }
 
-void worldPlaceRoad(UWORD x, UWORD y, ULONG typ) // typ=35-droga  266-palisada
-{
+void worldPlaceRoad(UWORD x, UWORD y, ULONG typ) {
+	// typ=35-droga  266-palisada
 	if (placeG[x][y] > typ + 10 || placeG[x][y] < typ - 4)
 		return;
 	if (typ > 200 && placeG[x][y] < typ - 1)
@@ -396,12 +397,20 @@ void worldDump(void) {
 	logBlockEnd("worldDump()");
 }
 
+void worldRevealAll(void) {
+	for(UBYTE ubX=0 ; ubX < WORLD_SIZE_X; ubX++) {
+    for(UBYTE ubY=0; ubY < WORLD_SIZE_Y; ubY++) {
+			placeN[ubX][ubY] = 1;
+		}
+	}
+}
+
 int drzewa;
 int drzewa0;
 UWORD place[WORLD_SIZE_X][WORLD_SIZE_Y];
 UBYTE placeN[WORLD_SIZE_X][WORLD_SIZE_Y]; // 0 means behind fog of war
 UWORD attack[WORLD_SIZE_X][WORLD_SIZE_Y];
-ULONG placeG[WORLD_SIZE_X][WORLD_SIZE_Y];
+UWORD placeG[WORLD_SIZE_X][WORLD_SIZE_Y];
 UBYTE xleczenie;
 UBYTE yleczenie;
 UWORD xpastw;
