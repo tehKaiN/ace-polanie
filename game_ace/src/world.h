@@ -15,7 +15,7 @@ void worldPlaceRoad(UWORD x, UWORD y, ULONG typ);
 
 void worldPlaceWater(UWORD x, UWORD y, ULONG t);
 
-void worldDump(void);
+void worldDump(UBYTE ubStartX, UBYTE ubStartY, UBYTE ubSizeX, UBYTE ubSizeY);
 
 void worldRevealAll(void);
 

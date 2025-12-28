@@ -1657,8 +1657,6 @@ static void battleInitLevel(UWORD uwLevel, UBYTE isLoadGame) {
 		else {
 			battleInitNewLevel(uwLevel);
 		}
-
-		// worldDump();
 	}
 	if (ScreenX < 1)
 		ScreenX = 1;
@@ -1823,6 +1821,12 @@ static void battleGsLoop(void) {
 	if(keyUse(KEY_ESCAPE)) {
 		stateChange(g_pStateMachineGame, &g_sStateMenu);
 		return;
+	}
+	else if(keyUse(KEY_F1)) {
+		worldDump(0, 0, WORLD_SIZE_X, WORLD_SIZE_Y);
+	}
+	else if(keyUse(KEY_F2)) {
+		worldDump(ScreenX, ScreenY, WORLD_WINDOW_SIZE_X, WORLD_WINDOW_SIZE_Y);
 	}
 
 // 	do {

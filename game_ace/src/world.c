@@ -374,31 +374,31 @@ void worldPlaceWater(UWORD x, UWORD y, ULONG t) // woda t=74-86
 	}
 }
 
-void worldDump(void) {
-	logBlockBegin("worldDump()");
-	static char szBfr[600];
+void worldDump(UBYTE ubStartX, UBYTE ubStartY, UBYTE ubSizeX, UBYTE ubSizeY) {
+	logBlockBegin("worldDump(ubStartX: %hhu, ubStartY: %hhu, ubSizeX: %hhu, ubSizeY: %hhu))", ubStartX, ubStartY, ubSizeX, ubSizeY);
+	static char szBfr[4 * WORLD_SIZE_X + 36];
 
 	logWrite("placeG:");
-	for(UBYTE y = 0; y < WORLD_SIZE_Y; ++y) {
+	for(UBYTE y = ubStartY; y < ubStartY + ubSizeY; ++y) {
 		char *pEnd = szBfr + sprintf(szBfr, "%2hhu: ", y);
-		for(UBYTE x = 0; x < WORLD_SIZE_X; ++x) {
+		for(UBYTE x = ubStartX; x < ubStartX + ubSizeX; ++x) {
 			pEnd += sprintf(pEnd, "%03X ", (UWORD)placeG[x][y]);
 		}
 		logWrite(szBfr);
 	}
 
 	logWrite("\nplaceN:");
-	for(UBYTE y = 0; y < WORLD_SIZE_Y; ++y) {
+	for(UBYTE y = ubStartY; y < ubStartY + ubSizeY; ++y) {
 		char *pEnd = szBfr + sprintf(szBfr, "%2hhu: ", y);
-		for(UBYTE x = 0; x < WORLD_SIZE_X; ++x) {
+		for(UBYTE x = ubStartX; x < ubStartX + ubSizeX; ++x) {
 			pEnd += sprintf(pEnd, "%03X ", placeN[x][y]);
 		}
 		logWrite(szBfr);
 	}
 	logWrite("\nplace:");
-	for(UBYTE y = 0; y < WORLD_SIZE_Y; ++y) {
+	for(UBYTE y = ubStartY; y < ubStartY + ubSizeY; ++y) {
 		char *pEnd = szBfr + sprintf(szBfr, "%2hhu: ", y);
-		for(UBYTE x = 0; x < WORLD_SIZE_X; ++x) {
+		for(UBYTE x = ubStartX; x < ubStartX + ubSizeX; ++x) {
 			pEnd += sprintf(pEnd, "%03X ", place[x][y]);
 		}
 		logWrite(szBfr);
