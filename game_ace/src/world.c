@@ -33,80 +33,89 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 	// kol[1] = Yellow;
 	// kol[2] = DarkYellow;
 	// kol[3] = LightYellow;
-	for (UBYTE ubY = uwTopY; ubY < uwTopY + 13; ubY++) {
-		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + 16; ubX++) {
+	for (UBYTE ubY = uwTopY; ubY < uwTopY + WORLD_WINDOW_SIZE_Y; ubY++) {
+		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + WORLD_WINDOW_SIZE_X; ubX++) {
 			if (placeN[ubX][ubY]) {
-				if (placeG[ubX][ubY] <= 8) {
-					UBYTE k = (ubX + ubY * 5) & 0x0f;
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[maskaT[k]]); // trawa
-					if (placeG[ubX][ubY] < 6)
-						gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[PICTURE_KIND_GRASS_1]); // wyjedzona
-					if (placeG[ubX][ubY] < 3)
-						gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[PICTURE_KIND_GRASS_0]); // wyjedzona bardzo
-				}
-				else if (8 < placeG[ubX][ubY] && placeG[ubX][ubY] < 22)
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // obrazki
-				// MISSING: 22, 23, 24
-				else if (24 < placeG[ubX][ubY] && placeG[ubX][ubY] <= 45)
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // obrazki
-				else if (45 < placeG[ubX][ubY] && placeG[ubX][ubY] <= 53) {
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[82 + (waterCounter * 13)]); // woda
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // most
-				}
-				else if (53 < placeG[ubX][ubY] && placeG[ubX][ubY] < 68)
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // obrazki
-				else if (placeG[ubX][ubY] == 68) {
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[68]);
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[8 + ((fireCounter + ubX + ubY) & 3)]);
-				} // male ognisko
-				else if (placeG[ubX][ubY] == 69) {
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[68]);
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[4 + ((fireCounter + ubX + ubY) & 3)]);
-				} // duze ognisko
-				else if (69 < placeG[ubX][ubY] && placeG[ubX][ubY] <= 73)
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[2]); // podstawa pod rzewa wypalone
-				else if (73 < placeG[ubX][ubY] && placeG[ubX][ubY] <= 86)
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY] + (waterCounter * 13)]); // woda
+				UWORD uwScreenX = Xe[ubX - uwLeftX];
+				UWORD uwScreenY = Ye[ubY - uwTopY];
 
-				if (placeG[ubX][ubY] > 265 && placeG[ubX][ubY] < 278)
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // palisada
-				if (placeG[ubX][ubY] > 112 && placeG[ubX][ubY] < 120)
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[2]); // trawa pod drzewem
-				if (placeG[ubX][ubY] < 266 && placeG[ubX][ubY] > 126 && place[ubX][ubY] < 512)
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // zamek i ruina nasz
-				if (placeG[ubX][ubY] < 266 && placeG[ubX][ubY] > 126 && place[ubX][ubY] > 511)
-					PutImageChange13h(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]], 0, color1, color2); // zamek i ruina ich
+				if (placeG[ubX][ubY] <= PICTURE_KIND_GRASS_8) {
+					UBYTE k = (ubX + ubY * 5) & 0x0f;
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[maskaT[k]]); // trawa
+					if (placeG[ubX][ubY] < 6)
+						gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &picture[PICTURE_KIND_GRASS_1]); // wyjedzona
+					if (placeG[ubX][ubY] < 3)
+						gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &picture[PICTURE_KIND_GRASS_0]); // wyjedzona bardzo
+				}
+				else if (placeG[ubX][ubY] <= PICTURE_KIND_ROCK_12) {
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY]]); // obrazki
+				}
+				else if (placeG[ubX][ubY] <= PICTURE_KIND_DRY_EARTH_2) {
+					// Missing dry earth: 22, 23, 24, drawn later
+				}
+				else if (placeG[ubX][ubY] <= PICTURE_KIND_ROAD_20)
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY]]); // obrazki
+				else if (placeG[ubX][ubY] <= PICTURE_KIND_BRIDGE_7) {
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[PICTURE_KIND_WATER_8 + (waterCounter * 13)]); // woda
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY]]); // most
+				}
+				else if (placeG[ubX][ubY] < 68)
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY]]); // obrazki
+				else if (placeG[ubX][ubY] == PICTURE_KIND_FIREPLACE_SMALL) {
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[PICTURE_KIND_FIREPLACE_SMALL]);
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &fire[8 + ((fireCounter + ubX + ubY) & 3)]);
+				} // male ognisko
+				else if (placeG[ubX][ubY] == PICTURE_KIND_FIRE_RING) {
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[PICTURE_KIND_FIREPLACE_SMALL]);
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &fire[4 + ((fireCounter + ubX + ubY) & 3)]);
+				} // duze ognisko
+				else if (placeG[ubX][ubY] <= PICTURE_KIND_GADGET_BURNT_TREE_4)
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[2]); // podstawa pod rzewa wypalone
+				else if (placeG[ubX][ubY] <= PICTURE_KIND_WATER_12)
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY] + (waterCounter * 13)]); // woda
+				else if (PICTURE_KIND_WALL_0 <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_WALL_11)
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY]]); // palisada
+				else if (PICTURE_KIND_TREE_0_BOTTOM <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_TREE_6_BOTTOM)
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[2]); // trawa pod drzewem
+				else if (PICTURE_KIND_CONSTRUCTION_0 <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_RUIN_8) {
+					if(place[ubX][ubY] < 512) {
+						gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY]]); // zamek i ruina nasz
+					}
+					else {
+						PutImageChange13h(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY]], 0, color1, color2); // zamek i ruina ich
+					}
+				}
 				if (place[ubX][ubY] == 2)
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[156]); // pale
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &picture[156]); // pale
 				if (placeG[ubX][ubY] == 256)
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[2]); // swiete miejsce
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[PICTURE_KIND_GRASS_2]); // swiete miejsce
 				if (placeG[ubX][ubY] == 301) {
-					PutImageChange13h(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[69], 1, Red, kol[(fireCounter & 3)]);
+					PutImageChange13h(uwScreenX, uwScreenY, &picture[PICTURE_KIND_FIRE_RING], 1, Red, kol[(fireCounter & 3)]);
 				}
 				if (placeG[ubX][ubY] == 300) {
-					gfxDrawImageNoMask(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[2]); // swiete miejsce - przemiana
-					PutImageChange13h(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[282 + (waterCounter & 1)], 1, Red, LightRed);
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[PICTURE_KIND_GRASS_2]); // swiete miejsce - przemiana
+					PutImageChange13h(uwScreenX, uwScreenY, &picture[PICTURE_KIND_HEAL_0 + (waterCounter & 1)], 1, Red, LightRed);
 				}
 				if (placeN[ubX][ubY] == 3)
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[12]); // popiul duzy
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &fire[12]); // popiul duzy
 				if (placeN[ubX][ubY] == 2)
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[13]); // popiul maly
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &fire[13]); // popiul maly
 				if (placeG[ubX][ubY] == 70)
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[1]); // lezy drzewo brazowe
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &tree[1]); // lezy drzewo brazowe
 				if (placeG[ubX][ubY] == 72)
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[8]); // lezy drzewo spalone
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &tree[8]); // lezy drzewo spalone
 				if (placeG[ubX + 1][ubY] == 70)
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[0]); // lezy drzewo brazowe
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &tree[0]); // lezy drzewo brazowe
 				if (placeG[ubX + 1][ubY] == 72)
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[7]); // lezy drzewo spalone
+					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &tree[7]); // lezy drzewo spalone
 			}
 		}
 	}
 
 	// Draw dry earth
-	for (UBYTE ubY = uwTopY; ubY < uwTopY + 13; ubY++) {
-		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + 16; ubX++) {
-			if (22 <= placeG[ubX][ubY] && placeG[ubX][ubY] <= 24)
+	for (UBYTE ubY = uwTopY; ubY < uwTopY + WORLD_WINDOW_SIZE_Y; ubY++) {
+		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + WORLD_WINDOW_SIZE_X; ubX++) {
+			if (PICTURE_KIND_DRY_EARTH_0 <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_DRY_EARTH_2)
 				if (placeN[ubX][ubY]) {
 					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 3, Ye[ubY - uwTopY] - 2, &picture[placeG[ubX][ubY]]);
 				}
@@ -114,15 +123,15 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 	}
 
 	// Fog of war
-	for (UBYTE ubY = uwTopY; ubY < uwTopY + 13; ubY++) {
-		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + 16; ubX++) {
+	for (UBYTE ubY = uwTopY; ubY < uwTopY + WORLD_WINDOW_SIZE_Y; ubY++) {
+		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + WORLD_WINDOW_SIZE_X; ubX++) {
 			if (!(placeN[ubX][ubY])) {
 				gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 9, Ye[ubY - uwTopY] - 7, &shadow);
 			}
 		}
 	}
 
-	// if (Msg.x >= uwLeftX && Msg.y >= uwTopX && Msg.x < uwLeftX + 16 && Msg.y < uwTopX + 13 && Msg.count) {
+	// if (Msg.x >= uwLeftX && Msg.y >= uwTopX && Msg.x < uwLeftX + WORLD_WINDOW_SIZE_X && Msg.y < uwTopX + 13 && Msg.count) {
 	//   if (Msg.count == 4)
 	//     Rectangle13h(Xe[Msg.x - uwLeftX] - 7, Ye[Msg.y - uwTopX] - 2, Xe[Msg.x - uwLeftX] + 14,
 	//                  Ye[Msg.y - uwTopX] + 15, White);
@@ -151,13 +160,13 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 }
 
 void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
-  for (UBYTE ubY = uwTopY; ubY < uwTopY + 14; ubY++) {
-    for (UBYTE ubX = uwLeftX; ubX < uwLeftX + 16; ubX++) {
+  for (UBYTE ubY = uwTopY; ubY < uwTopY + WORLD_WINDOW_SIZE_Y + 1; ubY++) {
+    for (UBYTE ubX = uwLeftX; ubX < uwLeftX + WORLD_WINDOW_SIZE_X; ubX++) {
       if (placeN[ubX][ubY]) {
         if (placeG[ubX][ubY] > 112 && placeG[ubX][ubY] < 120) // drzewo zywe
         {
           if (placeN[ubX][ubY] < 190) {
-            if (ubY < uwTopY + 13)
+            if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 8, Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // drzewo dol
             if (ubY > uwTopY)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 8, Ye[ubY - 1 - uwTopY], &picture[placeG[ubX][ubY] + 7]); //
@@ -175,13 +184,13 @@ void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
               if (ubX > uwLeftX)
                 gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY], &tree[5]); //
             }
-            if (ubY < uwTopY + 13)
+            if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[6]); //
           }                                                  // 1 faza przewrotu
           if (placeN[ubX][ubY] > 190 && placeN[ubX][ubY] < 195) {
             if (ubX > uwLeftX)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[3]); //
-            if (ubY < uwTopY + 13)
+            if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - uwTopY], &tree[2]); //
           } // 2 faza przewrotu
         }
@@ -189,7 +198,7 @@ void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
         if (placeG[ubX][ubY] == 71 || placeG[ubX][ubY] == 73) // drzewo spalone
         {
           if (placeN[ubX][ubY] < 190) {
-            if (ubY < uwTopY + 13)
+            if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // drzewo dol
             if (ubY > uwTopY)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY], &picture[placeG[ubX][ubY] - 1]); //
@@ -200,29 +209,29 @@ void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
               if (ubX > uwLeftX)
                 gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY], &tree[12]); //
             }
-            if (ubY < uwTopY + 13)
+            if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[13]); //
           } // 1 faza przewrotu
           if (placeN[ubX][ubY] > 190 && placeN[ubX][ubY] < 195) {
             if (ubX > uwLeftX)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[10]); //
-            if (ubY < uwTopY + 13)
+            if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - uwTopY], &tree[9]); //
           } // 2 faza przewrotu
         }
 
         ///////////// fire /////////////
-        if (ubY < uwTopY + 13 && placeN[ubX][ubY] > 90 && placeN[ubX][ubY] < 101) // fire big
+        if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y && placeN[ubX][ubY] > 90 && placeN[ubX][ubY] < 101) // fire big
         {
           gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[((fireCounter + ubX + ubY) & 3)]);
         }
-        if (ubY < uwTopY + 13 && placeN[ubX][ubY] > 72 && placeN[ubX][ubY] < 91) // fire med
+        if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y && placeN[ubX][ubY] > 72 && placeN[ubX][ubY] < 91) // fire med
         {
           if (placeG[ubX][ubY] < 113 || placeG[ubX][ubY] > 119)
             gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[12]);
           gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[4 + ((fireCounter + ubX + ubY) & 3)]);
         }
-        if (ubY < uwTopY + 13 && placeN[ubX][ubY] >= 70 && placeN[ubX][ubY] < 73) // fire small
+        if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y && placeN[ubX][ubY] >= 70 && placeN[ubX][ubY] < 73) // fire small
         {
           if (placeG[ubX][ubY] < 113 || placeG[ubX][ubY] > 119)
             gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[12]);

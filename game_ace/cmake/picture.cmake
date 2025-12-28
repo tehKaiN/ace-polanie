@@ -106,11 +106,11 @@ extractBitmaps(TARGET ${GAME_EXECUTABLE} SOURCE ${RES_DIR}/game1.png
 	${GEN_DIR}/picture/67.png 219 148 16 14 # GADGET_13
 
 	${GEN_DIR}/picture/68.png 139 162 16 14 # GADGET_14
-	${GEN_DIR}/picture/69.png 139 162 16 14 # GADGET_15
-	${GEN_DIR}/picture/70.png 139 162 16 14 # GADGET_16
-	${GEN_DIR}/picture/71.png 139 162 16 14 # GADGET_17
-	${GEN_DIR}/picture/72.png 139 162 16 14 # GADGET_18
-	${GEN_DIR}/picture/73.png 139 162 16 14 # GADGET_19
+	${GEN_DIR}/picture/69.png 155 162 16 14 # GADGET_15
+	${GEN_DIR}/picture/70.png 171 162 16 14 # GADGET_16
+	${GEN_DIR}/picture/71.png 187 162 16 14 # GADGET_17
+	${GEN_DIR}/picture/72.png 203 162 16 14 # GADGET_18
+	${GEN_DIR}/picture/73.png 219 162 16 14 # GADGET_19
 
 	${GEN_DIR}/picture/74.png  11 50 16 14 # WATER_0
 	${GEN_DIR}/picture/75.png  27 50 16 14 # WATER_1

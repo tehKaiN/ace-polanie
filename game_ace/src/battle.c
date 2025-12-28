@@ -15,8 +15,8 @@
 #include "misc.h"
 #include "menu.h"
 
-#define MaxX 66
-#define MaxY 66
+#define MaxX WORLD_SIZE_X
+#define MaxY WORLD_SIZE_Y
 #define MaxUnitsInCastle 40
 
 #define KUSZNIK_LEV 32
@@ -77,7 +77,7 @@ typedef struct EditStr {
 } EditStr;
 
 tEndLevelResult endL;
-tBattleStartKind isLoadGame;
+tBattleStartKind eStartKind;
 tBitMap *s_pBattleUi;
 Plansza pl;
 EditStr E;
@@ -550,13 +550,13 @@ static void battleProcessMouse(void) {
 	// if (uwMouseY > 192) {
 	//   uwMouseY = 192;
 	//   M = 9;
-	//   if (ScreenY == MaxY - 14)
+	//   if (ScreenY == WORLD_SIZE_Y - 14)
 	//     M = 12;
 	// }
 	// if (uwMouseY > 192 - 7 && M == 1) {
 	//   uwMouseY = 192;
 	//   M = 9;
-	//   if (ScreenY == MaxY - 14)
+	//   if (ScreenY == WORLD_SIZE_Y - 14)
 	//     M = 12;
 	// }
 	// if (uwMouseY < 8) {
@@ -574,7 +574,7 @@ static void battleProcessMouse(void) {
 	// if (uwMouseX > 306) {
 	//   uwMouseX = 311;
 	//   M = 11;
-	//   if (ScreenX == MaxX - 17)
+	//   if (ScreenX == WORLD_SIZE_X - 17)
 	//     M = 12;
 	// }
 
@@ -758,7 +758,7 @@ static void battleInitOldLevel(UWORD uwLevel) {
 	} while (k != uwLevel);
 
 	// Maps are encoded with windows codepage 1250
-	for (UBYTE j = 0; j < MaxY; j++) {
+	for (UBYTE j = 0; j < WORLD_SIZE_Y; j++) {
 		do {
 			fileRead(pFileMaps, &z, sizeof(z));
 			if (z == '@') {
@@ -811,7 +811,7 @@ static void battleInitOldLevel(UWORD uwLevel) {
 		if (pl.endType == 4 && !p1)
 			p1 = 1;
 
-		for (UBYTE i = 0; i < MaxX; i++) {
+		for (UBYTE i = 0; i < WORLD_SIZE_X; i++) {
 			// if(p0>MaxUnitsInCastle-5)p0=MaxUnitsInCastle-5;
 			// if(p1>MaxUnitsInCastle-5)p1=MaxUnitsInCastle-5;
 			fileRead(pFileMaps, &z, sizeof(z));
@@ -820,7 +820,7 @@ static void battleInitOldLevel(UWORD uwLevel) {
 				return;
 			}
 			place[i][j] = 0;
-			if (i == 0 || i == MaxX - 1 || j == 0 || j == MaxY - 1)
+			if (i == 0 || i == WORLD_SIZE_X - 1 || j == 0 || j == WORLD_SIZE_Y - 1)
 				place[i][j] = 10;
 			placeG[i][j] = 8;
 			if (z == '*') {
@@ -1355,7 +1355,7 @@ static void battleInitNewLevel(UWORD uwLevel) {
 	}
 
 	// OutText13h(50,15,"Czytam nagl%wek",255);
-	fileSeek(pFileMaps, MaxX * MaxY * 4, SEEK_SET);
+	fileSeek(pFileMaps, WORLD_SIZE_X * WORLD_SIZE_Y * 4, SEEK_SET);
 	// FIXME: this probably won't work due to struct alignment differences.
 	// Change to reading field by field + endian convert.
 	fileRead(pFileMaps, &E, sizeof(E));
@@ -1396,8 +1396,8 @@ static void battleInitNewLevel(UWORD uwLevel) {
 	// if(typ)OutText13h(50,120,"Blad",255);
 	// OutText13h(50,180,"Czytam dane",255);
 
-	for (UBYTE j = 0; j < MaxY; j++)
-		for (UBYTE i = 0; i < MaxX; i++) {
+	for (UBYTE j = 0; j < WORLD_SIZE_Y; j++)
+		for (UBYTE i = 0; i < WORLD_SIZE_X; i++) {
 			ULONG ulReadG;
 			typ = fileRead(pFileMaps, &ulReadG, sizeof(ulReadG));
 			ulReadG = endianLittle32(ulReadG);
@@ -1639,8 +1639,8 @@ static void battleInitLevel(UWORD uwLevel, UBYTE isLoadGame) {
 		pl.xp = 0;
 		pl.yp = 0;
 		pl.gen = 0;
-		for (UBYTE i = 0; i < MaxX; i++)
-			for (UBYTE j = 0; j < MaxY; j++) {
+		for (UBYTE i = 0; i < WORLD_SIZE_X; i++)
+			for (UBYTE j = 0; j < WORLD_SIZE_Y; j++) {
 				placeN[i][j] = 0;
 				placeG[i][j] = 8;
 				place[i][j] = 0;
@@ -1664,21 +1664,21 @@ static void battleInitLevel(UWORD uwLevel, UBYTE isLoadGame) {
 		ScreenX = 1;
 	if (ScreenY < 1)
 		ScreenY = 1;
-	if (ScreenX > MaxX - 16)
-		ScreenX = MaxX - 16;
-	if (ScreenY > MaxY - 14)
-		ScreenY = MaxY - 14;
+	if (ScreenX > WORLD_SIZE_X - 16)
+		ScreenX = WORLD_SIZE_X - 16;
+	if (ScreenY > WORLD_SIZE_Y - 14)
+		ScreenY = WORLD_SIZE_Y - 14;
 	if (uwLevel < 26) {
-		for (UBYTE i = 1; i < MaxX - 1; i++)
-			for (UBYTE j = 1; j < MaxY - 1; j++) {
-				if (placeG[i][j] > 30 && placeG[i][j] < 46)
-					worldPlaceRoad(i, j, 35); // droga
-				if (placeG[i][j] > 265 && placeG[i][j] < 277)
-					worldPlaceRoad(i, j, 266); // palisada
-				if (placeG[i][j] > 73 && placeG[i][j] < 87)
-					worldPlaceWater(i, j, 74);
-				if (placeG[i][j] == 22)
-					placeG[i][j] = 22 + (i & 1) + (j & 1); // sucha ziemia
+		for (UBYTE i = 1; i < WORLD_SIZE_X - 1; i++)
+			for (UBYTE j = 1; j < WORLD_SIZE_Y - 1; j++) {
+				if (PICTURE_KIND_ROAD_5 < placeG[i][j] && placeG[i][j] <= PICTURE_KIND_ROAD_20)
+					worldPlaceRoad(i, j, PICTURE_KIND_ROAD_10); // droga
+				if (PICTURE_KIND_WALL_0 <= placeG[i][j] && placeG[i][j] < PICTURE_KIND_WALL_11)
+					worldPlaceRoad(i, j, PICTURE_KIND_WALL_0); // palisada
+				if (PICTURE_KIND_WATER_0 <= placeG[i][j] && placeG[i][j] < PICTURE_KIND_WATER_13)
+					worldPlaceWater(i, j, PICTURE_KIND_WATER_0);
+				if (placeG[i][j] == PICTURE_KIND_DRY_EARTH_0)
+					placeG[i][j] = PICTURE_KIND_DRY_EARTH_0 + (i & 1) + (j & 1); // sucha ziemia
 			}
 	}
 	drzewa0 = drzewa + 256 + 512;
@@ -1700,7 +1700,7 @@ static void battleGsCreate(void) {
 	for (int i = 0; i < 52; i++)
 		Track[i] = 2 + (i & 1);
 #endif
-	// pl.nrh = 0;
+	pl.nrh = 0;
 	// color1 = Red;
 
 	// licznik2 = 0;
@@ -1712,11 +1712,11 @@ static void battleGsCreate(void) {
 
 	// StopPlaying();
 	// kody = 0;
-	if (isLoadGame != START_KIND_SAVED_GAME) {
+	if (eStartKind != START_KIND_SAVED_GAME) {
 		battleInitLevel(uwLevel, 0);
 	} else {
 		battleInitLevel(uwLevel, 1);
-		isLoadGame = START_KIND_SINGLEPLAYER;
+		eStartKind = START_KIND_SINGLEPLAYER;
 	}
 	// chat = 100;
 	// if (type > START_KIND_SINGLEPLAYER)
@@ -1761,7 +1761,7 @@ static void battleGsCreate(void) {
 	systemSetDmaBit(DMAB_SPRITE, 1);
 }
 
-static void Scroll(void) {
+static void battleScroll(void) {
   // if (scrollTimer + (5 - skroller) > licznik)
   //   return;
 
@@ -1784,8 +1784,8 @@ static void Scroll(void) {
   }
   if (uwMouseX > 310) {
     ScreenX++;
-    if (ScreenX > MaxX - 17) {
-      ScreenX = MaxX - 17;
+    if (ScreenX > WORLD_SIZE_X - 17) {
+      ScreenX = WORLD_SIZE_X - 17;
       return;
     }
     // castle[0].Prepare(ScreenX, ScreenY, 0);
@@ -1807,8 +1807,8 @@ static void Scroll(void) {
   }
   if (uwMouseY > 192 - 7) {
     ScreenY++;
-    if (ScreenY > MaxY - 14) {
-      ScreenY = MaxY - 14;
+    if (ScreenY > WORLD_SIZE_Y - 14) {
+      ScreenY = WORLD_SIZE_X - 14;
       return;
     }
     // castle[0].Prepare(ScreenX, ScreenY, 0);
@@ -1932,7 +1932,7 @@ static void battleGsLoop(void) {
 // 			if (!Map && MapY)
 // 				MapY--;
 // 			if (!zaznaczanie)
-				Scroll();
+				battleScroll();
 			battleShowSelected();
 // 			i = mouse.GetMsg13h();
 // 			ile0 = mouse.Ile(0);

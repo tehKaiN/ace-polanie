@@ -4,6 +4,8 @@
 
 #define WORLD_SIZE_X 66
 #define WORLD_SIZE_Y 66
+#define WORLD_WINDOW_SIZE_X 16
+#define WORLD_WINDOW_SIZE_Y 13
 
 void worldShowPlace(UWORD uwX, UWORD uwY);
 
