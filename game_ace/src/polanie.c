@@ -20,6 +20,7 @@ static tBitMap *s_pSpriteBitmap;
 void genericCreate(void) {
 	keyCreate();
 	mouseCreate(MOUSE_PORT_1);
+	mouseSetBounds(MOUSE_PORT_1, 0, 0, 320 - 1, 200 - 1);
 	g_pFont = fontCreateFromPath("data/uni54.fnt");
 	g_pTextBitmap = fontCreateTextBitMap(320, g_pFont->uwHeight);
 
@@ -40,7 +41,7 @@ void genericCreate(void) {
 	TAG_END);
 
 	s_pSpriteBitmap = bitmapCreate(16, 5, 2, BMF_INTERLEAVED | BMF_CLEAR);
-	blitRect(s_pSpriteBitmap, 0, 1, 3, 3, 1);
+	blitRect(s_pSpriteBitmap, 0, 1, 3, 3, 2);
 
 	spriteManagerCreate(s_pView, 0, 0);
 	g_pMouseSprite = spriteAdd(0, s_pSpriteBitmap);

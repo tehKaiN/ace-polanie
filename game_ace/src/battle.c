@@ -1754,6 +1754,7 @@ static void battleGsCreate(void) {
 	gfxCopyBackToFront();
 	systemUnuse();
 	viewLoad(g_pVp->pView);
+	systemSetDmaBit(DMAB_SPRITE, 1);
 }
 
 static void battleGsLoop(void) {
@@ -1966,6 +1967,8 @@ static void battleGsDestroy(void) {
 // 		quitLevel = 1;
 // 	} // zakonczenie gry
 
+	systemSetDmaBit(DMAB_SPRITE, 0);
+	viewLoad(0);
 	systemUse();
 	moverDestroy();
 	pictureDestroy();
