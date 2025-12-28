@@ -465,8 +465,8 @@ static void battleProcessMouse(void) {
 	// int M;
 	// int x, y;
 
-	// x = (int)((mouse.X - 11) >> 4) + ScreenX;
-	// y = (int)(mouse.Y - 8) / 14 + ScreenY;
+	// x = (int)((uwMouseX - 11) >> 4) + ScreenX;
+	// y = (int)(uwMouseY - 8) / 14 + ScreenY;
 	// M = 1;
 	// if (select.IFF < 2) // jezeli zaznaczony
 	// {
@@ -536,8 +536,8 @@ static void battleProcessMouse(void) {
 	// mouse.Button = 1;
 	// if (mouse.MWindow(11, 8, 76, 74) && Map && mouseCommand < 2) // na mapie
 	// {
-	//   x = mouse.X - 12;
-	//   y = mouse.Y - 9;
+	//   x = uwMouseX - 12;
+	//   y = uwMouseY - 9;
 	//   M = 15;
 	//   if (mouseMode)
 	//     M = 4;
@@ -545,48 +545,48 @@ static void battleProcessMouse(void) {
 	// mouse.Button = k;
 	// if (mouseCommand > 1 && mouseCommand < 8 && !select.co)
 	//   M = 1;
-	// if (mouse.X > 261)
+	// if (uwMouseX > 261)
 	//   M = 1; // panel
-	// if (mouse.Y > 192) {
-	//   mouse.Y = 192;
+	// if (uwMouseY > 192) {
+	//   uwMouseY = 192;
 	//   M = 9;
 	//   if (ScreenY == MaxY - 14)
 	//     M = 12;
 	// }
-	// if (mouse.Y > 192 - 7 && M == 1) {
-	//   mouse.Y = 192;
+	// if (uwMouseY > 192 - 7 && M == 1) {
+	//   uwMouseY = 192;
 	//   M = 9;
 	//   if (ScreenY == MaxY - 14)
 	//     M = 12;
 	// }
-	// if (mouse.Y < 8) {
-	//   mouse.Y = 7;
+	// if (uwMouseY < 8) {
+	//   uwMouseY = 7;
 	//   M = 8;
 	//   if (ScreenY == 1)
 	//     M = 12;
 	// }
-	// if (mouse.X < 11) {
-	//   mouse.X = 8;
+	// if (uwMouseX < 11) {
+	//   uwMouseX = 8;
 	//   M = 10;
 	//   if (ScreenX == 1)
 	//     M = 12;
 	// }
-	// if (mouse.X > 306) {
-	//   mouse.X = 311;
+	// if (uwMouseX > 306) {
+	//   uwMouseX = 311;
 	//   M = 11;
 	//   if (ScreenX == MaxX - 17)
 	//     M = 12;
 	// }
 
 	// if (zaznaczanie) {
-	//   if (mouse.X > 261)
-	//     mouse.X = 261;
-	//   if (mouse.Y > 192 - 7)
-	//     mouse.Y = 192 - 7;
-	//   if (mouse.Y < 10)
-	//     mouse.Y = 10;
-	//   if (mouse.X < 12)
-	//     mouse.X = 12;
+	//   if (uwMouseX > 261)
+	//     uwMouseX = 261;
+	//   if (uwMouseY > 192 - 7)
+	//     uwMouseY = 192 - 7;
+	//   if (uwMouseY < 10)
+	//     uwMouseY = 10;
+	//   if (uwMouseX < 12)
+	//     uwMouseX = 12;
 	//   Rectangle13h(rx1, ry1, rx2, ry2, LightGray);
 	//   M = 1;
 	// }
@@ -664,37 +664,37 @@ static void battleProcessMouse(void) {
 	// }
 	// int a = 8, b = 7;
 	// if (M == 15) {
-	//   GetImage13h(mouse.X - 8, mouse.Y - 7, mouse.X + 8, mouse.Y + 7, Mysz[0]);
-	//   PutImageChange13h(mouse.X - 8, mouse.Y - 7, buttons[5], 1, Color1, colorM);
+	//   GetImage13h(uwMouseX - 8, uwMouseY - 7, uwMouseX + 8, uwMouseY + 7, Mysz[0]);
+	//   PutImageChange13h(uwMouseX - 8, uwMouseY - 7, buttons[5], 1, Color1, colorM);
 	// } else {
 	//   if (M == 13) {
-	//     GetImage13h(mouse.X - 8, mouse.Y - 7, mouse.X + 8, mouse.Y + 7, Mysz[0]);
-	//     PutImage13h(mouse.X - 8, mouse.Y - 7, buttons[8], 1);
+	//     GetImage13h(uwMouseX - 8, uwMouseY - 7, uwMouseX + 8, uwMouseY + 7, Mysz[0]);
+	//     PutImage13h(uwMouseX - 8, uwMouseY - 7, buttons[8], 1);
 	//   } else {
 	//     if (M == 16) {
-	//       GetImage13h(mouse.X - 8, mouse.Y - 7, mouse.X + 8, mouse.Y + 7,
+	//       GetImage13h(uwMouseX - 8, uwMouseY - 7, uwMouseX + 8, uwMouseY + 7,
 	//                   Mysz[0]);
-	//       PutImage13h(mouse.X - 8, mouse.Y - 6, missiles[1][1][2], 1);
-	//       PutImage13h(mouse.X - 5, mouse.Y - 7, missiles[1][1][2], 1);
-	//       PutImage13h(mouse.X - 11, mouse.Y - 7, missiles[1][1][2], 1);
+	//       PutImage13h(uwMouseX - 8, uwMouseY - 6, missiles[1][1][2], 1);
+	//       PutImage13h(uwMouseX - 5, uwMouseY - 7, missiles[1][1][2], 1);
+	//       PutImage13h(uwMouseX - 11, uwMouseY - 7, missiles[1][1][2], 1);
 	//     } else {
 	//       if (M == 17) {
-	//         GetImage13h(mouse.X - 8, mouse.Y - 7, mouse.X + 8, mouse.Y + 7,
+	//         GetImage13h(uwMouseX - 8, uwMouseY - 7, uwMouseX + 8, uwMouseY + 7,
 	//                     Mysz[0]);
-	//         PutImage13h(mouse.X - 8, mouse.Y - 6, missiles[2][1][2], 1);
-	//         PutImage13h(mouse.X - 5, mouse.Y - 7, missiles[2][1][2], 1);
-	//         PutImage13h(mouse.X - 11, mouse.Y - 7, missiles[2][1][2], 1);
+	//         PutImage13h(uwMouseX - 8, uwMouseY - 6, missiles[2][1][2], 1);
+	//         PutImage13h(uwMouseX - 5, uwMouseY - 7, missiles[2][1][2], 1);
+	//         PutImage13h(uwMouseX - 11, uwMouseY - 7, missiles[2][1][2], 1);
 	//       } else {
 	//         if (M == 1) {
 	//           a = 2;
 	//           b = 2;
 	//         }
-	//         GetImage13h(mouse.X - a, mouse.Y - b, mouse.X - a + 16,
-	//                     mouse.Y - b + 14, Mysz[0]);
+	//         GetImage13h(uwMouseX - a, uwMouseY - b, uwMouseX - a + 16,
+	//                     uwMouseY - b + 14, Mysz[0]);
 	//         mouse.Button = 1;
 	//         if (mouseCommand > 1 && mouse.MWindow(11, 8, 267, 190)) {
 	//         } else {
-	//           PutImageChange13h(mouse.X - a, mouse.Y - b, Mysz[M], 1, Color1,
+	//           PutImageChange13h(uwMouseX - a, uwMouseY - b, Mysz[M], 1, Color1,
 	//                             colorM);
 	//         }
 	//         mouse.Button = 0;
@@ -703,13 +703,16 @@ static void battleProcessMouse(void) {
 	//   }
 	// }
 	// ShowVirtualScreen();
-	// PutImage13h(mouse.X - a, mouse.Y - b, Mysz[0], 0);
+	// PutImage13h(uwMouseX - a, uwMouseY - b, Mysz[0], 0);
+}
+
+void battleRefreshScreen(void) {
+	showAll = 2;
 }
 
 static void battleShowSelected(void) {
-	showAll = 1; // DEBUG
 	if (showAll) {
-		showAll = 0;
+		--showAll;
 		gfxSetClippingArea(11, 8, 267, 190); // 262,192
 		worldShowPlace(ScreenX, ScreenY);
 		// castle[0].ShowS(ScreenX, ScreenY, 1);
@@ -1726,7 +1729,8 @@ static void battleGsCreate(void) {
 	// 	PressButton(16, 2);
 	// else
 	// 	PressButton(16, 3);
-	gfxDrawImageNoMask(275, 139, &buttons[BUTTON_KIND_MENU]);
+	gfxDrawImageNoMask(275, 139, &buttons[BUTTON_KIND_MAP]);
+	gfxCopyBackToFront();
 
 	// PlayTrack(Track[level - 1]);
 	// quitLevel = 0; //   screen=1
@@ -1743,6 +1747,7 @@ static void battleGsCreate(void) {
 	// castle[1].Run();
 	// castle[0].Prepare(ScreenX, ScreenY, 1);
 	// castle[1].Prepare(ScreenX, ScreenY, 1);
+	battleRefreshScreen();
 	battleShowSelected();
 	// LoadExtendedPalette(3);
 	// RisePalette(1);
@@ -1751,10 +1756,67 @@ static void battleGsCreate(void) {
 	// mouseMode = 0;
 	// Msg.ddzwiek = 0;
 
-	gfxCopyBackToFront();
 	systemUnuse();
 	viewLoad(g_pVp->pView);
 	systemSetDmaBit(DMAB_SPRITE, 1);
+}
+
+static void Scroll(void) {
+  // if (scrollTimer + (5 - skroller) > licznik)
+  //   return;
+
+  // scrollTimer = licznik;
+  // if(skroller1>skroller){return;}
+
+	UWORD uwMouseX = mouseGetX(MOUSE_PORT_1);
+	UWORD uwMouseY = mouseGetY(MOUSE_PORT_1);
+
+  if (uwMouseX < 10) {
+    ScreenX--;
+    if (ScreenX < 1) {
+      ScreenX = 1;
+      return;
+    }
+    // castle[0].Prepare(ScreenX, ScreenY, 0);
+    // castle[1].Prepare(ScreenX, ScreenY, 0);
+    // skroller1++;
+    battleRefreshScreen();
+  }
+  if (uwMouseX > 310) {
+    ScreenX++;
+    if (ScreenX > MaxX - 17) {
+      ScreenX = MaxX - 17;
+      return;
+    }
+    // castle[0].Prepare(ScreenX, ScreenY, 0);
+    // castle[1].Prepare(ScreenX, ScreenY, 0);
+    // skroller1++;
+    battleRefreshScreen();
+  }
+  if (uwMouseY < 8) {
+    ScreenY--;
+    if (ScreenY < 1) {
+      ScreenY = 1;
+      return;
+    }
+    // castle[0].Prepare(ScreenX, ScreenY, 0);
+    // castle[1].Prepare(ScreenX, ScreenY, 0);
+    // skroller1++;
+    battleRefreshScreen();
+    return;
+  }
+  if (uwMouseY > 192 - 7) {
+    ScreenY++;
+    if (ScreenY > MaxY - 14) {
+      ScreenY = MaxY - 14;
+      return;
+    }
+    // castle[0].Prepare(ScreenX, ScreenY, 0);
+    // castle[1].Prepare(ScreenX, ScreenY, 0);
+    // skroller1++;
+    battleRefreshScreen();
+    return;
+  }
 }
 
 static void battleGsLoop(void) {
@@ -1865,8 +1927,8 @@ static void battleGsLoop(void) {
 // 			if (!Map && MapY)
 // 				MapY--;
 // 			if (!zaznaczanie)
-// 				Scroll();
-// 			battleShowSelected();
+				Scroll();
+			battleShowSelected();
 // 			i = mouse.GetMsg13h();
 // 			ile0 = mouse.Ile(0);
 // 			ile1 = mouse.Ile(1);

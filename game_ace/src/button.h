@@ -11,7 +11,7 @@ typedef enum tButtonBgKind {
 
 typedef enum tButtonKind {
 	BUTTON_KIND_SHIELD = 0,
-	BUTTON_KIND_MENU = 7,
+	BUTTON_KIND_MAP = 7,
 	BUTTON_KIND_REPAIR = 8,
 	BUTTON_KIND_SHED= 9,
 	BUTTON_KIND_HUT = 10,
