@@ -285,7 +285,8 @@ static void menuCampaignLoop(void) {
 
 			// UBYTE ubCampaignIndex = i + 1;
 			UBYTE ubLevelIndex = s_ubStartLevels[i];
-			battleStartNewLevel(ubLevelIndex); // Battle(1);
+			// TODO: click on head to select difficulty
+			battleStartNewLevel(ubLevelIndex, DIFFICULTY_EASY); // Battle(1);
 			// endGame = 0;
 			// PlayTrack(TRACK_MENU);
 			return;

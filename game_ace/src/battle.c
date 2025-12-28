@@ -9,19 +9,17 @@
 #include "gfx.h"
 #include "mover.h"
 #include "picture.h"
+#include "missile.h"
 #include "polanie.h"
 #include "track.h"
 #include "world.h"
 #include "misc.h"
 #include "menu.h"
+#include "castle.h"
 
 #define MaxX WORLD_SIZE_X
 #define MaxY WORLD_SIZE_Y
-#define MaxUnitsInCastle 40
-
-#define KUSZNIK_LEV 32
-#define PASTUCH_LEV 26
-#define MAG_LEV 40
+#define MaxUnitsInCastle CASTLE_UNITS_MAX
 
 // 1-single start   0-rs   2-loaded
 typedef enum tBattleStartKind {
@@ -130,11 +128,11 @@ typedef enum tWhat {
 	WHAT_KNIGHT_HUT = 25, // Dwór rycerza
 } tWhat;
 
-static tImage *missiles[6][3][3];
 // static tImage *tlo;
 // static tImage *Mysz[13];
 // static tImage *ramka[4];
-static UWORD uwLevel; // player level
+
+UWORD g_uwLevel;
 
 #define PANEL_BUTTON_X 274
 #define PANEL_BUTTON_Y1 18
@@ -177,7 +175,7 @@ static void battleShowPanel(int iff, int co, UWORD uwMax, UWORD uwFood, int ubPr
 			// odbudowa +krowa
 			if (uwMax >= 450 && uwFood)
 				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(4) + 1, &movers[0][MOVER_KIND_COW][1][1]);
-			if (uwMax >= 1250 && uwFood && uwLevel > PASTUCH_LEV)
+			if (uwMax >= 1250 && uwFood && g_uwLevel > PASTUCH_LEV)
 				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &movers[0][MOVER_KIND_FARMER][1][1]);
 			break;
 		case WHAT_HUT:
@@ -191,7 +189,7 @@ static void battleShowPanel(int iff, int co, UWORD uwMax, UWORD uwFood, int ubPr
 			break;
 		case WHAT_MAGE_HUT:
 			// odbudowa +babcia+kaplan
-			if (uwMax >= 1250 && uwFood && uwLevel > MAG_LEV)
+			if (uwMax >= 1250 && uwFood && g_uwLevel > MAG_LEV)
 				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &movers[0][MOVER_KIND_MAGE][1][1]); // mag
 			if (uwMax >= 1050 && uwFood)
 				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(1) + 1, &movers[0][MOVER_KIND_PRIEST][1][1]); // kaplan
@@ -211,7 +209,7 @@ static void battleShowPanel(int iff, int co, UWORD uwMax, UWORD uwFood, int ubPr
 			break;
 		case WHAT_KNIGHT_HUT:
 			// odbudowa +wodz
-			if (uwMax >= 1250 && uwFood && uwLevel > KUSZNIK_LEV)
+			if (uwMax >= 1250 && uwFood && g_uwLevel > KUSZNIK_LEV)
 				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &movers[0][MOVER_KIND_XBOW][1][1]);
 			if (uwMax >= 1050 && uwFood)
 				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(1) + 1, &movers[0][MOVER_KIND_KNIGHT][1][1]);
@@ -222,16 +220,16 @@ static void battleShowPanel(int iff, int co, UWORD uwMax, UWORD uwFood, int ubPr
 		gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &buttons[BUTTON_KIND_SHIELD]);
 
 		if (co == 4 && uwFood > 79) {
-			gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(2) + 3, missiles[2][1][2]);
-			gfxDrawImageMaskedClipped(PANEL_BUTTON_X - 3, PANEL_BUTTON_Y(2) + 1, missiles[2][1][2]); // deszcz
-			gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 5, PANEL_BUTTON_Y(2) + 1, missiles[2][1][2]);
+			gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(2) + 3, &missiles[2][1][2]);
+			gfxDrawImageMaskedClipped(PANEL_BUTTON_X - 3, PANEL_BUTTON_Y(2) + 1, &missiles[2][1][2]); // deszcz
+			gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 5, PANEL_BUTTON_Y(2) + 1, &missiles[2][1][2]);
 		}
 		if (co == 4 && uwFood > 25)
 			gfxDrawImageNoMask(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(3) + 1, &buttons[BUTTON_KIND_PEEK]);
 		if (co == 3 && uwFood > 79) {
-			gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(2) + 2, missiles[1][1][2]); // deszcz
-			gfxDrawImageMaskedClipped(PANEL_BUTTON_X - 3, PANEL_BUTTON_Y(2) + 1, missiles[1][1][2]); // deszcz
-			gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 5, PANEL_BUTTON_Y(2) + 1, missiles[1][1][2]); // deszcz
+			gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(2) + 2, &missiles[1][1][2]); // deszcz
+			gfxDrawImageMaskedClipped(PANEL_BUTTON_X - 3, PANEL_BUTTON_Y(2) + 1, &missiles[1][1][2]); // deszcz
+			gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 5, PANEL_BUTTON_Y(2) + 1, &missiles[1][1][2]); // deszcz
 		}
 		if (co == 3 && uwFood > 49) {
 			gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(3) + 1, &picture[PICTURE_KIND_SHIELD_0]);
@@ -257,7 +255,7 @@ static void battleDrawSelection(void) {
 	//       if (selectM->IFF == 1) {
 	//         b = 20;
 	//         int kkk = 0;
-	//         for (int i = 1; i < MaxUnitsInCastle; i++) {
+	//         for (int i = 1; i < CASTLE_MOVERS_MAX; i++) {
 	//           if (castle[0].m[i].wybrany && castle[0].m[i].exist == 1) {
 	//             p = i;
 	//             kkk++;
@@ -674,16 +672,16 @@ static void battleProcessMouse(void) {
 	//     if (M == 16) {
 	//       GetImage13h(uwMouseX - 8, uwMouseY - 7, uwMouseX + 8, uwMouseY + 7,
 	//                   Mysz[0]);
-	//       PutImage13h(uwMouseX - 8, uwMouseY - 6, missiles[1][1][2], 1);
-	//       PutImage13h(uwMouseX - 5, uwMouseY - 7, missiles[1][1][2], 1);
-	//       PutImage13h(uwMouseX - 11, uwMouseY - 7, missiles[1][1][2], 1);
+	//       PutImage13h(uwMouseX - 8, uwMouseY - 6, &missiles[1][1][2], 1);
+	//       PutImage13h(uwMouseX - 5, uwMouseY - 7, &missiles[1][1][2], 1);
+	//       PutImage13h(uwMouseX - 11, uwMouseY - 7, &missiles[1][1][2], 1);
 	//     } else {
 	//       if (M == 17) {
 	//         GetImage13h(uwMouseX - 8, uwMouseY - 7, uwMouseX + 8, uwMouseY + 7,
 	//                     Mysz[0]);
-	//         PutImage13h(uwMouseX - 8, uwMouseY - 6, missiles[2][1][2], 1);
-	//         PutImage13h(uwMouseX - 5, uwMouseY - 7, missiles[2][1][2], 1);
-	//         PutImage13h(uwMouseX - 11, uwMouseY - 7, missiles[2][1][2], 1);
+	//         PutImage13h(uwMouseX - 8, uwMouseY - 6, &missiles[2][1][2], 1);
+	//         PutImage13h(uwMouseX - 5, uwMouseY - 7, &missiles[2][1][2], 1);
+	//         PutImage13h(uwMouseX - 11, uwMouseY - 7, &missiles[2][1][2], 1);
 	//       } else {
 	//         if (M == 1) {
 	//           a = 2;
@@ -715,14 +713,16 @@ static void battleShowSelected(void) {
 		--showAll;
 		gfxSetClippingArea(11, 8, 267, 190); // 262,192
 		worldShowPlace(ScreenX, ScreenY);
-		// castle[0].ShowS(ScreenX, ScreenY, 1);
-		// castle[1].ShowS(ScreenX, ScreenY, 1);
-		// castle[1].ShowS(ScreenX, ScreenY, 2);
-		// castle[0].ShowS(ScreenX, ScreenY, 2);
-		// int xee = (ScreenX << 4) - 11;
-		// int yee = ScreenY * 14 - 8;
-		// castle[0].ShowS(xee, yee, 3);
-		// castle[1].ShowS(xee, yee, 3);
+
+		castleShowS(&castle[0], ScreenX, ScreenY, 1);
+		castleShowS(&castle[1], ScreenX, ScreenY, 1);
+		castleShowS(&castle[1], ScreenX, ScreenY, 2);
+		castleShowS(&castle[0], ScreenX, ScreenY, 2);
+		int xee = (ScreenX << 4) - 11;
+		int yee = ScreenY * 14 - 8;
+		castleShowS(&castle[0], xee, yee, 3);
+		castleShowS(&castle[1], xee, yee, 3);
+
 		worldShowTrees(ScreenX, ScreenY);
 		battleDrawSelection();
 		gfxSetClippingArea(0, 0, 319, 199);
@@ -812,8 +812,12 @@ static void battleInitOldLevel(UWORD uwLevel) {
 			p1 = 1;
 
 		for (UBYTE i = 0; i < WORLD_SIZE_X; i++) {
-			// if(p0>MaxUnitsInCastle-5)p0=MaxUnitsInCastle-5;
-			// if(p1>MaxUnitsInCastle-5)p1=MaxUnitsInCastle-5;
+			if(p0 > CASTLE_MOVERS_MAX - 5) {
+				p0 = CASTLE_MOVERS_MAX - 5;
+			}
+			if(p1 > CASTLE_MOVERS_MAX - 5) {
+				p1 = CASTLE_MOVERS_MAX - 5;
+			}
 			fileRead(pFileMaps, &z, sizeof(z));
 			if (z == '@') {
 				logWrite("ERR: unexpected char @ while loading map\n");
@@ -830,12 +834,14 @@ static void battleInitOldLevel(UWORD uwLevel) {
 					pl.y0 = j;
 				}
 				if (pl.endType == 4) {
-					if (!p1)
+					if (!p1) {
 						p1++;
-					// castle[1].m[1].Init(pl.typ, i, j, 0, 5);
-					// castle[1].m[1].SetNr(512 + 201);
-					// castle[1].m[1].SetIFF(2);
-					// castle[1].m[1].Show();
+					}
+
+					moverInit(&castle[1].m[1], pl.typ, i, j, 0, 5);
+					moverSetNr(&castle[1].m[1], 512 + 201);
+					moverSetIFF(&castle[1].m[1], 2);
+					moverShow(&castle[1].m[1]);
 				}
 			}
 			if (z == '^') {
@@ -1055,285 +1061,285 @@ static void battleInitOldLevel(UWORD uwLevel) {
 			//----- zamki -----------
 			if (z == 'H') {
 				if (chatki < 19) {
-					// castle[0].b[chatki].Init(i, j, 11, 1, chatki);
-					// castle[0].b[chatki].exist = 1;
-					// castle[0].b[chatki].hp = castle[0].b[chatki].maxhp;
+					buildingInit(&castle[0].b[chatki], i, j, 11, 1, chatki);
+					castle[0].b[chatki].exist = 1;
+					castle[0].b[chatki].hp = castle[0].b[chatki].maxhp;
 					chatki++;
 				}
 			}
 			if (z == 'I') {
 				if (chatki < 19) {
-					// castle[0].b[chatki].Init(i, j, 12, 1, chatki);
+					buildingInit(&castle[0].b[chatki], i, j, 12, 1, chatki);
 					chatki++;
 				}
 			}
 			if (z == 'J') // koszary
 			{
 				if (chatki < 19) {
-					// castle[0].b[chatki].Init(i, j, 13, 1, chatki);
+					buildingInit(&castle[0].b[chatki], i, j, 13, 1, chatki);
 					chatki++;
 				}
 			}
 			if (z == 'K') // swiatynia
 			{
 				if (chatki < 19) {
-					// castle[0].b[chatki].Init(i, j, 14, 1, chatki);
+					buildingInit(&castle[0].b[chatki], i, j, 14, 1, chatki);
 					chatki++;
 				}
 			}
 			if (z == 'L') // KOSZAARY 2
 			{
 				if (chatki < 19) {
-					// castle[0].b[chatki].Init(i, j, 15, 1, chatki);
+					buildingInit(&castle[0].b[chatki], i, j, 15, 1, chatki);
 					chatki++;
 				}
 			}
 			if (z == 'M') // DOM BOH
 			{
 				if (chatki < 19) {
-					// castle[0].b[chatki].Init(i, j, 16, 1, chatki);
+					buildingInit(&castle[0].b[chatki], i, j, 16, 1, chatki);
 					chatki++;
 				}
 			}
 			// KROWA NASZA
 			if (z == 'x' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(0, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 0, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 'y' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(1, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 1, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 'z' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(2, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 2, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == '9' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(3, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 3, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == '0' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(4, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 4, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == ':' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(5, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 5, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == ';' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(6, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 6, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == '<' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(7, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 7, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == '>' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(8, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 8, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == ',' && p0 < 39) {
 				p0++;
-				// castle[0].m[p0].Init(9, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 9, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 176 && p0 < 39) // 176  nasz Pastuch
 			{
 				p0++;
-				// castle[0].m[p0].Init(10, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 10, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 177 && p0 < 39) // 177 nasz Mag
 			{
 				p0++;
-				// castle[0].m[p0].Init(11, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 11, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 178 && p0 < 39) //  178  nasz Kusznik
 			{
 				p0++;
-				// castle[0].m[p0].Init(12, i, j, 0, 5);
-				// castle[0].m[p0].SetNr(256 + p0 + 200);
-				// castle[0].m[p0].SetIFF(1);
-				// castle[0].m[p0].Show();
+				moverInit(&castle[0].m[p0], 12, i, j, 0, 5);
+				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverSetIFF(&castle[0].m[p0], 1);
+				moverShow(&castle[0].m[p0]);
 			}
 			//-----------------------------------------------------------------
 			if (z == 'N') {
 				if (chaTki < 19) {
-					// castle[1].b[chaTki].Init(i, j, 11, 2, chaTki);
+					buildingInit(&castle[1].b[chaTki], i, j, 11, 2, chaTki);
 					chaTki++;
 				}
 			}
 			if (z == 'O') {
 				if (chaTki < 19) {
-					// castle[1].b[chaTki].Init(i, j, 12, 2, chaTki);
+					buildingInit(&castle[1].b[chaTki], i, j, 12, 2, chaTki);
 					chaTki++;
 				}
 			}
 			if (z == 'P') {
 				if (chaTki < 19) {
-					// castle[1].b[chaTki].Init(i, j, 13, 2, chaTki);
+					buildingInit(&castle[1].b[chaTki], i, j, 13, 2, chaTki);
 					chaTki++;
 				}
 			}
 			if (z == 'Q') // swiatynia
 			{
 				if (chaTki < 19) {
-					// castle[1].b[chaTki].Init(i, j, 14, 2, chaTki);
+					buildingInit(&castle[1].b[chaTki], i, j, 14, 2, chaTki);
 					chaTki++;
 				}
 			}
 			if (z == 'R') // koszary2
 			{
 				if (chaTki < 19) {
-					// castle[1].b[chaTki].Init(i, j, 15, 2, chaTki);
+					buildingInit(&castle[1].b[chaTki], i, j, 15, 2, chaTki);
 					chaTki++;
 				}
 			}
 			if (z == 'S') // akademia
 			{
 				if (chaTki < 19) {
-					// castle[1].b[chaTki].Init(i, j, 16, 2, chaTki);
+					buildingInit(&castle[1].b[chaTki], i, j, 16, 2, chaTki);
 					chaTki++;
 				}
 			}
 			//-----------------------------------------------------
 			if (z == 'T' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(0, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 0, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'U' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(1, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 1, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'W' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(2, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 2, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'X' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(3, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 3, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'Y' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(4, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 4, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'Z' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(5, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 5, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == '#' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(6, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 6, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == '"' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(7, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 7, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == '%' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(8, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 8, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == '&' && p1 < 39) {
 				p1++;
-				// castle[1].m[p1].Init(9, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 9, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 173 && p1 < 39) // 173          pastuch
 			{
 				p1++;
-				// castle[1].m[p1].Init(10, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 10, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 174 && p1 < 39) // 174    Mag
 			{
 				p1++;
-				// castle[1].m[p1].Init(11, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 11, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 175 && p1 < 39) // 175            kusznik
 			{
 				p1++;
-				// castle[1].m[p1].Init(12, i, j, 0, 5);
-				// castle[1].m[p1].SetNr(512 + p1 + 200);
-				// castle[1].m[p1].SetIFF(2);
-				// castle[1].m[p1].Show();
+				moverInit(&castle[1].m[p1], 12, i, j, 0, 5);
+				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverSetIFF(&castle[1].m[p1], 2);
+				moverShow(&castle[1].m[p1]);
 			}
 		}
 	}
 
 	fileClose(pFileMaps);
 	// mem.faza = 0;
-	// castle[0].maxmilk = pl.maxmilk;
-	// castle[0].milk = pl.maxmilk;
-	// castle[1].maxmilk = 1800;
-	// castle[1].milk = 1800;
+	castle[0].maxmilk = pl.maxmilk;
+	castle[0].milk = pl.maxmilk;
+	castle[1].maxmilk = 1800;
+	castle[1].milk = 1800;
 	drzewa0 = drzewa + 256 + 512;
 }
 
@@ -1343,10 +1349,7 @@ static void battleInitNewLevel(UWORD uwLevel) {
 	int chatki = 1, chaTki = 1;
 
 	sprintf(name, "data/levels/level.%d", uwLevel);
-	// SetScreen(0);
-	// Bar13h(0,0,320,200,0);
-	// OutText13h(50,5,"Otwieram plik:",255);
-	/// OutText13h(150,5,name,255);
+	logWrite("Otwieram plik: %s\n", name);
 
 	tFile *pFileMaps = diskFileOpen(name, DISK_FILE_MODE_READ, 0);
 	if (pFileMaps == NULL) {
@@ -1415,10 +1418,10 @@ static void battleInitNewLevel(UWORD uwLevel) {
 				if (pl.endType == 4) {
 					if (!p1)
 						p1++;
-					// castle[1].m[1].Init(pl.typ, i, j, 0, 5);
-					// castle[1].m[1].SetNr(512 + 201);
-					// castle[1].m[1].SetIFF(2);
-					// castle[1].m[1].Show();
+					moverInit(&castle[1].m[1], pl.typ, i, j, 0, 5);
+					moverSetNr(&castle[1].m[1], 512 + 201);
+					moverSetIFF(&castle[1].m[1], 2);
+					moverShow(&castle[1].m[1]);
 				}
 			}
 			if (placeG[i][j] == 301) // krag mocy
@@ -1503,9 +1506,9 @@ static void battleInitNewLevel(UWORD uwLevel) {
 			case 245:
 				typ = 1 + (placeG[i][j] - 145) / 20;
 				if (chatki < 19 && typ > 0 && typ < 7) {
-					// castle[0].b[chatki].Init(i, j, 10 + typ, 1, chatki);
-					// castle[0].b[chatki].exist = 1;
-					// castle[0].b[chatki].hp = castle[0].b[chatki].maxhp;
+					buildingInit(&castle[0].b[chatki], i, j, 10 + typ, 1, chatki);
+					castle[0].b[chatki].exist = 1;
+					castle[0].b[chatki].hp = castle[0].b[chatki].maxhp;
 					chatki++;
 				} else {
 					for (int xx = -2; xx < 1; xx++)
@@ -1529,10 +1532,10 @@ static void battleInitNewLevel(UWORD uwLevel) {
 			case 314: // kusznik
 				if (p0 < 39) {
 					p0++;
-					// castle[0].m[p0].Init(placeG[i][j] - 302, i, j, 0, 5);
-					// castle[0].m[p0].SetNr(256 + p0 + 200);
-					// castle[0].m[p0].SetIFF(1);
-					// castle[0].m[p0].Show();
+					moverInit(&castle[0].m[p0], placeG[i][j] - 302, i, j, 0, 5);
+					moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+					moverSetIFF(&castle[0].m[p0], 1);
+					moverShow(&castle[0].m[p0]);
 				}
 				placeG[i][j] = 8;
 				break;
@@ -1545,13 +1548,15 @@ static void battleInitNewLevel(UWORD uwLevel) {
 			case 255:
 				typ = 1 + (placeG[i][j] - 155) / 20;
 				if (chaTki < 19) {
-					// castle[1].b[chaTki].Init(i, j, 10 + typ, 2, chaTki);
+					buildingInit(&castle[1].b[chaTki], i, j, 10 + typ, 2, chaTki);
 					chaTki++;
-
-				} else {
-					for (int xx = -2; xx < 1; xx++)
-						for (int yy = -2; yy < 1; yy++)
+				}
+				else {
+					for (int xx = -2; xx < 1; xx++) {
+						for (int yy = -2; yy < 1; yy++) {
 							placeG[i + xx][j + yy] = 8;
+						}
+					}
 				}
 				break;
 			case 315: // ich krowa
@@ -1569,10 +1574,10 @@ static void battleInitNewLevel(UWORD uwLevel) {
 			case 327:
 				if (p1 < 39) {
 					p1++;
-					// castle[1].m[p1].Init(placeG[i][j] - 315, i, j, 0, 5);
-					// castle[1].m[p1].SetNr(512 + p1 + 200);
-					// castle[1].m[p1].SetIFF(2);
-					// castle[1].m[p1].Show();
+					moverInit(&castle[1].m[p1], placeG[i][j] - 315, i, j, 0, 5);
+					moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+					moverSetIFF(&castle[1].m[p1], 2);
+					moverShow(&castle[1].m[p1]);
 				}
 				placeG[i][j] = 8;
 				break;
@@ -1581,13 +1586,13 @@ static void battleInitNewLevel(UWORD uwLevel) {
 			if (placeG[i][j] > 301)
 				placeG[i][j] = 8;
 		}
-	// OutText13h(50,190,"Zamykam plik",255);
+
 	fileClose(pFileMaps);
 	// mem.faza = 0;
-	// castle[0].maxmilk = E.maxmilk;
-	// castle[0].milk = E.milk;
-	// castle[1].maxmilk = 1800;
-	// castle[1].milk = 1800;
+	castle[0].maxmilk = E.maxmilk;
+	castle[0].milk = E.milk;
+	castle[1].maxmilk = 1800;
+	castle[1].milk = 1800;
 }
 
 static void battleInitLevel(UWORD uwLevel, UBYTE isLoadGame) {
@@ -1629,6 +1634,17 @@ static void battleInitLevel(UWORD uwLevel, UBYTE isLoadGame) {
 	// for (i = 0; i < 10; i++)
 	//   posT[i].IFF = 2;
 
+	for(UBYTE c = 0; c < 2; ++c) {
+		for(UBYTE m = 0; m < CASTLE_MOVERS_MAX; ++m) {
+			moverConstruct(&castle[c].m[m]);
+		}
+		for(UBYTE b = 0; b < CASTLE_BUILIDNGS_MAX; ++b) {
+			for(UBYTE m = 0; m < BUILDING_MOVERS_MAX; ++m) {
+				moverConstruct(&castle[c].b[b].m[m]);
+			}
+		}
+	}
+
 	if (!isLoadGame) {
 		drzewa = 1;
 		pl.nrp = 0;
@@ -1646,8 +1662,8 @@ static void battleInitLevel(UWORD uwLevel, UBYTE isLoadGame) {
 				place[i][j] = 0;
 			}
 
-		// castle[0].Init(1, 2000);
-		// castle[1].Init(2, 2000);
+		castleInit(&castle[0], 1, 2000);
+		castleInit(&castle[1], 2, 2000);
 		ScreenX = 10;
 		ScreenY = 10;
 
@@ -1689,8 +1705,9 @@ static void battleInitLevel(UWORD uwLevel, UBYTE isLoadGame) {
 static void battleGsCreate(void) {
 	s_pBattleUi = bitmapCreateFromPath("data/battle_ui.bm", 0);
 	buttonCreate();
-	moverCreate();
+	moverGraphicsCreate();
 	pictureCreate();
+	missileImageCreate();
 	miscCreate();
 	paletteLoadFromPath("data/battle.plt", g_pVp->pPalette, 32);
 
@@ -1711,9 +1728,9 @@ static void battleGsCreate(void) {
 	// StopPlaying();
 	// kody = 0;
 	if (eStartKind != START_KIND_SAVED_GAME) {
-		battleInitLevel(uwLevel, 0);
+		battleInitLevel(g_uwLevel, 0);
 	} else {
-		battleInitLevel(uwLevel, 1);
+		battleInitLevel(g_uwLevel, 1);
 		eStartKind = START_KIND_SINGLEPLAYER;
 	}
 	// chat = 100;
@@ -1741,10 +1758,10 @@ static void battleGsCreate(void) {
 
 	worldRevealAll();
 
-	// castle[0].Run();
-	// castle[1].Run();
-	// castle[0].Prepare(ScreenX, ScreenY, 1);
-	// castle[1].Prepare(ScreenX, ScreenY, 1);
+	castleRun(&castle[0]);
+	castleRun(&castle[1]);
+	castlePrepare(&castle[0], ScreenX, ScreenY, 1);
+	castlePrepare(&castle[1], ScreenX, ScreenY, 1);
 	battleRefreshScreen();
 	battleShowSelected();
 	// LoadExtendedPalette(3);
@@ -1775,8 +1792,8 @@ static void battleScroll(void) {
       ScreenX = 1;
       return;
     }
-    // castle[0].Prepare(ScreenX, ScreenY, 0);
-    // castle[1].Prepare(ScreenX, ScreenY, 0);
+    castlePrepare(&castle[0], ScreenX, ScreenY, 0);
+    castlePrepare(&castle[1], ScreenX, ScreenY, 0);
     // skroller1++;
     battleRefreshScreen();
   }
@@ -1786,8 +1803,8 @@ static void battleScroll(void) {
       ScreenX = WORLD_SIZE_X - 17;
       return;
     }
-    // castle[0].Prepare(ScreenX, ScreenY, 0);
-    // castle[1].Prepare(ScreenX, ScreenY, 0);
+    castlePrepare(&castle[0], ScreenX, ScreenY, 0);
+    castlePrepare(&castle[1], ScreenX, ScreenY, 0);
     // skroller1++;
     battleRefreshScreen();
   }
@@ -1797,8 +1814,8 @@ static void battleScroll(void) {
       ScreenY = 1;
       return;
     }
-    // castle[0].Prepare(ScreenX, ScreenY, 0);
-    // castle[1].Prepare(ScreenX, ScreenY, 0);
+    castlePrepare(&castle[0], ScreenX, ScreenY, 0);
+    castlePrepare(&castle[1], ScreenX, ScreenY, 0);
     // skroller1++;
     battleRefreshScreen();
     return;
@@ -1809,8 +1826,8 @@ static void battleScroll(void) {
       ScreenY = WORLD_SIZE_X - 14;
       return;
     }
-    // castle[0].Prepare(ScreenX, ScreenY, 0);
-    // castle[1].Prepare(ScreenX, ScreenY, 0);
+    castlePrepare(&castle[0], ScreenX, ScreenY, 0);
+    castlePrepare(&castle[1], ScreenX, ScreenY, 0);
     // skroller1++;
     battleRefreshScreen();
     return;
@@ -1853,10 +1870,10 @@ static void battleGsLoop(void) {
 // 		castle[0].SetCmd(&Cmd[0]);
 // 		castle[1].SetCmd(&Cmd[1]);
 
-// 		castle[0].Run();
-// 		castle[1].Run();
-// 		castle[0].Prepare(ScreenX, ScreenY, 1);
-// 		castle[1].Prepare(ScreenX, ScreenY, 1);
+		castleRun(&castle[0]);
+		castleRun(&castle[1]);
+		castlePrepare(&castle[0], ScreenX, ScreenY, 1);
+		castlePrepare(&castle[1], ScreenX, ScreenY, 1);
 
 // 		// clear commmand
 // 		Cmd[1].co = 5;
@@ -1985,8 +2002,8 @@ static void battleGsLoop(void) {
 }
 
 static void battleGsDestroy(void) {
-// 	castle[0].FreeUnits();
-// 	castle[1].FreeUnits();
+	castleFreeUnits(&castle[0]);
+	castleFreeUnits(&castle[1]);
 // 	SetScreen(0);
 // 	if (endL == 1) {
 // 		PlayTrack(TRACK_VICTORY);
@@ -2039,15 +2056,17 @@ static void battleGsDestroy(void) {
 	systemSetDmaBit(DMAB_SPRITE, 0);
 	viewLoad(0);
 	systemUse();
-	moverDestroy();
+	moverGraphicsDestroy();
 	pictureDestroy();
+	missileImageDestroy();
 	miscDestroy();
 	buttonDestroy();
 	bitmapDestroy(s_pBattleUi);
 }
 
-void battleStartNewLevel(UBYTE ubLevelIndex) {
-	(void)ubLevelIndex;
+void battleStartNewLevel(UWORD uwLevelIndex, tDifficulty eDifficulty) {
+	g_uwLevel = uwLevelIndex;
+	g_eDifficulty = eDifficulty;
 	stateChange(g_pStateMachineGame, &g_sStateBattle);
 }
 
@@ -2055,6 +2074,8 @@ void battleLoadFromSlot(UBYTE ubSlotIndex) {
 	(void)ubSlotIndex;
 	statePush(g_pStateMachineGame, &g_sStateBattle);
 }
+
+tDifficulty g_eDifficulty;
 
 tState g_sStateBattle = {
 	.cbCreate = battleGsCreate,

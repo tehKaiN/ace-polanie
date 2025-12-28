@@ -29,3 +29,7 @@ extern UBYTE xleczenie;
 extern UBYTE yleczenie;
 extern UWORD xpastw;
 extern UWORD ypastw;
+
+// Positions of tiles on screen
+extern const UWORD Xe[20];
+extern const UWORD Ye[16];

@@ -3,11 +3,15 @@
 
 static tBitmapPair s_sFirePair;
 static tBitmapPair s_sTreePair;
+static tBitmapPair s_sDeadPair;
+static tBitmapPair s_sHitPair;
 static tBitmapPair s_sShadowPair;
 
 void miscCreate(void) {
 	bitmapPairCreate(&s_sFirePair, "fire");
 	bitmapPairCreate(&s_sTreePair, "tree");
+	bitmapPairCreate(&s_sDeadPair, "dead");
+	bitmapPairCreate(&s_sHitPair, "hit");
 	bitmapPairCreate(&s_sShadowPair, "movers/shadow");
 
 	UWORD uwOffsY = 0;
@@ -21,13 +25,33 @@ void miscCreate(void) {
 	}
 
 	uwOffsY = 0;
-	for(UBYTE i = 0; i < MISC_FIRE_FRAME_COUNT; ++i) {
+	for(UBYTE i = 0; i < MISC_TREE_FRAME_COUNT; ++i) {
 		tree[i].pBitmap = s_sTreePair.pFrames;
 		tree[i].pMask = s_sTreePair.pMasks;
 		tree[i].uwWidth = 16;
 		tree[i].uwHeight = 14;
 		tree[i].uwOffsY = uwOffsY;
 		uwOffsY += 14;
+	}
+
+	uwOffsY = 0;
+	for(UBYTE i = 0; i < MISC_DEAD_FRAME_COUNT; ++i) {
+		dead[i].pBitmap = s_sDeadPair.pFrames;
+		dead[i].pMask = s_sDeadPair.pMasks;
+		dead[i].uwWidth = 16;
+		dead[i].uwHeight = 14;
+		dead[i].uwOffsY = uwOffsY;
+		uwOffsY += 14;
+	}
+
+	uwOffsY = 0;
+	for(UBYTE i = 0; i < MISC_HIT_FRAME_COUNT; ++i) {
+		Hit[i].pBitmap = s_sHitPair.pFrames;
+		Hit[i].pMask = s_sHitPair.pMasks;
+		Hit[i].uwWidth = 16;
+		Hit[i].uwHeight = 13;
+		Hit[i].uwOffsY = uwOffsY;
+		uwOffsY += 13;
 	}
 
 	shadow.pBitmap = s_sShadowPair.pFrames;
@@ -40,9 +64,13 @@ void miscCreate(void) {
 void miscDestroy(void) {
 	bitmapPairDestroy(&s_sFirePair);
 	bitmapPairDestroy(&s_sTreePair);
+	bitmapPairDestroy(&s_sDeadPair);
+	bitmapPairDestroy(&s_sHitPair);
 	bitmapPairDestroy(&s_sShadowPair);
 }
 
 tImage fire[MISC_FIRE_FRAME_COUNT];
 tImage tree[MISC_TREE_FRAME_COUNT];
+tImage dead[MISC_DEAD_FRAME_COUNT];
+tImage Hit[MISC_HIT_FRAME_COUNT];
 tImage shadow;

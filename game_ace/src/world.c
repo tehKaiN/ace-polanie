@@ -3,17 +3,7 @@
 #include "picture.h"
 #include "misc.h"
 
-// Positions of tiles on screen
-static UWORD Xe[20] = {
-	11,  27,  43,  59,  75,  91,  107, 123, 139, 155,
-	171, 187, 203, 219, 235, 251, 267, 283, 299, 315
-};
-static UWORD Ye[16] = {
-	8,   22,  36,  50,  64,  78,  92,  106,
-	120, 134, 148, 162, 176, 190, 204, 218
-};
-
-static UBYTE maskaT[16] = {
+static const UBYTE maskaT[16] = {
 	PICTURE_KIND_GRASS_2, PICTURE_KIND_GRASS_3,
 	PICTURE_KIND_GRASS_4, PICTURE_KIND_GRASS_6,
 	PICTURE_KIND_GRASS_7, PICTURE_KIND_GRASS_5,
@@ -413,6 +403,15 @@ void worldRevealAll(void) {
 		}
 	}
 }
+
+const UWORD Xe[20] = {
+	11,  27,  43,  59,  75,  91,  107, 123, 139, 155,
+	171, 187, 203, 219, 235, 251, 267, 283, 299, 315
+};
+const UWORD Ye[16] = {
+	8,   22,  36,  50,  64,  78,  92,  106,
+	120, 134, 148, 162, 176, 190, 204, 218
+};
 
 int drzewa;
 int drzewa0;
