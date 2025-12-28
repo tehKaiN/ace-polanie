@@ -21,10 +21,10 @@ void pictureCreate(void) {
 	}
 
 	uwOffsY = 0;
-	for(tPictureKind ePic = PICTURE_KIND_DRY_EARTH_0; ePic < PICTURE_KIND_DRY_EARTH_2; ++ePic) {
+	for(tPictureKind ePic = PICTURE_KIND_DRY_EARTH_0; ePic <= PICTURE_KIND_DRY_EARTH_2; ++ePic) {
 		picture[ePic].pBitmap = s_sPairDryEarth.pFrames;
 		picture[ePic].pMask = s_sPairDryEarth.pMasks;
-		picture[ePic].uwWidth = 23;
+		picture[ePic].uwWidth = 22;
 		picture[ePic].uwHeight = 18;
 		picture[ePic].uwOffsY = uwOffsY;
 		uwOffsY += 18;

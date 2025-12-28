@@ -57,7 +57,7 @@ void gfxDrawImageMaskedClipped(WORD wX, WORD wY, tImage *pImage) {
 		uwHeight = g_gfxClipY2 - wY;
 	if (wY < g_gfxClipY1) {
 		uwSrcY += g_gfxClipY1 - wY;
-		uwHeight -= uwSrcY;
+		uwHeight -= g_gfxClipY1 - wY;
 		wY = g_gfxClipY1;
 	}
 
