@@ -1820,6 +1820,11 @@ static void Scroll(void) {
 }
 
 static void battleGsLoop(void) {
+	if(keyUse(KEY_ESCAPE)) {
+		stateChange(g_pStateMachineGame, &g_sStateMenu);
+		return;
+	}
+
 // 	do {
 // 		decisionFaza++;
 // 		if (decisionFaza == 6) {
@@ -1970,11 +1975,9 @@ static void battleGsLoop(void) {
 
 	vPortProcessManagers(g_pVp);
 	copProcessBlocks();
+	systemIdleBegin();
 	vPortWaitForEnd(g_pVp);
-
-	if(keyUse(KEY_ESCAPE)) {
-		stateChange(g_pStateMachineGame, &g_sStateMenu);
-	}
+	systemIdleEnd();
 }
 
 static void battleGsDestroy(void) {

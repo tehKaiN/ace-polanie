@@ -63,7 +63,9 @@ static void menuGsLoop(void) {
 
 	vPortProcessManagers(g_pVp);
 	copProcessBlocks();
+	systemIdleBegin();
 	vPortWaitForEnd(g_pVp);
+	systemIdleEnd();
 }
 
 static void menuGsDestroy(void) {
