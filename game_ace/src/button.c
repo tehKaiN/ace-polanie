@@ -15,7 +15,7 @@ void buttonCreate(void) {
 		buttons[i].uwOffsY = 14 * i;
 	}
 
-	for(UBYTE i = 0; i < BUTTON_KIND_COUNT; ++i) {
+	for(UBYTE i = 0; i < BUTTON_BG_KIND_COUNT; ++i) {
 		Buttons[i].pBitmap = s_pButtonsBgBitmap;
 		Buttons[i].pMask = 0;
 		Buttons[i].uwWidth = 32;

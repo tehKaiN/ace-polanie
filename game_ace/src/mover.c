@@ -35,9 +35,9 @@ static void moverNarrowCreate(tBitmapPair *pBmPair, const char *szDataPath, tMov
 	bitmapPairCreate(pBmPair, szDataPath);
 	UWORD uwOffsY = 0;
 	UBYTE ubFrameIndex = 0;
-	for(UBYTE ubPhase = 0; ubPhase < 3; ++ubPhase) {
+	for(UBYTE ubPhase = 0; ubPhase < MOVER_PHASE_COUNT; ++ubPhase) {
 		for(UBYTE ubX = 0; ubX < 2; ++ubX) {
-			for(UBYTE ubY = 0; ubY < MOVER_PHASE_COUNT; ++ubY) {
+			for(UBYTE ubY = 0; ubY < 2; ++ubY) {
 				movers[ubPhase][eKind][ubX][ubY].pBitmap = pBmPair->pFrames;
 				movers[ubPhase][eKind][ubX][ubY].pMask = pBmPair->pMasks;
 				movers[ubPhase][eKind][ubX][ubY].uwWidth = 16;
@@ -66,7 +66,7 @@ static void moverMixedCreate(tMixedBitmaps *pMixed, const char *szName, tMoverKi
 	UBYTE ubFrameIndex = 0;
 	for(UBYTE ubPhase = 0; ubPhase < MOVER_PHASE_ACTION1; ++ubPhase) {
 		for(UBYTE ubX = 0; ubX < 2; ++ubX) {
-			for(UBYTE ubY = 0; ubY < 3; ++ubY) {
+			for(UBYTE ubY = 0; ubY < 2; ++ubY) {
 				movers[ubPhase][eKind][ubX][ubY].pBitmap = pMixed->sPairNarrow.pFrames;
 				movers[ubPhase][eKind][ubX][ubY].pMask = pMixed->sPairNarrow.pMasks;
 				movers[ubPhase][eKind][ubX][ubY].uwWidth = 16;
@@ -82,7 +82,7 @@ static void moverMixedCreate(tMixedBitmaps *pMixed, const char *szName, tMoverKi
 	for(UBYTE ubPhase = MOVER_PHASE_ACTION1; ubPhase < MOVER_PHASE_COUNT; ++ubPhase) {
 		ubFrameIndex = 0;
 		for(UBYTE ubX = 0; ubX < 2; ++ubX) {
-			for(UBYTE ubY = 0; ubY < 3; ++ubY) {
+			for(UBYTE ubY = 0; ubY < 2; ++ubY) {
 				movers[ubPhase][eKind][ubX][ubY].pBitmap = pMixed->sPairWide.pFrames;
 				movers[ubPhase][eKind][ubX][ubY].pMask = pMixed->sPairWide.pMasks;
 				movers[ubPhase][eKind][ubX][ubY].uwWidth = pWideSizes[ubFrameIndex].ubX;
