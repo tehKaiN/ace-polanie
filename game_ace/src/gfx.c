@@ -27,34 +27,44 @@ void gfxCopyBackToFront(void) {
 }
 
 void gfxDrawImageNoMask(WORD wX, WORD wY, tImage *pImage) {
-  if (wX < 0 || wY < 0)
+  if (wX < 0 || wY < 0) {
     return;
+	}
 
   UWORD uwWidth = pImage->uwWidth;
   UWORD uwHeight = pImage->uwHeight;
-  if (wX + uwWidth < g_gfxClipX1 || wY + uwHeight < g_gfxClipY1 || wX > g_gfxClipX2 || wY > g_gfxClipY2)
+  if (wX + uwWidth < g_gfxClipX1 || wY + uwHeight < g_gfxClipY1 || wX >= g_gfxClipX2 || wY >= g_gfxClipY2) {
     return;
+	}
 
-	if (wY + uwHeight > 199)
+	if (wY + uwHeight > 199) {
 		uwHeight = 199 - wY;
+	}
+
+	if(!pImage->pBitmap) {
+		logWrite("ERR: pSrc is null\n");
+	}
 
 	tBitMap *pDest = g_pVpManager->pBack;
 	blitCopy(pImage->pBitmap, 0, pImage->uwOffsY, pDest, wX, wY, uwWidth, uwHeight, MINTERM_COOKIE);
 }
 
 void gfxDrawImageMaskedClipped(WORD wX, WORD wY, tImage *pImage) {
-  if (wX < 0 || wY < 0)
+  if (wX < 0 || wY < 0) {
     return;
+	}
 
   UWORD uwWidth = pImage->uwWidth;
   UWORD uwHeight = pImage->uwHeight;
-  if (wX + uwWidth < g_gfxClipX1 || wY + uwHeight < g_gfxClipY1 || wX > g_gfxClipX2 || wY > g_gfxClipY2)
+  if (wX + uwWidth < g_gfxClipX1 || wY + uwHeight < g_gfxClipY1 || wX >= g_gfxClipX2 || wY >= g_gfxClipY2) {
     return;
+	}
 
 	UWORD uwSrcX = 0;
 	UWORD uwSrcY = pImage->uwOffsY;
-	if (uwHeight > g_gfxClipY2 - wY)
+	if (uwHeight > g_gfxClipY2 - wY) {
 		uwHeight = g_gfxClipY2 - wY;
+	}
 	if (wY < g_gfxClipY1) {
 		uwSrcY += g_gfxClipY1 - wY;
 		uwHeight -= g_gfxClipY1 - wY;
@@ -71,6 +81,15 @@ void gfxDrawImageMaskedClipped(WORD wX, WORD wY, tImage *pImage) {
 	}
 
 	tBitMap *pDest = g_pVpManager->pBack;
+	if(!pImage->pBitmap) {
+		logWrite("ERR: pSrc is null\n");
+	}
+	if(!pImage->pMask) {
+		logWrite("ERR: pMask is null\n");
+	}
+	if(uwWidth == 0 || uwHeight == 0) {
+		logWrite("ERR: zero dimensions\n");
+	}
 	blitCopyMask(pImage->pBitmap, uwSrcX, uwSrcY, pDest, wX, wY, uwWidth, uwHeight, pImage->pMask->Planes[0]);
 }
 
