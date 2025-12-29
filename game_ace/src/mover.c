@@ -23,12 +23,17 @@ typedef struct tMoverStats {
 } tMoverStats;
 
 static const tUbCoordYX pWideSizes[] = {
-	{.ubX = 24, .ubY = 21},
-	{.ubX = 24, .ubY = 14},
-	{.ubX = 24, .ubY = 21},
-	{.ubX = 16, .ubY = 21},
-	{.ubX = 16, .ubY = 14},
-	{.ubX = 16, .ubY = 21},
+	{.ubX = 24, .ubY = 21}, // x0y0
+	{.ubX = 24, .ubY = 14}, // x0y1
+	{.ubX = 24, .ubY = 21}, // x0y2
+
+	{.ubX = 16, .ubY = 21}, // x1y0
+	{.ubX = 16, .ubY = 14}, // x1y1
+	{.ubX = 16, .ubY = 21}, // x1y2
+
+	{.ubX = 24, .ubY = 21}, // x2y0
+	{.ubX = 24, .ubY = 14}, // x2y1
+	{.ubX = 24, .ubY = 21}, // x2y2
 };
 
 int Place[WORLD_SIZE_X][WORLD_SIZE_Y];
@@ -126,8 +131,8 @@ static void moverNarrowCreate(tBitmapPair *pBmPair, const char *szDataPath, tMov
 	UWORD uwOffsY = 0;
 	UBYTE ubFrameIndex = 0;
 	for(UBYTE ubPhase = 0; ubPhase < MOVER_PHASE_COUNT; ++ubPhase) {
-		for(UBYTE ubX = 0; ubX < 2; ++ubX) {
-			for(UBYTE ubY = 0; ubY < 2; ++ubY) {
+		for(UBYTE ubX = 0; ubX < 3; ++ubX) {
+			for(UBYTE ubY = 0; ubY < 3; ++ubY) {
 				movers[ubPhase][eKind][ubX][ubY].pBitmap = pBmPair->pFrames;
 				movers[ubPhase][eKind][ubX][ubY].pMask = pBmPair->pMasks;
 				movers[ubPhase][eKind][ubX][ubY].uwWidth = 16;
@@ -155,8 +160,8 @@ static void moverMixedCreate(tMixedBitmaps *pMixed, const char *szName, tMoverKi
 	UWORD uwOffsY = 0;
 	UBYTE ubFrameIndex = 0;
 	for(UBYTE ubPhase = 0; ubPhase < MOVER_PHASE_ACTION1; ++ubPhase) {
-		for(UBYTE ubX = 0; ubX < 2; ++ubX) {
-			for(UBYTE ubY = 0; ubY < 2; ++ubY) {
+		for(UBYTE ubX = 0; ubX < 3; ++ubX) {
+			for(UBYTE ubY = 0; ubY < 3; ++ubY) {
 				movers[ubPhase][eKind][ubX][ubY].pBitmap = pMixed->sPairNarrow.pFrames;
 				movers[ubPhase][eKind][ubX][ubY].pMask = pMixed->sPairNarrow.pMasks;
 				movers[ubPhase][eKind][ubX][ubY].uwWidth = 16;
@@ -171,8 +176,8 @@ static void moverMixedCreate(tMixedBitmaps *pMixed, const char *szName, tMoverKi
 	uwOffsY = 0;
 	for(UBYTE ubPhase = MOVER_PHASE_ACTION1; ubPhase < MOVER_PHASE_COUNT; ++ubPhase) {
 		ubFrameIndex = 0;
-		for(UBYTE ubX = 0; ubX < 2; ++ubX) {
-			for(UBYTE ubY = 0; ubY < 2; ++ubY) {
+		for(UBYTE ubX = 0; ubX < 3; ++ubX) {
+			for(UBYTE ubY = 0; ubY < 3; ++ubY) {
 				movers[ubPhase][eKind][ubX][ubY].pBitmap = pMixed->sPairWide.pFrames;
 				movers[ubPhase][eKind][ubX][ubY].pMask = pMixed->sPairWide.pMasks;
 				movers[ubPhase][eKind][ubX][ubY].uwWidth = pWideSizes[ubFrameIndex].ubX;
@@ -1968,25 +1973,32 @@ void moverShowS(tMover *pMover) {
     if (pMover->delay < 70)
       k = 0; // k-faza rozkladu typ-typ postaci
     if (k) {
-      if (pMover->IFF == 1)
+      if (pMover->IFF == 1) {
         gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &movers[5 - k][pMover->type][1][1]);
-      else
+      }
+      else {
         PutImageChange13h(pMover->xr, pMover->yr, &movers[5 - k][pMover->type][1][1], 1, color1, color2);
+      }
     } else {
       k = 0;
       if (pMover->type == 8)
         k = 2;
       if (!pMover->type)
         k = 1;
-      if (pMover->IFF == 1)
+      if (pMover->IFF == 1) {
         gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &dead[k]);
-      else
+      }
+      else {
         PutImageChange13h(pMover->xr, pMover->yr, &dead[k], 1, color1, color2);
+      }
     }
     return;
   }
-  if (!pMover->dx && !pMover->dy)
+
+  if (!pMover->dx && !pMover->dy) {
     pMover->dy = 1;
+  }
+
   if (pMover->wybrany) {
     int a = 0, b = 0;
     if (pMover->inattack && pMover->phase > 2 &&
@@ -1996,10 +2008,7 @@ void moverShowS(tMover *pMover) {
       if (pMover->dx > 0)
         a = 8;
     }
-    // if (pMover->IFF == 1)
-    //   PutImageChange13h(pMover->xr + a, pMover->yr + b, Mysz[5], 1, color1, ExpColor[pMover->exp >> 4]);
-    // else
-    //   PutImageChange13h(pMover->xr + a, pMover->yr + b, Mysz[5], 1, color1, ExpColor[(pMover->exp >> 4) + 15]);
+
     int color = LightGreen;
     if (pMover->hp < (pMover->maxhp >> 1))
       color = Yellow;
@@ -2023,36 +2032,34 @@ void moverShowS(tMover *pMover) {
         Bar13h(pMover->xr + a + 16, pMover->yr + b + 14 - hh, pMover->xr + a + 17, pMover->yr + b + 14, White);
     }
   }
-  if (!pMover->dx && !pMover->dy)
+
+  if (!pMover->dx && !pMover->dy) {
     pMover->dy = 1;
-  if (pMover->dx < 0) {
-    if (movers[pMover->phase][pMover->type][0][1 - pMover->dy].pBitmap) {
-      if (pMover->IFF == 1)
-        PutImageChangeInverse13h(pMover->xr, pMover->yr, &movers[pMover->phase][pMover->type][0][1 - pMover->dy], 1, color1, color1);
-      else
-        PutImageChangeInverse13h(pMover->xr, pMover->yr, &movers[pMover->phase][pMover->type][0][1 - pMover->dy], 1, color1, color2);
-    }
-    if (pMover->marmour)
-      gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &picture[278 + (pMover->marmour & 3)]);
-    if (placeG[pMover->x][pMover->y] == 256 && pMover->hp < pMover->maxhp)
-      PutImageChange13h(pMover->xr, pMover->yr, &picture[282 + (pMover->delay & 1)], 1, Red, LightBlue);
-  } else {
-    if (movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy].pBitmap) {
-      if (pMover->IFF == 1)
-        gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy]);
-      else
-        PutImageChange13h(pMover->xr, pMover->yr, &movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy], 1, color1, color2);
-    }
-    if (pMover->marmour)
-      gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &picture[278 + (pMover->marmour & 3)]);
-    if (placeG[pMover->x][pMover->y] == 256 && pMover->hp < pMover->maxhp)
-      PutImageChange13h(pMover->xr, pMover->yr, &picture[282 + (pMover->delay & 1)], 1, Red, LightBlue);
   }
 
-  if (pMover->ShowHit > 2)
+  // There was a flipped draw of mover image here, it's gone now.
+  // Beware: mover dx and dy are in reverse orientation as frames!
+  if (movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy].pBitmap) {
+    if (pMover->IFF == 1) {
+      gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy]);
+    }
+    else {
+      PutImageChange13h(pMover->xr, pMover->yr, &movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy], 1, color1, color2);
+    }
+  }
+  if (pMover->marmour) {
+    gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &picture[278 + (pMover->marmour & 3)]);
+  }
+  if (placeG[pMover->x][pMover->y] == 256 && pMover->hp < pMover->maxhp) {
+    PutImageChange13h(pMover->xr, pMover->yr, &picture[282 + (pMover->delay & 1)], 1, Red, LightBlue);
+  }
+
+  if (pMover->ShowHit > 2) {
     gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &Hit[1]);
-  else if (pMover->ShowHit > 0)
+  }
+  else if (pMover->ShowHit > 0) {
     gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &Hit[0]);
+  }
 }
 
 void moverShow(tMover *pMover) {

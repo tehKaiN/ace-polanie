@@ -78,6 +78,7 @@ convertBitmaps(INTERLEAVED TARGET ${GAME_EXECUTABLE} PALETTE ${GAME_PLT_PATH}
 		${DATA_DIR}/battle_ui.bm
 )
 
+include(cmake/flip_bitmaps.cmake)
 include(cmake/mouse.cmake)
 include(cmake/button.cmake)
 include(cmake/button_bg.cmake)

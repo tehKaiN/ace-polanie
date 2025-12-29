@@ -5,9 +5,6 @@
 // FIXME: `how` controls whether mask is used or not, but clipping is enabled at all times
 #define PutImageChange13h(x, y, p, how, c1, c2) gfxDrawImageMaskedClipped(x, y, p)
 
-// FIXME: implement properly
-#define PutImageChangeInverse13h(x, y, p, how, c1, c2) gfxDrawImageMaskedClipped(x, y, p)
-
 #define Color1 16
 
 #define LightRed 16
