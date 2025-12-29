@@ -17,30 +17,31 @@ void castleInit(tCastle *pCastle, int iff, int mlk) {
 }
 
 void castleShowS(tCastle *pCastle, int Xs, int Ys, int what) {
-  //////////// pokaz budynki i ich rycerzy
+  // show buildings and their units
   for (UBYTE i = 0; i < CASTLE_BUILIDNGS_MAX; i++) {
     buildingShowS(&pCastle->b[i], Xs, Ys, what);
 	}
 
-  if (what == 1) //////////// pokaz obiekty  martwe
-  {
-    for (UBYTE i = 1; i < CASTLE_MOVERS_MAX; i++) {
-      if (pCastle->m[i].exist == 2)
-        moverShowS(&pCastle->m[i]);
-    }
-  }
-  if (what == 2) //////////// pokaz obiekty  zywe
-  {
-    for (UBYTE i = 1; i < CASTLE_MOVERS_MAX; i++) {
-      if (pCastle->m[i].exist == 1)
-        moverShowS(&pCastle->m[i]);
-    }
-  }
-
-  if (what == 3) /////////// pokaz pociski
-  {
-    for (UBYTE i = 1; i < CASTLE_MOVERS_MAX; i++)
-      missileShow(&pCastle->m[i].missile, Xs, Ys);
+  switch(what) {
+    case 1:
+      // show dead things
+      for (UBYTE i = 1; i < CASTLE_MOVERS_MAX; i++) {
+        if (pCastle->m[i].exist == 2)
+          moverShowS(&pCastle->m[i]);
+      }
+      break;
+    case 2:
+      // show living things
+      for (UBYTE i = 1; i < CASTLE_MOVERS_MAX; i++) {
+        if (pCastle->m[i].exist == 1)
+          moverShowS(&pCastle->m[i]);
+      }
+      break;
+    case 3:
+      // show missiles
+      for (UBYTE i = 1; i < CASTLE_MOVERS_MAX; i++)
+        missileShow(&pCastle->m[i].missile, Xs, Ys);
+      break;
   }
 }
 
