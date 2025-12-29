@@ -1971,7 +1971,7 @@ static void battleGsLoop(void) {
 // #endif
 
 // 		} while (licznik - licznik2 < speed);
-// 		showAll = 1;
+		showAll = 1;
 // 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // 		if (licznik > 10000) {
 // 			licznik = 0;
