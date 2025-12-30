@@ -1,67 +1,76 @@
 #include "building.h"
+#include <ace/managers/log.h>
 #include "castle.h"
 #include "world.h"
+#include "picture.h"
 #include "battle.h"
 
-void buildingInit(tBuilding *pBuilding, int x0, int y0, int t, int iff, int Nr) {
-	int k = 127;
-	pBuilding->exist = 4;
-	if (t > 10) {
-		t -= 10;
-		Nr += 300;
+void buildingInit(tBuilding *pBuilding, int x0, int y0, tBuildingKind eKind, tMapObjectTeam eTeam, UBYTE isFullyBuilt) {
+	if(eKind > BUILDING_KIND_COUNT) {
+		logWrite("ERR: building kind out of range: %d", eKind);
 	}
-	pBuilding->type = t;
+
+	pBuilding->exist = 4;
+	if (eKind > 10) {
+		eKind -= 10;
+		// Nr += 300; // wtf?
+	}
+	pBuilding->type = eKind;
 	switch (pBuilding->type) {
-		case 1:
+		case BUILDING_KIND_UNK:
 			pBuilding->maxfood = 0;
 			pBuilding->maxhp = 400;
 			break;
-		case 6:
+		case BUILDING_KIND_KNIGHT_HUT:
 			pBuilding->maxfood = 1;
 			pBuilding->maxhp = 400;
 			break;
-		case 2:
-		case 4:
+		case BUILDING_KIND_SHED:
+		case BUILDING_KIND_MAGE_HUT:
 			pBuilding->maxfood = 3;
 			pBuilding->maxhp = 350;
 			break;
-		case 3:
+		case BUILDING_KIND_HUT:
 			pBuilding->maxfood = 6;
 			pBuilding->maxhp = 350;
 			break;
-		case 5:
+		case BUILDING_KIND_WARRIOR_HUT:
 			pBuilding->maxfood = 4;
 			pBuilding->maxhp = 350;
+			break;
+		case BUILDING_KIND_COUNT:
 			break;
 	}
 	pBuilding->x = x0 - 2;
 	pBuilding->y = y0 - 2;
 
 	pBuilding->armour = 10;
-	if (iff == 1) {
+	if (eTeam == MAP_OBJECT_TEAM_PLAYER) {
 		pBuilding->maxhp = pBuilding->maxhp >> 1;
 	}
 
 	pBuilding->hp = 30;
-	pBuilding->IFF = iff;
-	if (Nr > 300) // od razu wybudowany
-	{
-		Nr -= 300;
+	pBuilding->sMapObject.eTeam = eTeam;
+
+	tPictureKind ePicTopLeft = PICTURE_KIND_CONSTRUCTION_0;
+	if (isFullyBuilt) {
 		pBuilding->exist = 1;
 		pBuilding->hp = pBuilding->maxhp;
-		k = 137 + (pBuilding->type - 1) * 20;
+		ePicTopLeft = PICTURE_KIND_BUILDING_0_FULL_0 + (pBuilding->type - 1) * 20;
 	}
-	pBuilding->nr = iff * 256 + Nr * 10;
+
 	pBuilding->faza = 0;
 	for (UBYTE i = 0; i < 6; i++) {
 		pBuilding->m[i].exist = 0;
 		pBuilding->m[i].missile.exist = 0;
 	}
-	for (UBYTE j = 0; j < 3; j++)
+	for (UBYTE j = 0; j < 3; j++) {
 		for (UBYTE i = 0; i < 3; i++) {
-			placeG[pBuilding->x + i][pBuilding->y + j] = k + i + j * 3;
+			placeG[pBuilding->x + i][pBuilding->y + j] = ePicTopLeft + i + j * 3;
 		}
-	if (pBuilding->IFF == 1) {
+	}
+
+	if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
 		for (UBYTE j = -2; j < 5; j++)
 			for (UBYTE i = -2; i < 5; i++) {
 				if (pBuilding->x + i > 0 && pBuilding->y + j > 0 && pBuilding->x + i < WORLD_SIZE_X && pBuilding->y + j < WORLD_SIZE_Y)
@@ -69,15 +78,21 @@ void buildingInit(tBuilding *pBuilding, int x0, int y0, int t, int iff, int Nr) 
 						placeN[pBuilding->x + i][pBuilding->y + j] = 1;
 			}
 	}
-	place[pBuilding->x][pBuilding->y] = pBuilding->nr;
-	place[pBuilding->x + 1][pBuilding->y] = pBuilding->nr;
-	place[pBuilding->x + 2][pBuilding->y] = pBuilding->nr + 1;
-	place[pBuilding->x + 2][pBuilding->y + 1] = pBuilding->nr + 1;
-	place[pBuilding->x][pBuilding->y + 1] = pBuilding->nr + 2;
-	place[pBuilding->x + 1][pBuilding->y + 1] = pBuilding->nr + 2;
-	if (pBuilding->type != 6)
-		place[pBuilding->x + 1][pBuilding->y + 2] = pBuilding->nr + 3;
-	place[pBuilding->x + 2][pBuilding->y + 2] = pBuilding->nr + 3;
+
+	place[pBuilding->x][pBuilding->y] = &pBuilding->sMapObject;
+	place[pBuilding->x + 1][pBuilding->y] = &pBuilding->sMapObject;
+	place[pBuilding->x + 2][pBuilding->y] = &pBuilding->sMapObject;
+
+	place[pBuilding->x + 2][pBuilding->y + 1] = &pBuilding->sMapObject;
+	place[pBuilding->x][pBuilding->y + 1] = &pBuilding->sMapObject;
+	place[pBuilding->x + 1][pBuilding->y + 1] = &pBuilding->sMapObject;
+
+	if (pBuilding->type != BUILDING_KIND_KNIGHT_HUT) {
+		place[pBuilding->x + 1][pBuilding->y + 2] = &pBuilding->sMapObject;
+	}
+
+	place[pBuilding->x + 2][pBuilding->y + 2] = &pBuilding->sMapObject;
+
 	place[pBuilding->x][pBuilding->y + 2] = 0; // miejsce gdzie rodza sie krowy
 }
 
@@ -93,7 +108,7 @@ void buildingRun(tBuilding *pBuilding) {
 			for (j = pBuilding->y; j < pBuilding->y + 3; j++) {
 				if (placeN[i][j] > 219) {
 					dd += (placeN[i][j] - 219) * 2;
-					if (pBuilding->IFF == 2)
+					if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU)
 						dd += 3;
 					placeN[i][j] = 1;
 				}
@@ -121,7 +136,7 @@ void buildingRun(tBuilding *pBuilding) {
 			for (i = 0; i < 3; i++) {
 				placeG[pBuilding->x + i][pBuilding->y + j] = 137 + (pBuilding->type - 1) * 20 + i + j * 3;
 			}
-		place[pBuilding->x + 1][pBuilding->y + 1] = pBuilding->nr;
+		place[pBuilding->x + 1][pBuilding->y + 1] = &pBuilding->sMapObject;
 		// if (Msg.dzwiek < 18) {
 		// 	Msg.dzwiek = 18;
 		// 	Msg.X = pBuilding->x;
@@ -162,11 +177,11 @@ void buildingRun(tBuilding *pBuilding) {
 	if (pBuilding->exist == 2)
 		dd = 0; // zabitego nie rabac
 	if (dd) {
-		if (pBuilding->IFF == 1) {
+		if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
 			// strcpy(Msg.msg, "Wr%g w wiosce !!!");
 			// Msg.licznik = 20;
 		}
-		if (pBuilding->IFF == 2) {
+		else if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU) {
 			for (int post = 4; post < CASTLE_MOVERS_MAX; post++) {
 				if (castle[1].m[post].type && castle[1].m[post].type < 10)
 					castle[1].m[post].drange = 7;
@@ -225,45 +240,49 @@ void buildingRun(tBuilding *pBuilding) {
 	// TODO: create table with dx/dy/tile1/tile3 per building type
 	if (pBuilding->exist == 1 && pBuilding->faza == 1)
 		switch (pBuilding->type) {
-		case BUILDING_KIND_UNK:
-			placeG[pBuilding->x + 1][pBuilding->y] = 137 + 9;
-			break; //?????
-		case BUILDING_KIND_SHED:
-			placeG[pBuilding->x + 2][pBuilding->y + 1] = 157 + 9;
-			break; // obora
-		case BUILDING_KIND_HUT:
-			placeG[pBuilding->x + 2][pBuilding->y] = 177 + 9;
-			break; // koszary1
-		case BUILDING_KIND_MAGE_HUT:
-			placeG[pBuilding->x + 1][pBuilding->y + 1] = 197 + 9;
-			break; // swiatynia
-		case BUILDING_KIND_WARRIOR_HUT:
-			placeG[pBuilding->x + 1][pBuilding->y + 1] = 217 + 9;
-			break; // koszary1
-		case BUILDING_KIND_KNIGHT_HUT:
-			placeG[pBuilding->x + 2][pBuilding->y] = 237 + 9;
-			break; // bohater
+			case BUILDING_KIND_UNK:
+				placeG[pBuilding->x + 1][pBuilding->y] = 137 + 9;
+				break;
+			case BUILDING_KIND_SHED:
+				placeG[pBuilding->x + 2][pBuilding->y + 1] = 157 + 9;
+				break;
+			case BUILDING_KIND_HUT:
+				placeG[pBuilding->x + 2][pBuilding->y] = 177 + 9;
+				break;
+			case BUILDING_KIND_MAGE_HUT:
+				placeG[pBuilding->x + 1][pBuilding->y + 1] = 197 + 9;
+				break;
+			case BUILDING_KIND_WARRIOR_HUT:
+				placeG[pBuilding->x + 1][pBuilding->y + 1] = 217 + 9;
+				break;
+			case BUILDING_KIND_KNIGHT_HUT:
+				placeG[pBuilding->x + 2][pBuilding->y] = 237 + 9;
+				break;
+			case BUILDING_KIND_COUNT:
+				break;
 		}
 	if (pBuilding->exist == 1 && pBuilding->faza == 3)
 		switch (pBuilding->type) {
-		case BUILDING_KIND_UNK:
-			placeG[pBuilding->x + 1][pBuilding->y] = 137 + 1;
-			break; //?????
-		case BUILDING_KIND_SHED:
-			placeG[pBuilding->x + 2][pBuilding->y + 1] = 157 + 5;
-			break; // obora
-		case BUILDING_KIND_HUT:
-			placeG[pBuilding->x + 2][pBuilding->y] = 177 + 2;
-			break; // koszary1
-		case BUILDING_KIND_MAGE_HUT:
-			placeG[pBuilding->x + 1][pBuilding->y + 1] = 197 + 4;
-			break; // swiatynia
-		case BUILDING_KIND_WARRIOR_HUT:
-			placeG[pBuilding->x + 1][pBuilding->y + 1] = 217 + 4;
-			break; // koszry1
-		case BUILDING_KIND_KNIGHT_HUT:
-			placeG[pBuilding->x + 2][pBuilding->y] = 237 + 2;
-			break; // bohater
+			case BUILDING_KIND_UNK:
+				placeG[pBuilding->x + 1][pBuilding->y] = 137 + 1;
+				break;
+			case BUILDING_KIND_SHED:
+				placeG[pBuilding->x + 2][pBuilding->y + 1] = 157 + 5;
+				break;
+			case BUILDING_KIND_HUT:
+				placeG[pBuilding->x + 2][pBuilding->y] = 177 + 2;
+				break;
+			case BUILDING_KIND_MAGE_HUT:
+				placeG[pBuilding->x + 1][pBuilding->y + 1] = 197 + 4;
+				break;
+			case BUILDING_KIND_WARRIOR_HUT:
+				placeG[pBuilding->x + 1][pBuilding->y + 1] = 217 + 4;
+				break;
+			case BUILDING_KIND_KNIGHT_HUT:
+				placeG[pBuilding->x + 2][pBuilding->y] = 237 + 2;
+				break;
+			case BUILDING_KIND_COUNT:
+				break;
 		}
 }
 
@@ -437,15 +456,14 @@ int buildingNewMan(tBuilding *pBuilding, int Nr) {
 	if (!xx || !yy)
 		return 0;
 	moverInit(&pBuilding->m[j], i, xx, yy, 0, 0);
-	moverSetNr(&pBuilding->m[j], pBuilding->nr + j + 4);
-	moverSetIFF(&pBuilding->m[j], pBuilding->IFF);
+	moverSetIFF(&pBuilding->m[j], pBuilding->sMapObject.eTeam);
 
 	if (!i) {
 		pBuilding->m[j].xm = pBuilding->x;
 		pBuilding->m[j].ym = pBuilding->y + 2;
 
 	} // stajnia dla krowy
-	if (pBuilding->IFF == 1) {
+	if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
 		moverSetCommand(&pBuilding->m[j], 1);
 		moverSetEnd(&pBuilding->m[j], pBuilding->x - 2, pBuilding->y + 4);
 	}

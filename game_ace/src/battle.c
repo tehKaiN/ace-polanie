@@ -808,6 +808,7 @@ static void battleInitOldLevel(UWORD uwLevel) {
 			} //   'imie'
 
 		} while (z != '!');
+
 		if (pl.endType == 4 && !p1)
 			p1 = 1;
 
@@ -823,13 +824,15 @@ static void battleInitOldLevel(UWORD uwLevel) {
 				logWrite("ERR: unexpected char @ while loading map\n");
 				return;
 			}
+
 			place[i][j] = 0;
 			if (i == 0 || i == WORLD_SIZE_X - 1 || j == 0 || j == WORLD_SIZE_Y - 1)
-				place[i][j] = 10;
+				place[i][j] = &g_sMapObjObstacle;
+
 			placeG[i][j] = 8;
 			if (z == '*') {
 				if (pl.endType == 1) {
-					place[i][j] = 10;
+					place[i][j] = &g_sMapObjObstacle;
 					pl.x0 = i;
 					pl.y0 = j;
 				}
@@ -839,7 +842,6 @@ static void battleInitOldLevel(UWORD uwLevel) {
 					}
 
 					moverInit(&castle[1].m[1], pl.typ, i, j, 0, 5);
-					moverSetNr(&castle[1].m[1], 512 + 201);
 					moverSetIFF(&castle[1].m[1], 2);
 					moverShow(&castle[1].m[1]);
 				}
@@ -859,111 +861,111 @@ static void battleInitOldLevel(UWORD uwLevel) {
 			}
 
 			if (z == 'a')
-				placeG[i][j] = 54; // zejscie ze skal
+				placeG[i][j] = PICTURE_KIND_GADGET_STUMP; // zejscie ze skal
 			if (z == 'b')
-				placeG[i][j] = 55;
+				placeG[i][j] = PICTURE_KIND_GADGET_ROCKS_1;
 			if (z == 'c')
-				placeG[i][j] = 56;
+				placeG[i][j] = PICTURE_KIND_GADGET_ROCKS_2;
 			if (z == 'd')
-				placeG[i][j] = 57;
+				placeG[i][j] = PICTURE_KIND_GADGET_ROCKS_3;
 			if (z == 'e') {
-				placeG[i][j] = 58;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_GADGET_SIGN;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 'f') {
-				placeG[i][j] = 59;
+				placeG[i][j] = PICTURE_KIND_GADGET_PATH;
 				place[i][j] = 0;
 			}
 			if (z == 'g') {
-				placeG[i][j] = 60;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_GADGET_POND;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 'h') {
-				placeG[i][j] = 61;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_GADGET_POLE;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 'i') {
-				placeG[i][j] = 62;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_GADGET_SKULL_POLE;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 'j') {
-				placeG[i][j] = 63;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_GADGET_OBELISK;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 'k') {
-				placeG[i][j] = 64;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_GADGET_WELL;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 'l') {
-				placeG[i][j] = 65;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_GADGET_ALTAR;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 'm') {
-				placeG[i][j] = 66;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_GADGET_ROCKS_4;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 'n')
-				placeG[i][j] = 67;
+				placeG[i][j] = PICTURE_KIND_GADGET_ROCKS_5;
 			if (z == 'o') {
-				placeG[i][j] = 68;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_FIREPLACE_SMALL;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 'p') {
-				placeG[i][j] = 69;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_FIRE_RING;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			// skaly
 			if (z == 211) { // 'Ó'
-				placeG[i][j] = 9;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_0;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 201) { // 'É'
-				placeG[i][j] = 10;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_1;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 186) { // 'ş'
-				placeG[i][j] = 11;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_2;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 217) { // 'Ů'
-				placeG[i][j] = 12;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_3;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 196) { // 'Ä'
-				placeG[i][j] = 13;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_4;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 130) { // '¸'
-				placeG[i][j] = 14;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_5;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 179) { // 'ł'
-				placeG[i][j] = 15;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_6;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 205) { // 'Í'
-				placeG[i][j] = 16;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_7;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 's') {
-				placeG[i][j] = 17;
+				placeG[i][j] = PICTURE_KIND_ROCK_8;
 				place[i][j] = 0;
 			} // wejscie
 			if (z == 188) { // 'Ľ'
-				placeG[i][j] = 18;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_9;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 212) { // 'Ô'
-				placeG[i][j] = 19;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_10;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 218) { // 'Ú'
-				placeG[i][j] = 20;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_11;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 			if (z == 183) { // '·'
-				placeG[i][j] = 21;
-				place[i][j] = 10;
+				placeG[i][j] = PICTURE_KIND_ROCK_12;
+				place[i][j] = &g_sMapObjObstacle;
 			}
 
 			if (z == 'u') {
@@ -977,69 +979,69 @@ static void battleInitOldLevel(UWORD uwLevel) {
 				pl.yp = j;
 			}
 			if (z == 'q')
-				placeG[i][j] = 22;
+				placeG[i][j] = PICTURE_KIND_DRY_EARTH_0;
 			if (z == 't')
-				placeG[i][j] = 35;
+				placeG[i][j] = PICTURE_KIND_ROAD_10;
 			if (z == 'w') {
-				placeG[i][j] = 74;
-				place[i][j] = 1;
+				placeG[i][j] = PICTURE_KIND_WATER_0;
+				place[i][j] = &g_sMapObjWater;
 			}
 			if (z == 'r') {
-				placeG[i][j] = 266;
-				place[i][j] = 256 + 512 + drzewa;
+				placeG[i][j] = PICTURE_KIND_WALL_0;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			} //??
 			//--------most-------------------
 			if (z == '1')
-				placeG[i][j] = 46;
+				placeG[i][j] = PICTURE_KIND_BRIDGE_0;
 			if (z == '2')
-				placeG[i][j] = 47;
+				placeG[i][j] = PICTURE_KIND_BRIDGE_1;
 			if (z == '3')
-				placeG[i][j] = 48;
+				placeG[i][j] = PICTURE_KIND_BRIDGE_2;
 			if (z == '4')
-				placeG[i][j] = 49;
+				placeG[i][j] = PICTURE_KIND_BRIDGE_3;
 			if (z == '5')
-				placeG[i][j] = 50;
+				placeG[i][j] = PICTURE_KIND_BRIDGE_4;
 			if (z == '6')
-				placeG[i][j] = 51;
+				placeG[i][j] = PICTURE_KIND_BRIDGE_5;
 			if (z == '7')
-				placeG[i][j] = 52;
+				placeG[i][j] = PICTURE_KIND_BRIDGE_6;
 			if (z == '8')
-				placeG[i][j] = 53;
+				placeG[i][j] = PICTURE_KIND_BRIDGE_7;
 			// ---------drzewa ---------------
 			if (z == 'A' && drzewa < 2000) {
-				placeG[i][j] = 113;
-				place[i][j] = 256 + 512 + drzewa;
+				placeG[i][j] = PICTURE_KIND_TREE_0_BOTTOM;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			}
 			if (z == 'B' && drzewa < 2000) {
-				placeG[i][j] = 114;
-				place[i][j] = 256 + 512 + drzewa;
+				placeG[i][j] = PICTURE_KIND_TREE_1_BOTTOM;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			}
 			if (z == 'C' && drzewa < 2000) {
-				placeG[i][j] = 115;
-				place[i][j] = 256 + 512 + drzewa;
+				placeG[i][j] = PICTURE_KIND_TREE_2_BOTTOM;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			}
 			if (z == 'D' && drzewa < 2000) {
-				placeG[i][j] = 116;
-				place[i][j] = 256 + 512 + drzewa;
+				placeG[i][j] = PICTURE_KIND_TREE_3_BOTTOM;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			}
 			if (z == 'E' && drzewa < 2000) {
-				placeG[i][j] = 117;
-				place[i][j] = 256 + 512 + drzewa;
+				placeG[i][j] = PICTURE_KIND_TREE_4_BOTTOM;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			}
 			if (z == 'F' && drzewa < 2000) {
-				placeG[i][j] = 118;
-				place[i][j] = 256 + 512 + drzewa;
+				placeG[i][j] = PICTURE_KIND_TREE_5_BOTTOM;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			}
 			if (z == 'G' && drzewa < 2000) {
-				placeG[i][j] = 119;
-				place[i][j] = 256 + 512 + drzewa;
+				placeG[i][j] = PICTURE_KIND_TREE_6_BOTTOM;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			}
 			//---- PASTWISKO I MIEJSCE ZBIORKI
@@ -1104,95 +1106,82 @@ static void battleInitOldLevel(UWORD uwLevel) {
 			// KROWA NASZA
 			if (z == 'x' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 0, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_COW, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 'y' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 1, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_AXE, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 'z' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 2, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_HUNTER, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == '9' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 3, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_PRIESTESS, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == '0' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 4, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_PRIEST, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == ':' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 5, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_SWORD, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == ';' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 6, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_PIKE, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == '<' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 7, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_KNIGHT, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == '>' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 8, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_BEAR, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == ',' && p0 < 39) {
 				p0++;
-				moverInit(&castle[0].m[p0], 9, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_BEAST, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 176 && p0 < 39) // 176  nasz Pastuch
 			{
 				p0++;
-				moverInit(&castle[0].m[p0], 10, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_FARMER, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 177 && p0 < 39) // 177 nasz Mag
 			{
 				p0++;
-				moverInit(&castle[0].m[p0], 11, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_MAGE, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
 			if (z == 178 && p0 < 39) //  178  nasz Kusznik
 			{
 				p0++;
-				moverInit(&castle[0].m[p0], 12, i, j, 0, 5);
-				moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
+				moverInit(&castle[0].m[p0], MOVER_KIND_XBOW, i, j, 0, 5);
 				moverSetIFF(&castle[0].m[p0], 1);
 				moverShow(&castle[0].m[p0]);
 			}
@@ -1239,95 +1228,82 @@ static void battleInitOldLevel(UWORD uwLevel) {
 			//-----------------------------------------------------
 			if (z == 'T' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 0, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_COW, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'U' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 1, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_AXE, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'W' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 2, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_HUNTER, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'X' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 3, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_PRIESTESS, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'Y' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 4, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_PRIEST, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 'Z' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 5, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_SWORD, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == '#' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 6, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_PIKE, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == '"' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 7, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_KNIGHT, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == '%' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 8, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_BEAR, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == '&' && p1 < 39) {
 				p1++;
-				moverInit(&castle[1].m[p1], 9, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_BEAST, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 173 && p1 < 39) // 173          pastuch
 			{
 				p1++;
-				moverInit(&castle[1].m[p1], 10, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_FARMER, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 174 && p1 < 39) // 174    Mag
 			{
 				p1++;
-				moverInit(&castle[1].m[p1], 11, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_MAGE, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
 			if (z == 175 && p1 < 39) // 175            kusznik
 			{
 				p1++;
-				moverInit(&castle[1].m[p1], 12, i, j, 0, 5);
-				moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
+				moverInit(&castle[1].m[p1], MOVER_KIND_XBOW, i, j, 0, 5);
 				moverSetIFF(&castle[1].m[p1], 2);
 				moverShow(&castle[1].m[p1]);
 			}
@@ -1411,7 +1387,7 @@ static void battleInitNewLevel(UWORD uwLevel) {
 			if (placeG[i][j] == 329) // postac do uratowania
 			{
 				if (pl.endType == 1) {
-					place[i][j] = 10;
+					place[i][j] = &g_sMapObjObstacle;
 					pl.x0 = i;
 					pl.y0 = j;
 				}
@@ -1419,7 +1395,6 @@ static void battleInitNewLevel(UWORD uwLevel) {
 					if (!p1)
 						p1++;
 					moverInit(&castle[1].m[1], pl.typ, i, j, 0, 5);
-					moverSetNr(&castle[1].m[1], 512 + 201);
 					moverSetIFF(&castle[1].m[1], 2);
 					moverShow(&castle[1].m[1]);
 				}
@@ -1440,18 +1415,18 @@ static void battleInitNewLevel(UWORD uwLevel) {
 			}
 
 			if (placeG[i][j] == 58)
-				place[i][j] = 10;
+				place[i][j] = &g_sMapObjObstacle;
 			if (placeG[i][j] > 59 && placeG[i][j] < 67)
-				place[i][j] = 10;
+				place[i][j] = &g_sMapObjObstacle;
 			if (placeG[i][j] == 68)
-				place[i][j] = 10;
+				place[i][j] = &g_sMapObjObstacle;
 			if (placeG[i][j] == 69)
-				place[i][j] = 10;
+				place[i][j] = &g_sMapObjObstacle;
 			// skaly
 			if (placeG[i][j] > 8 && placeG[i][j] < 17)
-				place[i][j] = 10;
+				place[i][j] = &g_sMapObjObstacle;
 			if (placeG[i][j] > 17 && placeG[i][j] < 22)
-				place[i][j] = 10;
+				place[i][j] = &g_sMapObjObstacle;
 
 			if (placeG[i][j] == 331) {
 				placeG[i][j] = 256;
@@ -1466,17 +1441,17 @@ static void battleInitNewLevel(UWORD uwLevel) {
 
 			if (placeG[i][j] > 73 && placeG[i][j] < 87) // woda
 			{
-				place[i][j] = 1;
+				place[i][j] = &g_sMapObjWater;
 			}
 			if (placeG[i][j] > 265 && placeG[i][j] < 278) // palisada
 			{
-				place[i][j] = 256 + 512 + drzewa;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			}
 			// ---------drzewa ---------------
 			if ((placeG[i][j] > 112 && placeG[i][j] < 120) ||
 					placeG[i][j] == 71 || placeG[i][j] == 73) {
-				place[i][j] = 256 + 512 + drzewa;
+				place[i][j] = &g_sMapObjTree;
 				drzewa++;
 			}
 
@@ -1533,7 +1508,6 @@ static void battleInitNewLevel(UWORD uwLevel) {
 				if (p0 < 39) {
 					p0++;
 					moverInit(&castle[0].m[p0], placeG[i][j] - 302, i, j, 0, 5);
-					moverSetNr(&castle[0].m[p0], 256 + p0 + 200);
 					moverSetIFF(&castle[0].m[p0], 1);
 					moverShow(&castle[0].m[p0]);
 				}
@@ -1575,7 +1549,6 @@ static void battleInitNewLevel(UWORD uwLevel) {
 				if (p1 < 39) {
 					p1++;
 					moverInit(&castle[1].m[p1], placeG[i][j] - 315, i, j, 0, 5);
-					moverSetNr(&castle[1].m[p1], 512 + p1 + 200);
 					moverSetIFF(&castle[1].m[p1], 2);
 					moverShow(&castle[1].m[p1]);
 				}

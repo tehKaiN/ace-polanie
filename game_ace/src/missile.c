@@ -29,12 +29,12 @@ void missileImageDestroy(void) {
 	bitmapPairDestroy(&s_sMissilesPair);
 }
 
-void missileInit(tMissile *pMissile, int x1, int y1, int x2, int y2, int d, int t) {
+void missileInit(tMissile *pMissile, int x1, int y1, int x2, int y2, int damage, int ownerKind) {
 	int max;
 	if (pMissile->exist)
 		return;
 
-	pMissile->damage = d;
+	pMissile->damage = damage;
 	pMissile->xt = x2;
 	pMissile->yt = y2;
 	pMissile->target = place[pMissile->xt][pMissile->yt];
@@ -53,49 +53,51 @@ void missileInit(tMissile *pMissile, int x1, int y1, int x2, int y2, int d, int 
 	if (pMissile->dy < 0)
 		pMissile->dy = -1;
 	pMissile->exist = 6;
-	pMissile->type = (char)t;
-	switch (t) {
-	case 9: // strzyga
-	case 8: // niedzwiedz
-	case 7: // miecz -bohater
-	case 5: // miecz
-	case 1:
-		pMissile->view = NULL;
-		break; // topor
+	pMissile->type = (char)ownerKind;
 
-	case 2:
-		pMissile->exist++;
-		pMissile->view = &missiles[0][pMissile->dx + 1][pMissile->dy + 1];
-		break; // luk
-	case 12:
-		pMissile->exist++;
-		pMissile->view = &missiles[5][pMissile->dx + 1][pMissile->dy + 1];
-		break; // kusznik
-	case 3:
-		pMissile->exist += 3;
-		pMissile->view = &missiles[1][pMissile->dx + 1][pMissile->dy + 1];
-		break; // grom
-	case 13:
-		pMissile->exist += 3;
-		pMissile->view = &missiles[1][pMissile->dx + 1][pMissile->dy + 1];
-		break; // grom
-	case 11:
-		pMissile->exist += 3;
-		pMissile->view = &missiles[4][pMissile->dx + 1][pMissile->dy + 1];
-		break; // magowy
-	case 4:
-		pMissile->exist += 3;
-		pMissile->view = &missiles[2][pMissile->dx + 1][pMissile->dy + 1];
-		break; // duzy ogien
-	case 14:
-		pMissile->exist += 3;
-		pMissile->view = &missiles[2][pMissile->dx + 1][pMissile->dy + 1];
-		break; // duzy ogien
-	case 6:
-		pMissile->exist += 2;
-		pMissile->view = &missiles[3][pMissile->dx + 1][pMissile->dy + 1];
-		break; // wlocznia
+	switch (ownerKind) {
+		case MOVER_KIND_BEAST:
+		case MOVER_KIND_BEAR:
+		case MOVER_KIND_KNIGHT:
+		case MOVER_KIND_SWORD:
+		case MOVER_KIND_AXE:
+			pMissile->view = NULL;
+			break;
+
+		case MOVER_KIND_HUNTER:
+			pMissile->exist++;
+			pMissile->view = &missiles[MISSILE_KIND_ARROW][pMissile->dx + 1][pMissile->dy + 1];
+			break; // luk
+		case MOVER_KIND_XBOW:
+			pMissile->exist++;
+			pMissile->view = &missiles[MISSILE_KIND_XBOW][pMissile->dx + 1][pMissile->dy + 1];
+			break; // kusznik
+		case MOVER_KIND_PRIESTESS:
+			pMissile->exist += 3;
+			pMissile->view = &missiles[MISSILE_KIND_LIGHTNING][pMissile->dx + 1][pMissile->dy + 1];
+			break; // grom
+		case MOVER_KIND_MAGE:
+			pMissile->exist += 3;
+			pMissile->view = &missiles[MISSILE_KIND_PHANTOM][pMissile->dx + 1][pMissile->dy + 1];
+			break; // magowy
+		case MOVER_KIND_PRIEST:
+			pMissile->exist += 3;
+			pMissile->view = &missiles[MISSILE_KIND_FIREBALL][pMissile->dx + 1][pMissile->dy + 1];
+			break; // duzy ogien
+		case MOVER_KIND_PIKE:
+			pMissile->exist += 2;
+			pMissile->view = &missiles[MISSILE_KIND_PIKE][pMissile->dx + 1][pMissile->dy + 1];
+			break; // wlocznia
+		case 14:
+			pMissile->exist += 3;
+			pMissile->view = &missiles[MISSILE_KIND_FIREBALL][pMissile->dx + 1][pMissile->dy + 1];
+			break; // duzy ogien
+		case 13:
+			pMissile->exist += 3;
+			pMissile->view = &missiles[MISSILE_KIND_LIGHTNING][pMissile->dx + 1][pMissile->dy + 1];
+			break; // grom
 	}
+
 	//------------obliczenie przyrostow na ekranie
 	max = 2;
 	if (pMissile->view != NULL) {
@@ -242,8 +244,8 @@ void missileMove(tMissile *pMissile) {
 		}
 		if ((pMissile->type != 4) && (pMissile->type != 11) && (pMissile->type < 13)) {
 			if (!place[pMissile->xt][pMissile->yt]) {
-				tMover *tar = moverGetByNum(pMissile->target);
-				if (tar != NULL) {
+				if (pMissile->target != NULL && pMissile->target->eKind == MAP_OBJECT_KIND_MOVER) {
+					const tMover *tar = (tMover*)pMissile->target;
 					if (ABS(pMissile->xt - tar->x) < 2 && ABS(pMissile->yt - tar->y) < 2) {
 						pMissile->xt = tar->x;
 						pMissile->yt = tar->y;
@@ -267,7 +269,7 @@ void missileMove(tMissile *pMissile) {
 		//   Msg.Y = pMissile->yt;
 		// }
 		if (pMissile->type == 7 || pMissile->type == 5 || pMissile->type == 1) {
-			if (place[pMissile->xt][pMissile->yt] > 768)
+			if (place[pMissile->xt][pMissile->yt] == &g_sMapObjTree)
 				pMissile->dx = 1;
 			else
 				pMissile->dx = 2;

@@ -253,7 +253,7 @@ static int Who(int nr) // 0 nikt 1-nasz wojownik 2-nasz budynek 3-ich wojownik 4
     return 2; // nasz budynek
 }
 
-static int Type(int nr) // 0 nikt 1-nasz wojownik 3-nasz budynek 2-ich wojownik 4-ich budynek
+static int Type(int nr) // building.type / mover.type
 {
   int aa = nr & 0x00ff;
   int bb = nr >> 8;
@@ -297,14 +297,11 @@ tMover *moverGetByNum(int nr) {
   return NULL;
 }
 
-static void NewCow(int nr) {
-  tMover *oldcow = moverGetByNum(nr);
+static void NewCow(tMover *oldcow) {
   if (oldcow == NULL)
     return;
   // oldcow->wybrany=1;
-  int side = 1;
-  if (nr > 512 && nr < 768)
-    side = 0;
+  int side = (oldcow->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU) ? 0 : 1;
 
   for (int i = 2; i < 38; i++) {
     if (!(castle[side].m[i].exist)) {
@@ -312,7 +309,6 @@ static void NewCow(int nr) {
       oldcow->exist = 0;
       moverInit(&castle[side].m[i], oldcow->type, oldcow->x, oldcow->y, 1, 10);
       moverSetIFF(&castle[side].m[i], side + 1);
-      moverSetNr(&castle[side].m[i], i + ((side + 1) * 256) + 200);
       castle[side].m[i].hp = oldcow->hp;
       castle[side].m[i].maxhp = oldcow->maxhp;
       castle[side].m[i].udder = oldcow->udder;
@@ -334,6 +330,7 @@ static void NewCow(int nr) {
       return;
     }
   }
+
   for (UBYTE bi = 0; bi < CASTLE_BUILIDNGS_MAX; bi++)
     for (UBYTE bmi = 0; bmi < BUILDING_MOVERS_MAX; bmi++) {
       if (castle[side].b[bi].type == 2 && castle[side].b[bi].exist == 1)
@@ -345,7 +342,6 @@ static void NewCow(int nr) {
           oldcow->exist = 0;
           moverInit(&castle[side].b[bi].m[bmi], oldcow->type, oldcow->x, oldcow->y, 1, 10);
           moverSetIFF(&castle[side].b[bi].m[bmi], side + 1);
-          moverSetNr(&castle[side].b[bi].m[bmi], bi * 10 + bmi + 4 + ((side + 1) * 256));
           castle[side].b[bi].m[bmi].hp = oldcow->hp;
           castle[side].b[bi].m[bmi].maxhp = oldcow->maxhp;
           castle[side].b[bi].m[bmi].udder = oldcow->udder;
@@ -378,13 +374,13 @@ static void FindCow(int x, int y, int *xe, int *ye) {
       if ((i > 0) && (j > 0) && (i < WORLD_SIZE_X - 1) && (j < WORLD_SIZE_Y - 1)) {
         if (!place[i][j])
           Place[i][j] = 1000;
-        if (place[i][j] > 255 && place[i][j] < 500) {
-          ii = Who(place[i][j]);
-          if (ii == 1) // nasz wojownik
+        if (place[i][j] && place[i][j]->eTeam == MAP_OBJECT_TEAM_PLAYER) {
+          if (place[i][j]->eKind == MAP_OBJECT_KIND_MOVER) // nasz wojownik
           {
-            ii = Type(place[i][j]);
-            if (ii == 0)
+            tMover *pPlayerMover = (tMover*)place[i][j];
+            if (pPlayerMover->type == 0) {
               Place[i][j] = 1001;
+            }
           }
         }
       }
@@ -447,21 +443,22 @@ static void FindShed(int k, int *xm, int *ym) {
   }
 }
 
-static void FindEnemy(int x, int y, int *xe, int *ye, int *distance) {
+static void FindEnemy(int x, int y, int *xe, int *ye, int distance) {
   int i, j, startk, stopk;
   int ii, jj;
-  for (j = 0; j < WORLD_SIZE_Y; j++)
+  for (j = 0; j < WORLD_SIZE_Y; j++) {
     for (i = 0; i < WORLD_SIZE_X; i++) {
       Place[i][j] = 1;
       if (!place[i][j])
         Place[i][j] = 1000;
-      if (place[i][j] > 255 && place[i][j] < 500 && !(*distance))
+      else if (place[i][j]->eTeam == MAP_OBJECT_TEAM_PLAYER && !(distance))
         Place[i][j] = 1001;
-      if (place[i][j] > 511 && place[i][j] < 512 + 255 && (*distance == 1))
+      else if (place[i][j]->eTeam == MAP_OBJECT_TEAM_CPU && distance == 1)
         Place[i][j] = 1001;
-      if ((place[i][j] > drzewa0) && ((*distance) == 2))
+      else if ((place[i][j]->eTeam == MAP_OBJECT_TEAM_TREE) && distance == 2)
         Place[i][j] = 1001;
     }
+  }
 
   startk = 0;
   stopk = 0;
@@ -579,6 +576,7 @@ void moverDisable(tMover *pMover) {
 }
 
 void moverInit(tMover *pMover, int eMoverKind, int x1, int y1, int c, int d) {
+  pMover->sMapObject.eKind = MAP_OBJECT_KIND_MOVER;
   pMover->magic = 0;
   if (eMoverKind == 3 || eMoverKind == 4 || eMoverKind == 11)
     pMover->magic = dmagic[0] / 2;
@@ -628,30 +626,25 @@ void moverDestruct(tMover *pMover) {
   pMover->wybrany = 0;
 }
 
-void moverSetNr(tMover *pMover, int Nr) {
-	pMover->nr = Nr;
-}
-
-void moverSetTarget(tMover *pMover, int Nr) {
-  pMover->target = Nr;
+void moverSetTarget(tMover *pMover, const tMapObject *pTarget) {
+  pMover->target = pTarget;
   pMover->mainTarget = 1;
 
   if (pMover->type == 11) {
-    int d = Who(pMover->target);
-    if (d != 1 && d != 3) {
+    if (pMover->target && pMover->target->eKind != MAP_OBJECT_KIND_MOVER) {
       pMover->target = 0;
       pMover->mainTarget = 0;
     }
   }
 }
 
-void moverSetIFF(tMover *pMover, int Nr) {
-  pMover->IFF = Nr;
-  if (pMover->IFF == 2 && g_eDifficulty > 1) {
+void moverSetIFF(tMover *pMover, tMapObjectTeam eTeam) {
+  pMover->sMapObject.eTeam = eTeam;
+  if (eTeam == MAP_OBJECT_TEAM_CPU && g_eDifficulty > DIFFICULTY_MEDIUM) {
     pMover->hp += 15;
     pMover->maxhp += 15;
   }
-  if (pMover->IFF == 2 && !g_eDifficulty) {
+  else if (eTeam == MAP_OBJECT_TEAM_CPU && g_eDifficulty == DIFFICULTY_EASY) {
     pMover->hp -= 25;
     pMover->maxhp -= 25;
   }
@@ -875,6 +868,13 @@ void moverLabeling(tMover *pMover) {
   }
 }
 
+tMover *moverTryGetAt(UBYTE ubX, UBYTE ubY) {
+  if(place[ubX][ubY] && place[ubX][ubY]->eKind == MAP_OBJECT_KIND_MOVER) {
+    return (tMover*)place[ubX][ubY];
+  }
+  return 0;
+}
+
 void moverMove(tMover *pMover) {
   pMover->inmove = 0;
   if (pMover->xe < 1)
@@ -901,12 +901,13 @@ void moverMove(tMover *pMover) {
   place[pMover->x][pMover->y] = 0;
   if (!pMover->ispath)
     moverLabeling(pMover);
-  place[pMover->x][pMover->y] = pMover->nr;
+
+  place[pMover->x][pMover->y] = &pMover->sMapObject;
   if (!pMover->ispath) {
     if (!pMover->type) {
       tMover *mov;
       if (place[pMover->x - 1][pMover->y - 1]) {
-        mov = moverGetByNum(place[pMover->x - 1][pMover->y - 1]);
+        mov = moverTryGetAt(pMover->x - 1, pMover->y - 1);
         if (mov != NULL) {
           moverSetEnd(mov, pMover->x - 5, pMover->y - 5);
           moverSetCommand(mov, 1);
@@ -915,7 +916,7 @@ void moverMove(tMover *pMover) {
         }
       }
       if (place[pMover->x + 1][pMover->y + 1]) {
-        mov = moverGetByNum(place[pMover->x + 1][pMover->y + 1]);
+        mov = moverTryGetAt(pMover->x + 1, pMover->y + 1);
         if (mov != NULL) {
           moverSetEnd(mov, pMover->x + 5, pMover->y + 5);
           moverSetCommand(mov, 1);
@@ -924,7 +925,7 @@ void moverMove(tMover *pMover) {
         }
       }
       if (place[pMover->x - 1][pMover->y + 1]) {
-        mov = moverGetByNum(place[pMover->x - 1][pMover->y + 1]);
+        mov = moverTryGetAt(pMover->x - 1, pMover->y + 1);
         if (mov != NULL) {
           moverSetEnd(mov, pMover->x - 5, pMover->y + 5);
           moverSetCommand(mov, 1);
@@ -1001,11 +1002,11 @@ int moverLookAround(tMover *pMover) {
     return 1;
   }
 
-  int i, j, k = 1, d = 0, iff;
+  int i, j, k = 1;
   int NoOfEnemies = 0;
   int NoOfOurs = 0;
 
-  if (pMover->IFF == 2 && pMover->type == 10) // pastuch
+  if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->type == MOVER_KIND_FARMER)
   {
     FindCow(pMover->x, pMover->y, &pMover->xe, &pMover->ye);
     if (pMover->xe != pMover->x || pMover->y != pMover->ye) {
@@ -1027,32 +1028,34 @@ int moverLookAround(tMover *pMover) {
       return 0;
   }*/
 
-  iff = pMover->IFF << 8;
   pMover->ispath = 0;
   pMover->target = 0;
 
-  if (pMover->IFF == 2 && pMover->hp > (pMover->maxhp - 20)) // komputerowy
+  if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->hp > (pMover->maxhp - 20))
   {
     k = pMover->s_range + pMover->drange;
-    for (i = pMover->x - k; i <= pMover->x + k && i < WORLD_SIZE_X - 1; i++)
+    for (i = pMover->x - k; i <= pMover->x + k && i < WORLD_SIZE_X - 1; i++) {
       for (j = pMover->y - k + 1; j <= pMover->y + k - 1 && j < WORLD_SIZE_Y - 1; j++) {
-        switch (Who(place[i][j])) {
-        case 1:
-          NoOfEnemies++;
-          break;
-        case 3:
-          NoOfOurs++;
-          break;
+        if(place[i][j] && place[i][j]->eKind == MAP_OBJECT_KIND_MOVER) {
+          if(place[i][j]->eTeam == MAP_OBJECT_TEAM_PLAYER) {
+            NoOfEnemies++;
+          }
+          else {
+            NoOfOurs++;
+          }
         }
       }
+    }
+
     if (NoOfEnemies > 2 && NoOfOurs == 1) {
-      int distance = 1;
-      FindEnemy(pMover->x, pMover->y, &pMover->xe, &pMover->ye, &distance);
+      FindEnemy(pMover->x, pMover->y, &pMover->xe, &pMover->ye, 1);
       pMover->commandN = 1; // move
       return 0;
     }
   }
 
+  const tMapObject *pOther = 0;
+  tMapObjectTeam eEnemyTeam = pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER ? MAP_OBJECT_TEAM_CPU : MAP_OBJECT_TEAM_PLAYER;
   for (k = 1; k <= pMover->s_range + pMover->drange; k++) {
     UBYTE ubStartX = MAX(0, pMover->x - k);
     UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, pMover->x + k);
@@ -1060,26 +1063,29 @@ int moverLookAround(tMover *pMover) {
     UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, pMover->y + k);
     for (i = ubStartX; i <= ubEndX; i++)
       for (j = ubStartY; j <= ubEndY; j++) {
-        if (place[i][j] && place[i][j] != pMover->nr) {
-          d = place[i][j];
-          int dd = Who(d);
-          if (((d & 0xff00) != iff) && (dd == 1 || dd == 3)) { // postac
-            pMover->target = d;
-            if (pMover->type != 10)
+        if (place[i][j] && place[i][j] != &pMover->sMapObject) {
+          pOther = place[i][j];
+          if (pOther->eTeam == eEnemyTeam && pOther->eKind == MAP_OBJECT_KIND_MOVER) {
+            tMover *pOtherMover = (tMover*)pOther;
+            pMover->target = pOther;
+
+            if (pMover->type != 10) {
               return 1;
-            tMover *mm = moverGetByNum(pMover->target);
-            if ((!mm->type) || (mm->type == 9))
+            }
+
+            if ((!pOtherMover->type) || (pOtherMover->type == 9)) {
               return 1;
+            }
           }
         }
       }
   }
 
-  if (!d || pMover->IFF == 1) {
-    return 0; // nasi nie atakuja budynkow
-  }
-  if (pMover->type == 11) {
-    return 0; // Mag tez nie
+  if (!pOther || pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER || pMover->type == 11) {
+    // No map objects in vincity
+    // Player units don't auto-attack buildings
+    // Mages don't auto-attack buildings
+    return 0;
   }
 
   for (k = 1; k <= pMover->s_range + pMover->drange; k++) {
@@ -1087,16 +1093,17 @@ int moverLookAround(tMover *pMover) {
     UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, pMover->x + k);
     UBYTE ubStartY = MAX(0, pMover->y - k);
     UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, pMover->y + k);
-    for (i = ubStartX; i <= ubEndX; i++)
+    for (i = ubStartX; i <= ubEndX; i++) {
       for (j = ubStartY; j <= ubEndY; j++) {
-        if (place[i][j] && place[i][j] != pMover->nr) {
-          d = place[i][j];
-          if (d < 256 + 512 && d > 255 && (d & 0xff00) != iff) {
-            pMover->target = d;
+        if (place[i][j] && place[i][j] != &pMover->sMapObject) {
+          pOther = place[i][j];
+          if (pOther->eTeam == eEnemyTeam) {
+            pMover->target = pOther;
             return 1;
           }
         }
       }
+    }
   }
 
   return 0;
@@ -1135,16 +1142,19 @@ int moverDistance(tMover *pMover) {
 
 void moverAttack(tMover *pMover) {
   pMover->inmove = 0;
-  if (pMover->target < 768)
-    pMover->ispath = 0;
-  if (pMover->target > 768 && pMover->type != 1 && pMover->type != 4) {
-    pMover->target = 0;
-    pMover->mainTarget = 0;
-  }
   if (!pMover->target) {
     pMover->phase = 0;
     pMover->delay = pMover->maxdelay;
     return;
+  }
+
+  // wooden wall is internally a tree
+  if (pMover->target->eTeam != MAP_OBJECT_TEAM_TREE) {
+    pMover->ispath = 0;
+  }
+  else if (pMover->type != MOVER_KIND_AXE && pMover->type != MOVER_KIND_MAGE) {
+    pMover->target = 0;
+    pMover->mainTarget = 0;
   }
 
   if (!moverLokateTarget(pMover)) {
@@ -1162,15 +1172,18 @@ void moverAttack(tMover *pMover) {
     pMover->delay = pMover->maxdelay;
     return;
   }
+
   if (moverDistance(pMover) <= pMover->a_range) {
     if (pMover->type == 10) {
       pMover->ispath = 0;
       /// wstaznik na krowe
 
       pMover->inattack = 1;
-      tMover *oldcow = moverGetByNum(pMover->target);
-      if (oldcow != NULL)
+      tMover *oldcow = (tMover*)pMover->target;
+      if (oldcow != NULL) {
         moverSetCommand(oldcow, 123); // zmiana
+      }
+
       pMover->dx = pMover->x - pMover->xe;
       pMover->dy = pMover->y - pMover->ye;
       if (pMover->dx > 1)
@@ -1194,42 +1207,42 @@ void moverAttack(tMover *pMover) {
     }
     pMover->dx = pMover->x - pMover->xe;
     pMover->dy = pMover->y - pMover->ye;
-    if (pMover->IFF == 2 && pMover->type == 3 && pMover->magic < 11) {
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->type == MOVER_KIND_PRIESTESS && pMover->magic < 11) {
       moverSetEnd(pMover, pMover->x + (pMover->dx * 3), pMover->y + (pMover->dy * 3));
       moverMove(pMover);
       return;
     }
-    if (pMover->IFF == 2 && pMover->type == 11 && pMover->magic < 11) {
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->type == MOVER_KIND_MAGE && pMover->magic < 11) {
       moverSetEnd(pMover, pMover->x + (pMover->dx * 3), pMover->y + (pMover->dy * 3));
       moverMove(pMover);
       return;
     }
-    if (pMover->IFF == 2 && pMover->type == 4 && pMover->magic < 21) {
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->type == MOVER_KIND_PRIEST && pMover->magic < 21) {
       moverSetEnd(pMover, pMover->x + (pMover->dx * 3), pMover->y + (pMover->dy * 3));
       moverMove(pMover);
       return;
     } // ucieczka
     pMover->delay = pMover->maxdelay;
 
-    if (pMover->type == 3 && pMover->magic < 11) {
+    if (pMover->type == MOVER_KIND_PRIESTESS && pMover->magic < 11) {
       pMover->phase = 0;
       pMover->dx = 0;
       pMover->dy = 0;
       return;
     }
-    if (pMover->type == 4 && pMover->magic < 21) {
+    if (pMover->type == MOVER_KIND_PRIEST && pMover->magic < 21) {
       pMover->phase = 0;
       pMover->dx = 0;
       pMover->dy = 0;
       return;
     }
-    if (pMover->type == 11 && pMover->magic < 21) {
+    if (pMover->type == MOVER_KIND_MAGE && pMover->magic < 21) {
       pMover->phase = 0;
       pMover->dx = 0;
       pMover->dy = 0;
       return;
     }
-    if (pMover->IFF == 2 && (pMover->type == 4 || pMover->type == 3) && pMover->magic > 80) {
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && (pMover->type == MOVER_KIND_PRIEST || pMover->type == MOVER_KIND_PRIESTESS) && pMover->magic > 80) {
       pMover->phase = 0;
       pMover->dx = 0;
       pMover->dy = 0;
@@ -1238,26 +1251,26 @@ void moverAttack(tMover *pMover) {
       return;
     }
 
-    if (pMover->type == 3)
+    if (pMover->type == MOVER_KIND_PRIESTESS)
       pMover->magic -= 10;
-    if (pMover->type == 4)
+    if (pMover->type == MOVER_KIND_PRIEST)
       pMover->magic -= 20;
-    if (pMover->type == 11)
+    if (pMover->type == MOVER_KIND_MAGE)
       pMover->magic -= 20;
-    if (pMover->IFF == 2 && place[pMover->xe][pMover->ye] > 800)
-      pMover->damage += 20;
-    missileInit(&pMover->missile, pMover->x, pMover->y, pMover->xe, pMover->ye, pMover->damage + ddamage[pMover->exp >> 4], pMover->type);
-    if (pMover->IFF == 2 && place[pMover->xe][pMover->ye] > 800)
-      pMover->damage -= 20;
-    if ((pMover->type == 4 || pMover->type == 11) && pMover->target > 768) {
+
+    int baseDamage = pMover->damage;
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && place[pMover->xe][pMover->ye] == &g_sMapObjTree) // was comparing to 800, doesn't make sense
+      baseDamage += 20;
+    missileInit(&pMover->missile, pMover->x, pMover->y, pMover->xe, pMover->ye, baseDamage + ddamage[pMover->exp >> 4], pMover->type);
+
+    if ((pMover->type == 4 || pMover->type == 11) && pMover->target->eTeam == MAP_OBJECT_TEAM_TREE) {
       pMover->mainTarget = 0;
     }
-    if (pMover->target < 768 && pMover->exp < (15 * 16) - 5) {
-      int kkl = Who(pMover->target);
-      if (kkl == 3 || pMover->IFF == 2) // jezeli nie budynek
-      {
+    if (pMover->target && pMover->target->eTeam != MAP_OBJECT_TEAM_TREE && pMover->exp < (15 * 16) - 5) {
+      if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU) {
+        // NOTE: comment says "if not a building", but condition allowed them anyway
         pMover->exp++;
-        if (pMover->type == 3 || pMover->type == 4 || pMover->type == 11)
+        if (pMover->type == MOVER_KIND_PRIESTESS || pMover->type == MOVER_KIND_PRIEST || pMover->type == MOVER_KIND_MAGE)
           pMover->exp += 3;
       }
     }
@@ -1394,7 +1407,7 @@ void moverRun1(tMover *pMover) // rycerze
       if (pMover->hp > dem) {
         pMover->hp -= dem;
         pMover->ShowHit = 5;
-        if (pMover->IFF == 2)
+        if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU)
           pMover->drange = 6;
       } else {
         pMover->exist = 2;
@@ -1413,7 +1426,7 @@ void moverRun1(tMover *pMover) // rycerze
         // }
         return;
       }
-      if (pMover->hp < ((UBYTE)g_eDifficulty >> 4) && pMover->IFF == 2 && pMover->command != 1) //&&diff
+      if (pMover->hp < ((UBYTE)g_eDifficulty >> 4) && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->command != 1) //&&diff
       { // jezeli chory to udaj sie do swiatyni na leczenie
         int xl = pMover->x, yl = pMover->y;
         FindHolyPlace(&xl, &yl);
@@ -1433,7 +1446,7 @@ void moverRun1(tMover *pMover) // rycerze
   if (pMover->drange)
     pMover->drange--;
 
-  if (pMover->IFF == 2 && !pMover->command && placeG[pMover->x][pMover->y] == 163) //??? nie blokuj obory
+  if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && !pMover->command && placeG[pMover->x][pMover->y] == 163) //??? nie blokuj obory
   {
     moverSetEnd(pMover, pMover->x + 2, pMover->y - 3);
     moverSetCommand(pMover, 1);
@@ -1455,7 +1468,7 @@ void moverRun1(tMover *pMover) // rycerze
              SetCommand(1);
          }
      }*/
-  if (pMover->hp == pMover->maxhp && pMover->IFF == 2 && !pMover->command &&
+  if (pMover->hp == pMover->maxhp && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && !pMover->command &&
       placeG[pMover->x][pMover->y] == 256) { // wyleczony odsun sie z miejsca leczenia
     moverSetEnd(pMover, pMover->x + 5, pMover->y + 5);
     moverSetCommand(pMover, 1);
@@ -1520,7 +1533,7 @@ void moverRun1(tMover *pMover) // rycerze
 
   switch (pMover->command) {
   case 123:
-    NewCow(pMover->nr);
+    NewCow(pMover);
     return;
   case 0:
     if (moverLookAround(pMover)) {
@@ -1584,7 +1597,7 @@ void moverRun1(tMover *pMover) // rycerze
       pMover->inattack = 1;
       pMover->magic -= 50;
       pMover->marmour = 100;
-      if (pMover->IFF == 1)
+      if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER)
         pMover->marmour = 200;
       // if (Msg.dzwiek < 16) {
       //   Msg.dzwiek = 10;
@@ -1629,17 +1642,18 @@ void moverRun1(tMover *pMover) // rycerze
       pMover->commandN = 0;
       return;
     }
-    pMover->target = 2;
-    FindEnemy(pMover->x, pMover->y, &pMover->xe, &pMover->ye, &pMover->target);
+    FindEnemy(pMover->x, pMover->y, &pMover->xe, &pMover->ye, 2);
     pMover->target = place[pMover->xe][pMover->ye];
     if (pMover->xe == 32 && pMover->ye == 32)
       pMover->target = 0;
-    if (pMover->target == pMover->nr)
+    if (pMover->target == &pMover->sMapObject)
       pMover->target = 0;
-    if (!pMover->target)
+    if (!pMover->target) {
       moverLookAround(pMover);
-    if (pMover->target)
+    }
+    if (pMover->target) {
       moverAttack(pMover);
+    }
     pMover->commandN = 11;
     pMover->target = 0;
     return;
@@ -1715,7 +1729,7 @@ void moverGraze(tMover *pMover) {
   placeG[pMover->x][pMover->y]--;
   if (pMover->udder >= 100) {
     int k = 0;
-    if (pMover->IFF == 2)
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU)
       k = 1;
 
     if (placeG[pMover->xm][pMover->ym - 1] != 160) {
@@ -1792,7 +1806,7 @@ void moverRun2(tMover *pMover) // krowy
       } else {
         if (placeG[pMover->xm][pMover->ym - 1] != 160) {
           int k = 0;
-          if (pMover->IFF == 2)
+          if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU)
             k = 1;
           FindShed(k, &pMover->xm, &pMover->ym);
         }
@@ -1806,7 +1820,7 @@ void moverRun2(tMover *pMover) // krowy
   }
 
   if (pMover->command == 123) {
-    NewCow(pMover->nr);
+    NewCow(pMover);
     return;
   }
   if (pMover->command == 1) {
@@ -1831,7 +1845,7 @@ void moverRun2(tMover *pMover) // krowy
   if (pMover->command == 5) {
     // ucieczka do obory
     int k = 0;
-    if (pMover->IFF == 2)
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU)
       k = 1;
 
     if (placeG[pMover->xm][pMover->ym - 1] != 160) {
@@ -1866,9 +1880,11 @@ void moverSetEnd(tMover *pMover, int x0, int y0) {
   if (x0 > WORLD_SIZE_X - 2)
     x0 = WORLD_SIZE_X - 2;
 
-  if (!pMover->type) {
-    if ((placeG[x0][y0] == 163 && place[x0][y0 - 1] < 512) ||
-        (place[x0][y0] < 512 && placeG[x0][y0] > 157 && placeG[x0][y0] < 166)) {
+  if (pMover->type == MOVER_KIND_COW) {
+    if (
+      (placeG[x0][y0] == PICTURE_KIND_BUILDING_1_FULL_6 && place[x0][y0 - 1]->eTeam == MAP_OBJECT_TEAM_PLAYER) ||
+      (PICTURE_KIND_BUILDING_1_FULL_0 < placeG[x0][y0] && placeG[x0][y0] < PICTURE_KIND_BUILDING_1_FULL_9 && place[x0][y0]->eTeam == MAP_OBJECT_TEAM_PLAYER)
+    ) {
       for (int i = x0 - 3; i < x0 + 1; i++)
         for (int j = y0; j < y0 + 3; j++) {
           if (placeG[i][j] == 163) {
@@ -1881,7 +1897,8 @@ void moverSetEnd(tMover *pMover, int x0, int y0) {
           }
         }
       return;
-    } else {
+    }
+    else {
       pMover->xp = x0;
       pMover->yp = y0;
     }
@@ -1989,7 +2006,7 @@ void moverShowS(tMover *pMover) {
     if (pMover->delay < 70)
       k = 0; // k-faza rozkladu typ-typ postaci
     if (k) {
-      if (pMover->IFF == 1) {
+      if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
         gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &movers[5 - k][pMover->type][1][1]);
       }
       else {
@@ -2001,7 +2018,7 @@ void moverShowS(tMover *pMover) {
         k = 2;
       if (!pMover->type)
         k = 1;
-      if (pMover->IFF == 1) {
+      if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
         gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &dead[k]);
       }
       else {
@@ -2035,11 +2052,11 @@ void moverShowS(tMover *pMover) {
     if (!hh)
       hh = 1;
     Bar13h(pMover->xr + a + 1, pMover->yr + b - 2, pMover->xr + a + 1 + hh, pMover->yr + b, color);
-    if (pMover->magic && pMover->IFF == 1) {
+    if (pMover->magic && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
       hh = (pMover->magic * 14 / dmagic[pMover->exp >> 4]);
       Bar13h(pMover->xr + a + 16, pMover->yr + b + 14 - hh, pMover->xr + a + 17, pMover->yr + b + 14, LightBlue);
     }
-    if (!pMover->type && pMover->IFF == 1) {
+    if (!pMover->type && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
       hh = ((pMover->udder * 14) / 100);
       if (pMover->udder < 4)
         hh = 0;
@@ -2056,7 +2073,7 @@ void moverShowS(tMover *pMover) {
   // There was a flipped draw of mover image here, it's gone now.
   // Beware: mover dx and dy are in reverse orientation as frames!
   if (movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy].pBitmap) {
-    if (pMover->IFF == 1) {
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
       gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy]);
     }
     else {
@@ -2080,8 +2097,8 @@ void moverShowS(tMover *pMover) {
 
 void moverShow(tMover *pMover) {
   int i, j;
-  place[pMover->x][pMover->y] = pMover->nr;
-  if (pMover->IFF == 1) {
+  place[pMover->x][pMover->y] = &pMover->sMapObject;
+  if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
     for (i = -pMover->s_range; i <= pMover->s_range; i++) {
       if (pMover->x + i > 0 && pMover->x + i < WORLD_SIZE_X)
         for (j = -pMover->s_range; j <= pMover->s_range; j++) {

@@ -2,6 +2,7 @@
 
 #include "gfx.h"
 #include "missile.h"
+#include "map_object.h"
 
 typedef enum tMoverPhase {
 	MOVER_PHASE_STAND,
@@ -30,11 +31,11 @@ typedef enum tMoverKind {
 } tMoverKind;
 
 typedef struct tMover {
+  tMapObject sMapObject;
   int xr, yr;
   char wybrany;
-  int nr; // nr bity 0-7 nr bity 8-9 IFF bity 10-15 typ
   int hp, maxhp;
-  int mainTarget;
+  int mainTarget; // bool
   int visible;
   int command, commandN; // 0-nic 1-go 2-fight
   tMoverKind type;              // 0-krowa 1-miecz 2-luk 3-mag
@@ -42,7 +43,6 @@ typedef struct tMover {
 
   int exist;
 
-  int IFF; // zawsze 1 lub 2
   int exp;
   int x, y;
   int xe, ye;
@@ -60,7 +60,7 @@ typedef struct tMover {
   int base;
   int s_range;
   int a_range;
-  int target;
+  const tMapObject *target;
   int ShowHit;
   int delay, maxdelay;
   int ispath;
@@ -72,6 +72,7 @@ void moverGraphicsCreate(void);
 void moverGraphicsDestroy(void);
 
 tMover *moverGetByNum(int nr);
+tMover *moverTryGetAt(UBYTE ubX, UBYTE ubY);
 
 void moverConstruct(tMover *pMover);
 void moverDestruct(tMover *pMover);
@@ -84,11 +85,10 @@ void moverPrepare(tMover *pMover, int, int, int);
 void moverShowS(tMover *pMover);
 void moverDisable(tMover *pMover);
 void moverRepare(tMover *pMover);
-void moverSetNr(tMover *pMover, int);
-void moverSetIFF(tMover *pMover, int);
-void moverInit(tMover *pMover, int, int, int, int, int);
+void moverSetIFF(tMover *pMover, tMapObjectTeam eTeam);
+void moverInit(tMover *pMover, int eMoverKind, int x1, int y1, int c, int d);
 void moverSetCommand(tMover *pMover, int);
-void moverSetTarget(tMover *pMover, int);
+void moverSetTarget(tMover *pMover, const tMapObject *pTarget);
 void moverRun(tMover *pMover);
 int moverMilk(tMover *pMover);
 int moverOK(const tMover *pMover);

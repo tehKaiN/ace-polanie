@@ -68,14 +68,14 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 				else if (PICTURE_KIND_TREE_0_BOTTOM <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_TREE_6_BOTTOM)
 					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[2]); // trawa pod drzewem
 				else if (PICTURE_KIND_CONSTRUCTION_0 <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_RUIN_8) {
-					if(place[ubX][ubY] < 512) {
+					if(place[ubX][ubY]->eTeam == MAP_OBJECT_TEAM_PLAYER) {
 						gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY]]); // zamek i ruina nasz
 					}
 					else {
 						PutImageChange13h(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY]], 0, color1, color2); // zamek i ruina ich
 					}
 				}
-				if (place[ubX][ubY] == 2)
+				if (place[ubX][ubY] == &g_sMapObjBridge)
 					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &picture[156]); // pale
 				if (placeG[ubX][ubY] == 256)
 					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[PICTURE_KIND_GRASS_2]); // swiete miejsce
@@ -385,14 +385,6 @@ void worldDump(UBYTE ubStartX, UBYTE ubStartY, UBYTE ubSizeX, UBYTE ubSizeY) {
 		}
 		logWrite(szBfr);
 	}
-	logWrite("\nplace:");
-	for(UBYTE y = ubStartY; y < ubStartY + ubSizeY; ++y) {
-		char *pEnd = szBfr + sprintf(szBfr, "%2hhu: ", y);
-		for(UBYTE x = ubStartX; x < ubStartX + ubSizeX; ++x) {
-			pEnd += sprintf(pEnd, "%03X ", place[x][y]);
-		}
-		logWrite(szBfr);
-	}
 	logBlockEnd("worldDump()");
 }
 
@@ -415,7 +407,7 @@ const UWORD Ye[16] = {
 
 int drzewa;
 int drzewa0;
-UWORD place[WORLD_SIZE_X][WORLD_SIZE_Y];
+const tMapObject *place[WORLD_SIZE_X][WORLD_SIZE_Y];
 UBYTE placeN[WORLD_SIZE_X][WORLD_SIZE_Y]; // 0 means behind fog of war
 UWORD attack[WORLD_SIZE_X][WORLD_SIZE_Y];
 UWORD placeG[WORLD_SIZE_X][WORLD_SIZE_Y];

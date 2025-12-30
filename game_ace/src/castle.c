@@ -95,10 +95,11 @@ void castleRun(tCastle *pCastle) {
       //   Msg.Y = pCastle->command.y;
       // }
     }
+
     if (pCastle->command.command == 2 && pCastle->milk >= 45 &&
-        place[pCastle->command.x][pCastle->command.y] == 1) // most
+        place[pCastle->command.x][pCastle->command.y] == &g_sMapObjWater) // most
     {
-      place[pCastle->command.x][pCastle->command.y] = 2;
+      place[pCastle->command.x][pCastle->command.y] = &g_sMapObjBridge;
       pCastle->milk -= 80;
       // if (Msg.dzwiek < 20) {
       //   Msg.dzwiek = 20;
@@ -106,6 +107,7 @@ void castleRun(tCastle *pCastle) {
       //   Msg.Y = pCastle->command.y;
       // }
     }
+
     if (pCastle->command.command == 3 && pCastle->milk >= 50) // palisada
     {
       placeG[pCastle->command.x][pCastle->command.y] = 277;
@@ -120,6 +122,7 @@ void castleRun(tCastle *pCastle) {
       //   Msg.Y = pCastle->command.y;
       // }
     }
+
     if (pCastle->command.command > 3) // budowa budynku
     {
       int w = 20;
@@ -147,6 +150,7 @@ void castleRun(tCastle *pCastle) {
       }
     }
   }
+
   if (pCastle->command.co == 0) // komendy dla budynkow (odbudowa)
   {
     if (pCastle->command.command == 1 && pCastle->milk >= 250) {

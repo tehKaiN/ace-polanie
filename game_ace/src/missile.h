@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gfx.h"
+#include "map_object.h"
 
 typedef enum tMissileKind {
 	MISSILE_KIND_ARROW,
@@ -13,7 +14,8 @@ typedef enum tMissileKind {
 } tMissileKind;
 
 typedef struct tMissile {
-  int x, y, xt, yt, target;
+  int x, y, xt, yt;
+	const tMapObject *target;
   int dx, dy;
   char type;
   tImage *view;
@@ -26,7 +28,7 @@ void missileImageCreate(void);
 
 void missileImageDestroy(void);
 
-void missileInit(tMissile *pMissile, int x1, int y1, int x2, int y2, int d, int t);
+void missileInit(tMissile *pMissile, int x1, int y1, int x2, int y2, int damage, int ownerKind);
 
 void missileMove(tMissile *pMissile);
 
