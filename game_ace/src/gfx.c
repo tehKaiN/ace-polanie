@@ -28,17 +28,17 @@ void gfxCopyBackToFront(void) {
 
 void gfxDrawImageNoMask(WORD wX, WORD wY, tImage *pImage) {
   if (wX < 0 || wY < 0) {
-    return;
+    logWrite("ERR: gfxDrawImageNoMask() has negative coords");
 	}
 
   UWORD uwWidth = pImage->uwWidth;
   UWORD uwHeight = pImage->uwHeight;
   if (wX + uwWidth < g_gfxClipX1 || wY + uwHeight < g_gfxClipY1 || wX >= g_gfxClipX2 || wY >= g_gfxClipY2) {
-    return;
+    logWrite("ERR: gfxDrawImageNoMask() deep out of clip bounds");
 	}
 
 	if (wY + uwHeight > 199) {
-		uwHeight = 199 - wY;
+    logWrite("ERR: gfxDrawImageNoMask() out of screen bound Y");
 	}
 
 	if(!pImage->pBitmap) {
