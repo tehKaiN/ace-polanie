@@ -109,8 +109,8 @@ static const UBYTE Phase[MOVER_KIND_COUNT][19] = {
     {0, 0, 2, 2, 0, 0, 1, 1, 1, 6, 0, 0, 0, 0, 0, 0, 0, 4, 2}
 };
 
-static UBYTE floodfillQueue[2000];
-static int Place[WORLD_SIZE_X][WORLD_SIZE_Y];
+static UBYTE s_pFloodfillQueue[2000];
+static int s_pFloodFillPlane[WORLD_SIZE_X][WORLD_SIZE_Y];
 
 static tMixedBitmaps s_sMixedAxe;
 static tMixedBitmaps s_sMixedBear;
@@ -370,16 +370,16 @@ static void FindCow(int x, int y, int *xe, int *ye) {
   int ii, jj;
   for (j = 0; j < WORLD_SIZE_Y; j++)
     for (i = 0; i < WORLD_SIZE_X; i++) {
-      Place[i][j] = 1;
+      s_pFloodFillPlane[i][j] = 1;
       if ((i > 0) && (j > 0) && (i < WORLD_SIZE_X - 1) && (j < WORLD_SIZE_Y - 1)) {
         if (!place[i][j])
-          Place[i][j] = 1000;
+          s_pFloodFillPlane[i][j] = 1000;
         if (place[i][j] && place[i][j]->eTeam == MAP_OBJECT_TEAM_PLAYER) {
           if (place[i][j]->eKind == MAP_OBJECT_KIND_MOVER) // nasz wojownik
           {
             tMover *pPlayerMover = (tMover*)place[i][j];
             if (pPlayerMover->type == 0) {
-              Place[i][j] = 1001;
+              s_pFloodFillPlane[i][j] = 1001;
             }
           }
         }
@@ -389,12 +389,12 @@ static void FindCow(int x, int y, int *xe, int *ye) {
   stopk = 0;
   i = x;
   j = y;
-  Place[i][j] = 1000;
+  s_pFloodFillPlane[i][j] = 1000;
   do {
     /////////////////pozar prerii///////////////////////////
     if (stopk != startk) {
-      i = floodfillQueue[stopk];
-      j = floodfillQueue[stopk + 1];
+      i = s_pFloodfillQueue[stopk];
+      j = s_pFloodfillQueue[stopk + 1];
       if (stopk < 1950)
         stopk += 2;
       else
@@ -403,16 +403,16 @@ static void FindCow(int x, int y, int *xe, int *ye) {
 
     for (jj = j - 1; jj < j + 2; jj++)
       for (ii = i - 1; ii < i + 2; ii++) {
-        if (Place[ii][jj] == 1001) {
+        if (s_pFloodFillPlane[ii][jj] == 1001) {
           *xe = ii;
           *ye = jj;
           return;
         }
-        if (Place[ii][jj] == 1000)
+        if (s_pFloodFillPlane[ii][jj] == 1000)
           if (ii > 0 && ii < WORLD_SIZE_X - 1 && jj > 0 && jj < WORLD_SIZE_Y - 1) {
-            Place[ii][jj] = 1;
-            floodfillQueue[startk] = ii;
-            floodfillQueue[startk + 1] = jj;
+            s_pFloodFillPlane[ii][jj] = 1;
+            s_pFloodfillQueue[startk] = ii;
+            s_pFloodfillQueue[startk + 1] = jj;
             if (startk < 1950)
               startk += 2;
             else
@@ -448,15 +448,15 @@ static void FindEnemy(int x, int y, int *xe, int *ye, int distance) {
   int ii, jj;
   for (j = 0; j < WORLD_SIZE_Y; j++) {
     for (i = 0; i < WORLD_SIZE_X; i++) {
-      Place[i][j] = 1;
+      s_pFloodFillPlane[i][j] = 1;
       if (!place[i][j])
-        Place[i][j] = 1000;
+        s_pFloodFillPlane[i][j] = 1000;
       else if (place[i][j]->eTeam == MAP_OBJECT_TEAM_PLAYER && !(distance))
-        Place[i][j] = 1001;
+        s_pFloodFillPlane[i][j] = 1001;
       else if (place[i][j]->eTeam == MAP_OBJECT_TEAM_CPU && distance == 1)
-        Place[i][j] = 1001;
+        s_pFloodFillPlane[i][j] = 1001;
       else if ((place[i][j]->eTeam == MAP_OBJECT_TEAM_TREE) && distance == 2)
-        Place[i][j] = 1001;
+        s_pFloodFillPlane[i][j] = 1001;
     }
   }
 
@@ -464,12 +464,12 @@ static void FindEnemy(int x, int y, int *xe, int *ye, int distance) {
   stopk = 0;
   i = x;
   j = y;
-  Place[i][j] = 1000;
+  s_pFloodFillPlane[i][j] = 1000;
   do {
     /////////////////pozar prerii///////////////////////////
     if (stopk != startk) {
-      i = floodfillQueue[stopk];
-      j = floodfillQueue[stopk + 1];
+      i = s_pFloodfillQueue[stopk];
+      j = s_pFloodfillQueue[stopk + 1];
       if (stopk < 1950)
         stopk += 2;
       else
@@ -478,16 +478,16 @@ static void FindEnemy(int x, int y, int *xe, int *ye, int distance) {
 
     for (jj = j - 1; jj < j + 2; jj++)
       for (ii = i - 1; ii < i + 2; ii++) {
-        if (Place[ii][jj] == 1001) {
+        if (s_pFloodFillPlane[ii][jj] == 1001) {
           *xe = ii;
           *ye = jj;
           return;
         }
-        if (Place[ii][jj] == 1000)
+        if (s_pFloodFillPlane[ii][jj] == 1000)
           if (ii > 0 && ii < WORLD_SIZE_X - 1 && jj > 0 && jj < WORLD_SIZE_Y - 1) {
-            Place[ii][jj] = 1;
-            floodfillQueue[startk] = ii;
-            floodfillQueue[startk + 1] = jj;
+            s_pFloodFillPlane[ii][jj] = 1;
+            s_pFloodfillQueue[startk] = ii;
+            s_pFloodfillQueue[startk + 1] = jj;
             if (startk < 1950)
               startk += 2;
             else
@@ -510,12 +510,12 @@ static void FindHolyPlace(int *xe, int *ye) {
   int y = *ye;
   for (j = 0; j < WORLD_SIZE_Y; j++)
     for (i = 0; i < WORLD_SIZE_X; i++) {
-      Place[i][j] = 1; // zajete
+      s_pFloodFillPlane[i][j] = 1; // zajete
       if ((i > 0) && (j > 0) && (i < WORLD_SIZE_X - 1) && (j < WORLD_SIZE_Y - 1)) {
         if (!(place[i][j]))
-          Place[i][j] = 1000; // wolne
+          s_pFloodFillPlane[i][j] = 1000; // wolne
         if (placeG[i][j] == 256)
-          Place[i][j] = 1234;
+          s_pFloodFillPlane[i][j] = 1234;
       }
     }
 
@@ -523,12 +523,12 @@ static void FindHolyPlace(int *xe, int *ye) {
   stopk = 0;
   i = x;
   j = y;
-  Place[i][j] = 1000;
+  s_pFloodFillPlane[i][j] = 1000;
   do {
     /////////////////pozar prerii///////////////////////////
     if (stopk != startk) {
-      i = floodfillQueue[stopk];
-      j = floodfillQueue[stopk + 1];
+      i = s_pFloodfillQueue[stopk];
+      j = s_pFloodfillQueue[stopk + 1];
       if (stopk < 1950)
         stopk += 2;
       else
@@ -537,16 +537,16 @@ static void FindHolyPlace(int *xe, int *ye) {
 
     for (jj = j - 1; jj < j + 2; jj++)
       for (ii = i - 1; ii < i + 2; ii++) {
-        if (Place[ii][jj] == 1234) {
+        if (s_pFloodFillPlane[ii][jj] == 1234) {
           *xe = ii;
           *ye = jj;
           return;
         }
-        if (Place[ii][jj] == 1000) {
+        if (s_pFloodFillPlane[ii][jj] == 1000) {
           if (ii > 0 && ii < WORLD_SIZE_X - 1 && jj > 0 && jj < WORLD_SIZE_Y - 1) {
-            Place[ii][jj] = 1;
-            floodfillQueue[startk] = ii;
-            floodfillQueue[startk + 1] = jj;
+            s_pFloodFillPlane[ii][jj] = 1;
+            s_pFloodfillQueue[startk] = ii;
+            s_pFloodfillQueue[startk + 1] = jj;
             if (startk < 1950)
               startk += 2;
             else
@@ -652,7 +652,7 @@ void moverSetIFF(tMover *pMover, tMapObjectTeam eTeam) {
 }
 
 void moverSetCommand(tMover *pMover, int Nr) {
-  if (pMover->type != 1 && (Nr == 8 || Nr == 11))
+  if (pMover->type != MOVER_KIND_AXE && (Nr == 8 || Nr == 11))
     return;
   if (Nr == 8) {
     pMover->xm = pMover->xe;
@@ -662,58 +662,58 @@ void moverSetCommand(tMover *pMover, int Nr) {
     pMover->ispath = 0;
   if (Nr == 5)
     pMover->mainTarget = 0;
-  if (pMover->type && Nr == 123 && (pMover->sMapObject.ubX & 1))
+  if (pMover->type != MOVER_KIND_COW && Nr == 123 && (pMover->sMapObject.ubX & 1))
     return;
   pMover->commandN = Nr;
 }
 
-void moverLabeling(tMover *pMover) {
-  int min, startk, stopk;
-  pMover->delay = pMover->maxdelay;
-  if (PlaceUsed > 5 && pMover->type)
-    return;
-  PlaceUsed++;
-
+static void moverLabelingPrepareWeights(void) {
   for (UBYTE j = 0; j < WORLD_SIZE_Y; j++) {
     for (UBYTE i = 0; i < WORLD_SIZE_X; i++) {
       if (place[i][j] == 0) {
-        Place[i][j] = 1000;
-        if (10 < placeN[i][j] && placeN[i][j] < 100)
-          Place[i][j] = 9999;
+        s_pFloodFillPlane[i][j] = 1000;
+        if (10 < placeN[i][j] && placeN[i][j] < 100) {
+          // Avoid fire
+          s_pFloodFillPlane[i][j] = 9999;
+        }
       }
       else {
-        Place[i][j] = 9999;
+        // Avoid units
+        s_pFloodFillPlane[i][j] = 9999;
       }
     }
   }
+}
 
-  startk = 0;
-  stopk = 0;
+static void moverLabelingFloodFill(tMover *pMover) {
+  UWORD startk = 0;
+  UWORD stopk = 0;
   UBYTE i = pMover->xe;
   UBYTE j = pMover->ye;
-  Place[i][j] = 0;
+  s_pFloodFillPlane[i][j] = 0;
+
   do {
     /////////////////pozar prerii///////////////////////////
     if (stopk != startk) {
-      i = floodfillQueue[stopk];
-      j = floodfillQueue[stopk + 1];
+      i = s_pFloodfillQueue[stopk];
+      j = s_pFloodfillQueue[stopk + 1];
       if (stopk < 1950)
         stopk += 2;
       else
         stopk = 0;
     }
 
-    min = Place[i][j];
+    int min = s_pFloodFillPlane[i][j];
     UBYTE ubStartX = MAX(0, i - 1);
     UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, i + 1);
     UBYTE ubStartY = MAX(0, j - 1);
     UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, j + 1);
     for (UBYTE jj = ubStartY; jj <= ubEndY; jj++) {
       for (UBYTE ii = ubStartX; ii <= ubEndX; ii++) {
-        if (min + 1 < Place[ii][jj] && Place[ii][jj] <= 1000) {
-          Place[ii][jj] = min + 1;
-          floodfillQueue[startk] = ii;
-          floodfillQueue[startk + 1] = jj;
+        if (min + 1 < s_pFloodFillPlane[ii][jj] && s_pFloodFillPlane[ii][jj] <= 1000) {
+          s_pFloodFillPlane[ii][jj] = min + 1;
+          s_pFloodfillQueue[startk] = ii;
+          s_pFloodfillQueue[startk + 1] = jj;
           if (startk < 1950)
             startk += 2;
           else
@@ -721,75 +721,79 @@ void moverLabeling(tMover *pMover) {
         }
       }
     }
-  } while ((Place[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 1000) && (stopk != startk));
+  } while ((s_pFloodFillPlane[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 1000) && (stopk != startk));
+}
 
-  if (Place[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 1000) // 1 ruch w kierunku
+void moverLabeling(tMover *pMover) {
+  int min;
+  pMover->delay = pMover->maxdelay;
+  if (PlaceUsed > 5 && pMover->type != MOVER_KIND_COW)
+    return;
+  PlaceUsed++;
+
+  moverLabelingPrepareWeights();
+  moverLabelingFloodFill(pMover);
+
+  if (s_pFloodFillPlane[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 1000)
   {
-    if (!pMover->type)
+    // 1 ruch w kierunku
+    if (pMover->type == MOVER_KIND_COW)
       return;
-    int ddx, ddy;
-    ddx = pMover->sMapObject.ubX - pMover->xe;
-    if (ddx < 0)
-      ddx = -1;
-    if (ddx > 0)
-      ddx = 1;
-    ddy = pMover->sMapObject.ubY - pMover->ye;
-    if (ddy < 0)
-      ddy = -1;
-    if (ddy > 0)
-      ddy = 1;
-    pMover->path[0][0] = ddx;
-    pMover->path[0][1] = ddy;
+
+    int ddx = pMover->sMapObject.ubX - pMover->xe;
+    ddx = CLAMP(ddx, -1, 1);
+    int ddy = pMover->sMapObject.ubY - pMover->ye;
+    ddy = CLAMP(ddy, -1, 1);
+    pMover->path[0].bX = ddx;
+    pMover->path[0].bY = ddy;
     pMover->ispath = 1;
     pMover->xe += ddx; // przesun punkt docelowy
     pMover->ye += ddy;
-    // if(!type&&udder<100){xp=xe;yp=ye;}
-    // if(!type){xp=x;yp=y;}
     return;
   }
 
-  i = pMover->sMapObject.ubX;
-  j = pMover->sMapObject.ubY;
-  Place[i][j] = 1000;
+  UBYTE i = pMover->sMapObject.ubX;
+  UBYTE j = pMover->sMapObject.ubY;
+  s_pFloodFillPlane[i][j] = 1000;
   min = 1000;
   BYTE mini, minj;
-  if (Place[i - 1][j] < min) {
-    min = Place[i - 1][j];
+  if (s_pFloodFillPlane[i - 1][j] < min) {
+    min = s_pFloodFillPlane[i - 1][j];
     mini = i - 1;
     minj = j;
   }
-  if (Place[i + 1][j] < min) {
-    min = Place[i + 1][j];
+  if (s_pFloodFillPlane[i + 1][j] < min) {
+    min = s_pFloodFillPlane[i + 1][j];
     mini = i + 1;
     minj = j;
   }
-  if (Place[i][j - 1] < min) {
-    min = Place[i][j - 1];
+  if (s_pFloodFillPlane[i][j - 1] < min) {
+    min = s_pFloodFillPlane[i][j - 1];
     mini = i;
     minj = j - 1;
   }
-  if (Place[i][j + 1] < min) {
-    min = Place[i][j + 1];
+  if (s_pFloodFillPlane[i][j + 1] < min) {
+    min = s_pFloodFillPlane[i][j + 1];
     mini = i;
     minj = j + 1;
   }
-  if (Place[i - 1][j - 1] < min) {
-    min = Place[i - 1][j - 1];
+  if (s_pFloodFillPlane[i - 1][j - 1] < min) {
+    min = s_pFloodFillPlane[i - 1][j - 1];
     mini = i - 1;
     minj = j - 1;
   }
-  if (Place[i - 1][j + 1] < min) {
-    min = Place[i - 1][j + 1];
+  if (s_pFloodFillPlane[i - 1][j + 1] < min) {
+    min = s_pFloodFillPlane[i - 1][j + 1];
     mini = i - 1;
     minj = j + 1;
   }
-  if (Place[i + 1][j - 1] < min) {
-    min = Place[i + 1][j - 1];
+  if (s_pFloodFillPlane[i + 1][j - 1] < min) {
+    min = s_pFloodFillPlane[i + 1][j - 1];
     mini = i + 1;
     minj = j - 1;
   }
-  if (Place[i + 1][j + 1] < min) {
-    min = Place[i + 1][j + 1];
+  if (s_pFloodFillPlane[i + 1][j + 1] < min) {
+    min = s_pFloodFillPlane[i + 1][j + 1];
     mini = i + 1;
     minj = j + 1;
   }
@@ -797,75 +801,74 @@ void moverLabeling(tMover *pMover) {
   if (min >= 1000)
     return;
 
-  int Path[6][2];
-  Path[0][0] = i - mini;
-  Path[0][1] = j - minj;
+  tBCoordYX Path[MOVER_PATH_LENGTH_MAX];
+  Path[0].bX = i - mini;
+  Path[0].bY = j - minj;
   pMover->ispath = 1;
   if (min == 0) {
-    pMover->path[0][0] = Path[0][0];
-    pMover->path[0][1] = Path[0][1];
+    pMover->path[0] = Path[0];
     return;
   }
+
   do {
     i = mini;
     j = minj;
     min = 1000;
-    Place[i][j] = 1000;
-    if (Place[i - 1][j] < min) {
-      min = Place[i - 1][j];
+    s_pFloodFillPlane[i][j] = 1000;
+    if (s_pFloodFillPlane[i - 1][j] < min) {
+      min = s_pFloodFillPlane[i - 1][j];
       mini = i - 1;
       minj = j;
     }
-    if (Place[i + 1][j] < min) {
-      min = Place[i + 1][j];
+    if (s_pFloodFillPlane[i + 1][j] < min) {
+      min = s_pFloodFillPlane[i + 1][j];
       mini = i + 1;
       minj = j;
     }
-    if (Place[i][j - 1] < min) {
-      min = Place[i][j - 1];
+    if (s_pFloodFillPlane[i][j - 1] < min) {
+      min = s_pFloodFillPlane[i][j - 1];
       mini = i;
       minj = j - 1;
     }
-    if (Place[i][j + 1] < min) {
-      min = Place[i][j + 1];
+    if (s_pFloodFillPlane[i][j + 1] < min) {
+      min = s_pFloodFillPlane[i][j + 1];
       mini = i;
       minj = j + 1;
     }
-    if (Place[i - 1][j - 1] < min) {
-      min = Place[i - 1][j - 1];
+    if (s_pFloodFillPlane[i - 1][j - 1] < min) {
+      min = s_pFloodFillPlane[i - 1][j - 1];
       mini = i - 1;
       minj = j - 1;
     }
-    if (Place[i - 1][j + 1] < min) {
-      min = Place[i - 1][j + 1];
+    if (s_pFloodFillPlane[i - 1][j + 1] < min) {
+      min = s_pFloodFillPlane[i - 1][j + 1];
       mini = i - 1;
       minj = j + 1;
     }
-    if (Place[i + 1][j - 1] < min) {
-      min = Place[i + 1][j - 1];
+    if (s_pFloodFillPlane[i + 1][j - 1] < min) {
+      min = s_pFloodFillPlane[i + 1][j - 1];
       mini = i + 1;
       minj = j - 1;
     }
-    if (Place[i + 1][j + 1] < min) {
-      min = Place[i + 1][j + 1];
+    if (s_pFloodFillPlane[i + 1][j + 1] < min) {
+      min = s_pFloodFillPlane[i + 1][j + 1];
       mini = i + 1;
       minj = j + 1;
     }
 
     if (min >= 1000) {
       for (i = 0; i < pMover->ispath; i++) {
-        pMover->path[i][0] = Path[pMover->ispath - i - 1][0];
-        pMover->path[i][1] = Path[pMover->ispath - i - 1][1];
+        pMover->path[i] = Path[pMover->ispath - i - 1];
       }
       return;
     }
-    Path[pMover->ispath][0] = i - mini;
-    Path[pMover->ispath][1] = j - minj;
+    Path[pMover->ispath].bX = i - mini;
+    Path[pMover->ispath].bY = j - minj;
     pMover->ispath++;
-  } while ((min != 0) && (pMover->ispath < 6));
+  } while ((min != 0) && (pMover->ispath < MOVER_PATH_LENGTH_MAX));
+
   for (i = 0; i < pMover->ispath; i++) {
-    pMover->path[i][0] = Path[pMover->ispath - i - 1][0];
-    pMover->path[i][1] = Path[pMover->ispath - i - 1][1];
+    pMover->path[i] = Path[pMover->ispath - i - 1];
   }
 }
 
@@ -954,8 +957,8 @@ void moverMove(tMover *pMover) {
     }
   }
 
-  pMover->dx = pMover->path[pMover->ispath - 1][0];
-  pMover->dy = pMover->path[pMover->ispath - 1][1];
+  pMover->dx = pMover->path[pMover->ispath - 1].bX;
+  pMover->dy = pMover->path[pMover->ispath - 1].bY;
 
   if (place[pMover->sMapObject.ubX - pMover->dx][pMover->sMapObject.ubY - pMover->dy] != 0) {
     if ((pMover->type) && (pMover->sMapObject.ubX - pMover->xe < 2) && (pMover->sMapObject.ubX - pMover->xe > -2) && (pMover->sMapObject.ubY - pMover->ye < 2) &&
@@ -1307,31 +1310,33 @@ void moverAttack(tMover *pMover) {
 void moverRepare(tMover *pMover) {
   pMover->inmove = 0;
   pMover->inattack = 0;
-  if (placeN[pMover->xe][pMover->ye] > 226 || placeG[pMover->xe][pMover->ye] == 47 ||
-      (placeG[pMover->xe][pMover->ye] > 265 && placeG[pMover->xe][pMover->ye] < 277)) {
+
+  if (
+    placeN[pMover->xe][pMover->ye] > 226 ||
+    placeG[pMover->xe][pMover->ye] == 47 ||
+    (placeG[pMover->xe][pMover->ye] > 265 && placeG[pMover->xe][pMover->ye] < 277)
+  ) {
     pMover->commandN = 0;
     placeN[pMover->xe][pMover->ye] = 1;
     pMover->delay = pMover->maxdelay;
     return;
   }
+
   if (moverDistance(pMover) == 1) {
     pMover->ispath = 0;
-    if (placeG[pMover->xe][pMover->ye] == 277 && place[pMover->xe][pMover->ye]) {
+    if (placeG[pMover->xe][pMover->ye] == PICTURE_KIND_WALL_11 && place[pMover->xe][pMover->ye]) {
       pMover->delay = pMover->maxdelay;
       return;
     }
+
     pMover->dx = pMover->sMapObject.ubX - pMover->xe;
+    pMover->dx = CLAMP(pMover->dx, -1, 1);
     pMover->dy = pMover->sMapObject.ubY - pMover->ye;
+    pMover->dy = CLAMP(pMover->dy, -1, 1);
+
     pMover->delay = pMover->maxdelay;
     pMover->inattack = 1;
-    if (pMover->dx > 1)
-      pMover->dx = 1;
-    if (pMover->dx < 0)
-      pMover->dx = -1;
-    if (pMover->dy > 1)
-      pMover->dy = 1;
-    if (pMover->dy < 0)
-      pMover->dy = -1;
+
     if (placeN[pMover->xe][pMover->ye] < 220)
       placeN[pMover->xe][pMover->ye] = 220;
     else
@@ -1343,6 +1348,7 @@ void moverRepare(tMover *pMover) {
     // }
     return;
   }
+
   pMover->xe = pMover->xm;
   pMover->ye = pMover->ym;
   moverMove(pMover);

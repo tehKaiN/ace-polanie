@@ -4,6 +4,8 @@
 #include "missile.h"
 #include "map_object.h"
 
+#define MOVER_PATH_LENGTH_MAX 6
+
 typedef enum tMoverExist {
   MOVER_EXIST_NONE = 0,
   MOVER_EXIST_ALIVE = 1,
@@ -71,7 +73,7 @@ typedef struct tMover {
   int ShowHit;
   int delay, maxdelay;
   int ispath;
-  int path[6][2];
+  tBCoordYX path[MOVER_PATH_LENGTH_MAX];
 } tMover;
 
 void moverGraphicsCreate(void);
