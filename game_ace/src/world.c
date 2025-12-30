@@ -18,11 +18,35 @@ static const UBYTE maskaT[16] = {
 static int waterCounter;
 static int fireCounter;
 
+static tUbCoordYX s_pDryEarthPlaces[WORLD_WINDOW_SIZE_Y * WORLD_WINDOW_SIZE_X];
+static tUbCoordYX s_pFogOfWarPlaces[WORLD_WINDOW_SIZE_Y * WORLD_WINDOW_SIZE_X];
+static UBYTE s_ubDryEarthCount = 0;
+static UBYTE s_ubFogOfWarCount = 0;
+
+static void worldDrawFogOfWar(UWORD uwLeftX, UWORD uwTopY) {
+	for(UBYTE i = 0; i < s_ubFogOfWarCount; ++i) {
+		UBYTE ubX = s_pFogOfWarPlaces[i].ubX;
+		UBYTE ubY = s_pFogOfWarPlaces[i].ubY;
+		gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 9, Ye[ubY - uwTopY] - 7, &shadow);
+	}
+}
+
+static void worldDrawDryEarth(UWORD uwLeftX, UWORD uwTopY) {
+	for(UBYTE i = 0; i < s_ubDryEarthCount; ++i) {
+		UBYTE ubX = s_pDryEarthPlaces[i].ubX;
+		UBYTE ubY = s_pDryEarthPlaces[i].ubY;
+		gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 3, Ye[ubY - uwTopY] - 2, &picture[placeG[ubX][ubY]]);
+	}
+}
+
 void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 	// kol[0] = LightYellow;
 	// kol[1] = Yellow;
 	// kol[2] = DarkYellow;
 	// kol[3] = LightYellow;
+
+	s_ubDryEarthCount = 0;
+	s_ubFogOfWarCount = 0;
 	for (UBYTE ubY = uwTopY; ubY < uwTopY + WORLD_WINDOW_SIZE_Y; ubY++) {
 		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + WORLD_WINDOW_SIZE_X; ubX++) {
 			if (placeN[ubX][ubY]) {
@@ -98,28 +122,19 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &tree[0]); // lezy drzewo brazowe
 				if (placeG[ubX + 1][ubY] == 72)
 					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &tree[7]); // lezy drzewo spalone
-			}
-		}
-	}
 
-	// Draw dry earth
-	for (UBYTE ubY = uwTopY; ubY < uwTopY + WORLD_WINDOW_SIZE_Y; ubY++) {
-		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + WORLD_WINDOW_SIZE_X; ubX++) {
-			if (PICTURE_KIND_DRY_EARTH_0 <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_DRY_EARTH_2)
-				if (placeN[ubX][ubY]) {
-					gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 3, Ye[ubY - uwTopY] - 2, &picture[placeG[ubX][ubY]]);
+				if (PICTURE_KIND_DRY_EARTH_0 <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_DRY_EARTH_2) {
+					s_pDryEarthPlaces[s_ubDryEarthCount++] = (tUbCoordYX) {.ubX = ubX, .ubY = ubY};
 				}
-		}
-	}
-
-	// Fog of war
-	for (UBYTE ubY = uwTopY; ubY < uwTopY + WORLD_WINDOW_SIZE_Y; ubY++) {
-		for (UBYTE ubX = uwLeftX; ubX < uwLeftX + WORLD_WINDOW_SIZE_X; ubX++) {
-			if (!(placeN[ubX][ubY])) {
-				gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 9, Ye[ubY - uwTopY] - 7, &shadow);
+			}
+			else {
+					s_pFogOfWarPlaces[s_ubFogOfWarCount++] = (tUbCoordYX) {.ubX = ubX, .ubY = ubY};
 			}
 		}
 	}
+
+	worldDrawDryEarth(uwLeftX, uwTopY);
+	worldDrawFogOfWar(uwLeftX, uwTopY);
 
 	// if (Msg.x >= uwLeftX && Msg.y >= uwTopX && Msg.x < uwLeftX + WORLD_WINDOW_SIZE_X && Msg.y < uwTopX + 13 && Msg.count) {
 	//   if (Msg.count == 4)
