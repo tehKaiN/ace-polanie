@@ -1022,11 +1022,6 @@ int moverLookAround(tMover *pMover) {
     }
     return 0;
   }
-  /*
-  if(IFF==1&&type==10)//pastuch
-  {
-      return 0;
-  }*/
 
   pMover->ispath = 0;
   pMover->target = 0;
@@ -1081,8 +1076,8 @@ int moverLookAround(tMover *pMover) {
       }
   }
 
-  if (!pOther || pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER || pMover->type == 11) {
-    // No map objects in vincity
+  if (!pOther || pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER || pMover->type == MOVER_KIND_MAGE) {
+    // No attackable map objects in vincity
     // Player units don't auto-attack buildings
     // Mages don't auto-attack buildings
     return 0;
