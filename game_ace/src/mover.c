@@ -36,8 +36,6 @@ static const tUbCoordYX pWideSizes[] = {
 	{.ubX = 24, .ubY = 21}, // x2y2
 };
 
-int Place[WORLD_SIZE_X][WORLD_SIZE_Y];
-
 static const tMoverStats Udata[MOVER_KIND_COUNT] = {
 	{2, 0, 0, 0, 100, 12},
 	{3, 1, 10, 0, 100, 10},
@@ -63,7 +61,7 @@ static const int dmagic[15] = {
   170, 180, 190, 200, 220, 240, 280
 };
 
-char shiftX[MOVER_KIND_COUNT][17] = {
+static const UBYTE shiftX[MOVER_KIND_COUNT][17] = {
     {0, 1, 2, 3, 5, 6, 8, 9, 11, 12, 13, 14, 16, 15, 15, 15, 15},
     {0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 25, 15, 15, 15, 15, 15},
     {0, 2, 4, 6, 8, 10, 12, 14, 16, 15, 15, 15, 15, 15, 15, 15, 15},
@@ -79,7 +77,7 @@ char shiftX[MOVER_KIND_COUNT][17] = {
     {0, 2, 4, 6, 8, 10, 12, 14, 16, 15, 15, 15, 15, 15, 15, 15, 15}
 };
 
-char shiftY[MOVER_KIND_COUNT][17] = {
+static const UBYTE shiftY[MOVER_KIND_COUNT][17] = {
     {0, 1, 2, 3, 5, 6, 8, 9, 11, 12, 13, 14, 15, 15, 15, 15, 15},
     {0, 1, 2, 5, 6, 7, 8, 10, 11, 12, 14, 25, 15, 15, 15, 15, 15},
     {0, 1, 3, 5, 7, 9, 11, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15},
@@ -95,7 +93,7 @@ char shiftY[MOVER_KIND_COUNT][17] = {
     {0, 1, 3, 5, 7, 9, 11, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15}
 };
 
-char Phase[MOVER_KIND_COUNT][19] = {
+static const UBYTE Phase[MOVER_KIND_COUNT][19] = {
     {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 0, 6, 1, 1, 0, 8, 4},
     {0, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 6, 0, 0, 0, 0, 0, 6, 3},
     {0, 0, 2, 2, 0, 0, 1, 1, 1, 6, 0, 0, 0, 0, 0, 0, 0, 4, 2},
@@ -110,6 +108,9 @@ char Phase[MOVER_KIND_COUNT][19] = {
     {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 0, 6, 1, 1, 0, 8, 4},
     {0, 0, 2, 2, 0, 0, 1, 1, 1, 6, 0, 0, 0, 0, 0, 0, 0, 4, 2}
 };
+
+static UBYTE floodfillQueue[2000];
+static int Place[WORLD_SIZE_X][WORLD_SIZE_Y];
 
 static tMixedBitmaps s_sMixedAxe;
 static tMixedBitmaps s_sMixedBear;
@@ -371,7 +372,6 @@ static void NewCow(int nr) {
 static void FindCow(int x, int y, int *xe, int *ye) {
   int i, j, startk, stopk;
   int ii, jj;
-  unsigned char kolejka[2000];
   for (j = 0; j < WORLD_SIZE_Y; j++)
     for (i = 0; i < WORLD_SIZE_X; i++) {
       Place[i][j] = 1;
@@ -397,8 +397,8 @@ static void FindCow(int x, int y, int *xe, int *ye) {
   do {
     /////////////////pozar prerii///////////////////////////
     if (stopk != startk) {
-      i = kolejka[stopk];
-      j = kolejka[stopk + 1];
+      i = floodfillQueue[stopk];
+      j = floodfillQueue[stopk + 1];
       if (stopk < 1950)
         stopk += 2;
       else
@@ -415,8 +415,8 @@ static void FindCow(int x, int y, int *xe, int *ye) {
         if (Place[ii][jj] == 1000)
           if (ii > 0 && ii < WORLD_SIZE_X - 1 && jj > 0 && jj < WORLD_SIZE_Y - 1) {
             Place[ii][jj] = 1;
-            kolejka[startk] = ii;
-            kolejka[startk + 1] = jj;
+            floodfillQueue[startk] = ii;
+            floodfillQueue[startk + 1] = jj;
             if (startk < 1950)
               startk += 2;
             else
@@ -450,7 +450,6 @@ static void FindShed(int k, int *xm, int *ym) {
 static void FindEnemy(int x, int y, int *xe, int *ye, int *distance) {
   int i, j, startk, stopk;
   int ii, jj;
-  unsigned char kolejka[2000];
   for (j = 0; j < WORLD_SIZE_Y; j++)
     for (i = 0; i < WORLD_SIZE_X; i++) {
       Place[i][j] = 1;
@@ -472,8 +471,8 @@ static void FindEnemy(int x, int y, int *xe, int *ye, int *distance) {
   do {
     /////////////////pozar prerii///////////////////////////
     if (stopk != startk) {
-      i = kolejka[stopk];
-      j = kolejka[stopk + 1];
+      i = floodfillQueue[stopk];
+      j = floodfillQueue[stopk + 1];
       if (stopk < 1950)
         stopk += 2;
       else
@@ -490,8 +489,8 @@ static void FindEnemy(int x, int y, int *xe, int *ye, int *distance) {
         if (Place[ii][jj] == 1000)
           if (ii > 0 && ii < WORLD_SIZE_X - 1 && jj > 0 && jj < WORLD_SIZE_Y - 1) {
             Place[ii][jj] = 1;
-            kolejka[startk] = ii;
-            kolejka[startk + 1] = jj;
+            floodfillQueue[startk] = ii;
+            floodfillQueue[startk + 1] = jj;
             if (startk < 1950)
               startk += 2;
             else
@@ -512,7 +511,6 @@ static void FindHolyPlace(int *xe, int *ye) {
     return;
   int x = *xe;
   int y = *ye;
-  unsigned char kolejka[2000];
   for (j = 0; j < WORLD_SIZE_Y; j++)
     for (i = 0; i < WORLD_SIZE_X; i++) {
       Place[i][j] = 1; // zajete
@@ -532,8 +530,8 @@ static void FindHolyPlace(int *xe, int *ye) {
   do {
     /////////////////pozar prerii///////////////////////////
     if (stopk != startk) {
-      i = kolejka[stopk];
-      j = kolejka[stopk + 1];
+      i = floodfillQueue[stopk];
+      j = floodfillQueue[stopk + 1];
       if (stopk < 1950)
         stopk += 2;
       else
@@ -550,8 +548,8 @@ static void FindHolyPlace(int *xe, int *ye) {
         if (Place[ii][jj] == 1000) {
           if (ii > 0 && ii < WORLD_SIZE_X - 1 && jj > 0 && jj < WORLD_SIZE_Y - 1) {
             Place[ii][jj] = 1;
-            kolejka[startk] = ii;
-            kolejka[startk + 1] = jj;
+            floodfillQueue[startk] = ii;
+            floodfillQueue[startk + 1] = jj;
             if (startk < 1950)
               startk += 2;
             else
@@ -676,33 +674,35 @@ void moverSetCommand(tMover *pMover, int Nr) {
 }
 
 void moverLabeling(tMover *pMover) {
-  int i, j, mini, minj, min, startk, stopk;
-
-  unsigned char ii, jj;
-  unsigned char kolejka[2000];
+  int min, startk, stopk;
   pMover->delay = pMover->maxdelay;
   if (PlaceUsed > 5 && pMover->type)
     return;
   PlaceUsed++;
-  for (j = 0; j < WORLD_SIZE_Y; j++)
-    for (i = 0; i < WORLD_SIZE_X; i++)
+
+  for (UBYTE j = 0; j < WORLD_SIZE_Y; j++) {
+    for (UBYTE i = 0; i < WORLD_SIZE_X; i++) {
       if (place[i][j] == 0) {
         Place[i][j] = 1000;
-        if (placeN[i][j] > 10 && placeN[i][j] < 100)
+        if (10 < placeN[i][j] && placeN[i][j] < 100)
           Place[i][j] = 9999;
-      } else
+      }
+      else {
         Place[i][j] = 9999;
+      }
+    }
+  }
 
   startk = 0;
   stopk = 0;
-  i = pMover->xe;
-  j = pMover->ye;
+  UBYTE i = pMover->xe;
+  UBYTE j = pMover->ye;
   Place[i][j] = 0;
   do {
     /////////////////pozar prerii///////////////////////////
     if (stopk != startk) {
-      i = kolejka[stopk];
-      j = kolejka[stopk + 1];
+      i = floodfillQueue[stopk];
+      j = floodfillQueue[stopk + 1];
       if (stopk < 1950)
         stopk += 2;
       else
@@ -710,21 +710,25 @@ void moverLabeling(tMover *pMover) {
     }
 
     min = Place[i][j];
-    for (jj = j - 1; jj < j + 2; jj++)
-      for (ii = i - 1; ii < i + 2; ii++)
-        if (Place[ii][jj] < 1001 && Place[ii][jj] > min + 1) {
-          if (ii > 0 && ii < WORLD_SIZE_X - 1 && jj > 0 && jj < WORLD_SIZE_Y - 1) {
-            Place[ii][jj] = min + 1;
-            kolejka[startk] = ii;
-            kolejka[startk + 1] = jj;
-            if (startk < 1950)
-              startk += 2;
-            else
-              startk = 0;
-          }
+    UBYTE ubStartX = MAX(0, i - 1);
+    UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, i + 1);
+    UBYTE ubStartY = MAX(0, j - 1);
+    UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, j + 1);
+    for (UBYTE jj = ubStartY; jj <= ubEndY; jj++) {
+      for (UBYTE ii = ubStartX; ii <= ubEndX; ii++) {
+        if (min + 1 < Place[ii][jj] && Place[ii][jj] <= 1000) {
+          Place[ii][jj] = min + 1;
+          floodfillQueue[startk] = ii;
+          floodfillQueue[startk + 1] = jj;
+          if (startk < 1950)
+            startk += 2;
+          else
+            startk = 0;
         }
+      }
+    }
   } while ((Place[pMover->x][pMover->y] == 1000) && (stopk != startk));
-  //-------------------
+
   if (Place[pMover->x][pMover->y] == 1000) // 1 ruch w kierunku
   {
     if (!pMover->type)
@@ -749,12 +753,12 @@ void moverLabeling(tMover *pMover) {
     // if(!type){xp=x;yp=y;}
     return;
   }
-  //-------------------------
-  int Path[6][2];
+
   i = pMover->x;
   j = pMover->y;
   Place[i][j] = 1000;
   min = 1000;
+  BYTE mini, minj;
   if (Place[i - 1][j] < min) {
     min = Place[i - 1][j];
     mini = i - 1;
@@ -798,6 +802,8 @@ void moverLabeling(tMover *pMover) {
 
   if (min >= 1000)
     return;
+
+  int Path[6][2];
   Path[0][0] = i - mini;
   Path[0][1] = j - minj;
   pMover->ispath = 1;
@@ -994,9 +1000,11 @@ int moverLookAround(tMover *pMover) {
     pMover->command = 2;
     return 1;
   }
+
   int i, j, k = 1, d = 0, iff;
   int NoOfEnemies = 0;
   int NoOfOurs = 0;
+
   if (pMover->IFF == 2 && pMover->type == 10) // pastuch
   {
     FindCow(pMover->x, pMover->y, &pMover->xe, &pMover->ye);
@@ -1004,12 +1012,12 @@ int moverLookAround(tMover *pMover) {
       pMover->target = place[pMover->xe][pMover->ye];
       pMover->commandN = 2;
       return 1;
-    } else {
-      if (pMover->x != pMover->xm || pMover->y != pMover->ym) {
-        pMover->xe = pMover->xm;
-        pMover->ye = pMover->ym;
-        pMover->commandN = 1;
-      }
+    }
+
+    if (pMover->x != pMover->xm || pMover->y != pMover->ym) {
+      pMover->xe = pMover->xm;
+      pMover->ye = pMover->ym;
+      pMover->commandN = 1;
     }
     return 0;
   }
@@ -1022,6 +1030,7 @@ int moverLookAround(tMover *pMover) {
   iff = pMover->IFF << 8;
   pMover->ispath = 0;
   pMover->target = 0;
+
   if (pMover->IFF == 2 && pMover->hp > (pMover->maxhp - 20)) // komputerowy
   {
     k = pMover->s_range + pMover->drange;
@@ -1043,39 +1052,48 @@ int moverLookAround(tMover *pMover) {
       return 0;
     }
   }
+
   for (k = 1; k <= pMover->s_range + pMover->drange; k++) {
-    for (i = pMover->x - k; i <= pMover->x + k && i < WORLD_SIZE_X - 1; i++)
-      for (j = pMover->y - k; j <= pMover->y + k && j < WORLD_SIZE_Y - 1; j++) {
-        if (i > 0 && i < WORLD_SIZE_X - 1 && j > 0 && j < WORLD_SIZE_Y - 1) {
-          if (place[i][j] && place[i][j] != pMover->nr) {
-            d = place[i][j];
-            int dd = Who(d);
-            if (((d & 0xff00) != iff) && (dd == 1 || dd == 3)) { // postac
-              pMover->target = d;
-              if (pMover->type != 10)
-                return 1;
-              tMover *mm = moverGetByNum(pMover->target);
-              if ((!mm->type) || (mm->type == 9))
-                return 1;
-            }
+    UBYTE ubStartX = MAX(0, pMover->x - k);
+    UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, pMover->x + k);
+    UBYTE ubStartY = MAX(0, pMover->y - k);
+    UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, pMover->y + k);
+    for (i = ubStartX; i <= ubEndX; i++)
+      for (j = ubStartY; j <= ubEndY; j++) {
+        if (place[i][j] && place[i][j] != pMover->nr) {
+          d = place[i][j];
+          int dd = Who(d);
+          if (((d & 0xff00) != iff) && (dd == 1 || dd == 3)) { // postac
+            pMover->target = d;
+            if (pMover->type != 10)
+              return 1;
+            tMover *mm = moverGetByNum(pMover->target);
+            if ((!mm->type) || (mm->type == 9))
+              return 1;
           }
         }
       }
   }
-  if (!d || pMover->IFF == 1)
+
+  if (!d || pMover->IFF == 1) {
     return 0; // nasi nie atakuja budynkow
-  if (pMover->type == 11)
+  }
+  if (pMover->type == 11) {
     return 0; // Mag tez nie
+  }
+
   for (k = 1; k <= pMover->s_range + pMover->drange; k++) {
-    for (i = pMover->x - k; i <= pMover->x + k && i < WORLD_SIZE_X - 1; i++)
-      for (j = pMover->y - k + 1; j <= pMover->y + k - 1 && j < WORLD_SIZE_Y - 1; j++) {
-        if (i > 0 && i < WORLD_SIZE_X - 1 && j > 0 && j < WORLD_SIZE_Y - 1) {
-          if (place[i][j] && place[i][j] != pMover->nr) {
-            d = place[i][j];
-            if (d < 256 + 512 && d > 255 && (d & 0xff00) != iff) {
-              pMover->target = d;
-              return 1;
-            }
+    UBYTE ubStartX = MAX(0, pMover->x - k);
+    UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, pMover->x + k);
+    UBYTE ubStartY = MAX(0, pMover->y - k);
+    UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, pMover->y + k);
+    for (i = ubStartX; i <= ubEndX; i++)
+      for (j = ubStartY; j <= ubEndY; j++) {
+        if (place[i][j] && place[i][j] != pMover->nr) {
+          d = place[i][j];
+          if (d < 256 + 512 && d > 255 && (d & 0xff00) != iff) {
+            pMover->target = d;
+            return 1;
           }
         }
       }
@@ -1649,14 +1667,13 @@ int moverMilk(tMover *pMover) {
 }
 
 void moverFindGrass(tMover *pMover) {
-  int i, j, max, maxx, maxy, range = 1;
+  int max = 0, maxx = 0, maxy = 0;
 
-  max = 0;
-  for (range = 1; range < 5; range++) {
+  for (int range = 1; range < 5; range++) {
     max = 0;
     if (pMover->x & 1) {
-      for (i = pMover->x - range; i <= pMover->x + range; i++)
-        for (j = pMover->y - range; j <= pMover->y + range; j++)
+      for (int i = pMover->x - range; i <= pMover->x + range; i++)
+        for (int j = pMover->y - range; j <= pMover->y + range; j++)
           if (i > 0 && j > 0 && i < WORLD_SIZE_X - 1 && j < WORLD_SIZE_Y - 1)
             if (place[i][j] == 0 && placeG[i][j] > max && placeG[i][j] < 9) {
               max = placeG[i][j];
@@ -1664,8 +1681,8 @@ void moverFindGrass(tMover *pMover) {
               maxy = j;
             }
     } else {
-      for (i = pMover->x + range; i >= pMover->x - range; i--)
-        for (j = pMover->y + range; j >= pMover->y - range; j--)
+      for (int i = pMover->x + range; i >= pMover->x - range; i--)
+        for (int j = pMover->y + range; j >= pMover->y - range; j--)
           if (i > 0 && j > 0 && i < WORLD_SIZE_X - 1 && j < WORLD_SIZE_Y - 1)
             if (place[i][j] == 0 && placeG[i][j] > max && placeG[i][j] < 9) {
               max = placeG[i][j];
@@ -1886,19 +1903,18 @@ void moverPrepare(tMover *pMover, int x0, int y0, int typ) {
     pMover->phase = 0;
   if (pMover->inmove) {
     pMover->phase = Phase[pMover->type][pMover->delay];
-  } else {
-    if (pMover->inattack) {
-      if (pMover->delay > pMover->maxdelay - 2) {
-        pMover->phase = 3;
-      }
-      if (pMover->delay == Phase[pMover->type][17]) {
-        pMover->phase = 4;
-      }
-      if (pMover->delay == Phase[pMover->type][18]) {
-        pMover->phase = 1;
-        if (!pMover->type)
-          pMover->phase = 0;
-      }
+  }
+  else if (pMover->inattack) {
+    if (pMover->delay > pMover->maxdelay - 2) {
+      pMover->phase = 3;
+    }
+    if (pMover->delay == Phase[pMover->type][17]) {
+      pMover->phase = 4;
+    }
+    if (pMover->delay == Phase[pMover->type][18]) {
+      pMover->phase = 1;
+      if (!pMover->type)
+        pMover->phase = 0;
     }
   }
 
@@ -1908,7 +1924,8 @@ void moverPrepare(tMover *pMover, int x0, int y0, int typ) {
   {
     if (pMover->faza < 4) {
       pMover->faza++;
-    } else {
+    }
+    else {
       pMover->faza = 0;
       pMover->dx++;
       if (pMover->dx > 1) {
