@@ -4,6 +4,12 @@
 #include "missile.h"
 #include "map_object.h"
 
+typedef enum tMoverExist {
+  MOVER_EXIST_NONE = 0,
+  MOVER_EXIST_ALIVE = 1,
+  MOVER_EXIST_ROT = 2,
+} tMoverExist;
+
 typedef enum tMoverPhase {
 	MOVER_PHASE_STAND,
 	MOVER_PHASE_WALK1,
@@ -40,12 +46,10 @@ typedef struct tMover {
   int command, commandN; // 0-nic 1-go 2-fight
   tMoverKind type;              // 0-krowa 1-miecz 2-luk 3-mag
   tMissile missile;
-
-  int exist;
+  tMoverExist exist;
 
   int exp;
-  int x, y;
-  int xe, ye;
+  int xe, ye; // enemy x/y
   int dx, dy;
   int phase; // 0-faza ruch  1-faza ruch 2-atak
   int faza;
@@ -95,8 +99,6 @@ int moverOK(const tMover *pMover);
 
 void moverFindGrass(tMover *pMover);
 void moverLabeling(tMover *pMover);
-void moverRun1(tMover *pMover);
-void moverRun2(tMover *pMover);
 int moverLookAround(tMover *pMover);
 int moverLokateTarget(tMover *pMover);
 void moverGraze(tMover *pMover); // pasienie sie

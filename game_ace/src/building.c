@@ -41,8 +41,8 @@ void buildingInit(tBuilding *pBuilding, int x0, int y0, tBuildingKind eKind, tMa
 		case BUILDING_KIND_COUNT:
 			break;
 	}
-	pBuilding->x = x0 - 2;
-	pBuilding->y = y0 - 2;
+	pBuilding->sMapObject.ubX = x0 - 2;
+	pBuilding->sMapObject.ubY = y0 - 2;
 
 	pBuilding->armour = 10;
 	if (eTeam == MAP_OBJECT_TEAM_PLAYER) {
@@ -61,39 +61,39 @@ void buildingInit(tBuilding *pBuilding, int x0, int y0, tBuildingKind eKind, tMa
 
 	pBuilding->faza = 0;
 	for (UBYTE i = 0; i < 6; i++) {
-		pBuilding->m[i].exist = 0;
+		pBuilding->m[i].exist = MOVER_EXIST_NONE;
 		pBuilding->m[i].missile.exist = 0;
 	}
 	for (UBYTE j = 0; j < 3; j++) {
 		for (UBYTE i = 0; i < 3; i++) {
-			placeG[pBuilding->x + i][pBuilding->y + j] = ePicTopLeft + i + j * 3;
+			placeG[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = ePicTopLeft + i + j * 3;
 		}
 	}
 
 	if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
 		for (UBYTE j = -2; j < 5; j++)
 			for (UBYTE i = -2; i < 5; i++) {
-				if (pBuilding->x + i > 0 && pBuilding->y + j > 0 && pBuilding->x + i < WORLD_SIZE_X && pBuilding->y + j < WORLD_SIZE_Y)
-					if (!placeN[pBuilding->x + i][pBuilding->y + j])
-						placeN[pBuilding->x + i][pBuilding->y + j] = 1;
+				if (pBuilding->sMapObject.ubX + i > 0 && pBuilding->sMapObject.ubY + j > 0 && pBuilding->sMapObject.ubX + i < WORLD_SIZE_X && pBuilding->sMapObject.ubY + j < WORLD_SIZE_Y)
+					if (!placeN[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j])
+						placeN[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = 1;
 			}
 	}
 
-	place[pBuilding->x][pBuilding->y] = &pBuilding->sMapObject;
-	place[pBuilding->x + 1][pBuilding->y] = &pBuilding->sMapObject;
-	place[pBuilding->x + 2][pBuilding->y] = &pBuilding->sMapObject;
+	place[pBuilding->sMapObject.ubX][pBuilding->sMapObject.ubY] = &pBuilding->sMapObject;
+	place[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY] = &pBuilding->sMapObject;
+	place[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY] = &pBuilding->sMapObject;
 
-	place[pBuilding->x + 2][pBuilding->y + 1] = &pBuilding->sMapObject;
-	place[pBuilding->x][pBuilding->y + 1] = &pBuilding->sMapObject;
-	place[pBuilding->x + 1][pBuilding->y + 1] = &pBuilding->sMapObject;
+	place[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY + 1] = &pBuilding->sMapObject;
+	place[pBuilding->sMapObject.ubX][pBuilding->sMapObject.ubY + 1] = &pBuilding->sMapObject;
+	place[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = &pBuilding->sMapObject;
 
 	if (pBuilding->type != BUILDING_KIND_KNIGHT_HUT) {
-		place[pBuilding->x + 1][pBuilding->y + 2] = &pBuilding->sMapObject;
+		place[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 2] = &pBuilding->sMapObject;
 	}
 
-	place[pBuilding->x + 2][pBuilding->y + 2] = &pBuilding->sMapObject;
+	place[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY + 2] = &pBuilding->sMapObject;
 
-	place[pBuilding->x][pBuilding->y + 2] = 0; // miejsce gdzie rodza sie krowy
+	place[pBuilding->sMapObject.ubX][pBuilding->sMapObject.ubY + 2] = 0; // miejsce gdzie rodza sie krowy
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -104,8 +104,8 @@ void buildingRun(tBuilding *pBuilding) {
 		return;
 	// odbudowa
 	if (pBuilding->hp < pBuilding->maxhp)
-		for (i = pBuilding->x; i < pBuilding->x + 3; i++)
-			for (j = pBuilding->y; j < pBuilding->y + 3; j++) {
+		for (i = pBuilding->sMapObject.ubX; i < pBuilding->sMapObject.ubX + 3; i++)
+			for (j = pBuilding->sMapObject.ubY; j < pBuilding->sMapObject.ubY + 3; j++) {
 				if (placeN[i][j] > 219) {
 					dd += (placeN[i][j] - 219) * 2;
 					if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU)
@@ -124,7 +124,7 @@ void buildingRun(tBuilding *pBuilding) {
 	{
 		for (j = 0; j < 3; j++)
 			for (i = 0; i < 3; i++) {
-				placeG[pBuilding->x + i][pBuilding->y + j] = 147 + (pBuilding->type - 1) * 20 + i + j * 3;
+				placeG[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = 147 + (pBuilding->type - 1) * 20 + i + j * 3;
 			}
 		pBuilding->exist = 3;
 	}
@@ -134,13 +134,13 @@ void buildingRun(tBuilding *pBuilding) {
 		pBuilding->exist = 1;
 		for (j = 0; j < 3; j++)
 			for (i = 0; i < 3; i++) {
-				placeG[pBuilding->x + i][pBuilding->y + j] = 137 + (pBuilding->type - 1) * 20 + i + j * 3;
+				placeG[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = 137 + (pBuilding->type - 1) * 20 + i + j * 3;
 			}
-		place[pBuilding->x + 1][pBuilding->y + 1] = &pBuilding->sMapObject;
+		place[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = &pBuilding->sMapObject;
 		// if (Msg.dzwiek < 18) {
 		// 	Msg.dzwiek = 18;
-		// 	Msg.X = pBuilding->x;
-		// 	Msg.Y = pBuilding->y;
+		// 	Msg.X = pBuilding->sMapObject.ubX;
+		// 	Msg.Y = pBuilding->sMapObject.ubY;
 		// }
 	}
 
@@ -161,10 +161,10 @@ void buildingRun(tBuilding *pBuilding) {
 	//--- sprawdzenie atakow
 	dd = 0;
 	if (pBuilding->exist == 1 || pBuilding->exist > 2) {
-		attack[pBuilding->x + 1][pBuilding->y + 1] = 0;
-		for (i = pBuilding->x; i < pBuilding->x + 3; i++)
-			for (j = pBuilding->y; j < pBuilding->y + 3; j++)
-				if ((i != pBuilding->x) || j < 2 + pBuilding->y) {
+		attack[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 0;
+		for (i = pBuilding->sMapObject.ubX; i < pBuilding->sMapObject.ubX + 3; i++)
+			for (j = pBuilding->sMapObject.ubY; j < pBuilding->sMapObject.ubY + 3; j++)
+				if ((i != pBuilding->sMapObject.ubX) || j < 2 + pBuilding->sMapObject.ubY) {
 					dd += attack[i][j];
 					attack[i][j] = 0;
 				}
@@ -199,25 +199,25 @@ void buildingRun(tBuilding *pBuilding) {
 			j = 0;
 			do {
 				for (i = 0; i < 3; i++) {
-					placeG[pBuilding->x + i][pBuilding->y + j] = 257 + i + j * 3; // ruina
+					placeG[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = 257 + i + j * 3; // ruina
 					if (pBuilding->type != 6 || i != 1 || j != 2)
 						if (i || j != 2)
-							place[pBuilding->x + i][pBuilding->y + j] = 0;
-					placeN[pBuilding->x + i][pBuilding->y + j] = 88;
+							place[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = 0;
+					placeN[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = 88;
 				}
 				j++;
 			} while (j < 3);
-			placeN[pBuilding->x + 2][pBuilding->y + 2] = 100;
-			placeN[pBuilding->x][pBuilding->y] = 81;
-			placeN[pBuilding->x][pBuilding->y + 1] = 95;
-			placeN[pBuilding->x + 2][pBuilding->y + 2] = 83;
-			placeN[pBuilding->x + 2][pBuilding->y] = 81;
-			placeN[pBuilding->x][pBuilding->y + 2] = 79;
+			placeN[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY + 2] = 100;
+			placeN[pBuilding->sMapObject.ubX][pBuilding->sMapObject.ubY] = 81;
+			placeN[pBuilding->sMapObject.ubX][pBuilding->sMapObject.ubY + 1] = 95;
+			placeN[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY + 2] = 83;
+			placeN[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY] = 81;
+			placeN[pBuilding->sMapObject.ubX][pBuilding->sMapObject.ubY + 2] = 79;
 			pBuilding->exist = 2;
 			// if (Msg.dzwiek < 17) {
 			// 	Msg.dzwiek = 17;
-			// 	Msg.X = pBuilding->x;
-			// 	Msg.Y = pBuilding->y;
+			// 	Msg.X = pBuilding->sMapObject.ubX;
+			// 	Msg.Y = pBuilding->sMapObject.ubY;
 			// }
 		}
 	}
@@ -225,13 +225,13 @@ void buildingRun(tBuilding *pBuilding) {
 	if (pBuilding->exist != 1)
 		return;
 	if (pBuilding->hp < pBuilding->maxhp)
-		placeN[pBuilding->x + 1][pBuilding->y + 1] = 1;
+		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 1;
 	if (pBuilding->hp < pBuilding->maxhp / 2)
-		placeN[pBuilding->x + 1][pBuilding->y + 1] = 74;
+		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 74;
 	if (pBuilding->hp < pBuilding->maxhp / 4)
-		placeN[pBuilding->x + 1][pBuilding->y + 1] = 78;
+		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 78;
 	if (pBuilding->hp < pBuilding->maxhp / 8)
-		placeN[pBuilding->x + 1][pBuilding->y + 1] = 100;
+		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 100;
 
 	if (++pBuilding->faza > 4)
 		pBuilding->faza = 0;
@@ -241,22 +241,22 @@ void buildingRun(tBuilding *pBuilding) {
 	if (pBuilding->exist == 1 && pBuilding->faza == 1)
 		switch (pBuilding->type) {
 			case BUILDING_KIND_UNK:
-				placeG[pBuilding->x + 1][pBuilding->y] = 137 + 9;
+				placeG[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY] = 137 + 9;
 				break;
 			case BUILDING_KIND_SHED:
-				placeG[pBuilding->x + 2][pBuilding->y + 1] = 157 + 9;
+				placeG[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY + 1] = 157 + 9;
 				break;
 			case BUILDING_KIND_HUT:
-				placeG[pBuilding->x + 2][pBuilding->y] = 177 + 9;
+				placeG[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY] = 177 + 9;
 				break;
 			case BUILDING_KIND_MAGE_HUT:
-				placeG[pBuilding->x + 1][pBuilding->y + 1] = 197 + 9;
+				placeG[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 197 + 9;
 				break;
 			case BUILDING_KIND_WARRIOR_HUT:
-				placeG[pBuilding->x + 1][pBuilding->y + 1] = 217 + 9;
+				placeG[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 217 + 9;
 				break;
 			case BUILDING_KIND_KNIGHT_HUT:
-				placeG[pBuilding->x + 2][pBuilding->y] = 237 + 9;
+				placeG[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY] = 237 + 9;
 				break;
 			case BUILDING_KIND_COUNT:
 				break;
@@ -264,22 +264,22 @@ void buildingRun(tBuilding *pBuilding) {
 	if (pBuilding->exist == 1 && pBuilding->faza == 3)
 		switch (pBuilding->type) {
 			case BUILDING_KIND_UNK:
-				placeG[pBuilding->x + 1][pBuilding->y] = 137 + 1;
+				placeG[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY] = 137 + 1;
 				break;
 			case BUILDING_KIND_SHED:
-				placeG[pBuilding->x + 2][pBuilding->y + 1] = 157 + 5;
+				placeG[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY + 1] = 157 + 5;
 				break;
 			case BUILDING_KIND_HUT:
-				placeG[pBuilding->x + 2][pBuilding->y] = 177 + 2;
+				placeG[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY] = 177 + 2;
 				break;
 			case BUILDING_KIND_MAGE_HUT:
-				placeG[pBuilding->x + 1][pBuilding->y + 1] = 197 + 4;
+				placeG[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 197 + 4;
 				break;
 			case BUILDING_KIND_WARRIOR_HUT:
-				placeG[pBuilding->x + 1][pBuilding->y + 1] = 217 + 4;
+				placeG[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 217 + 4;
 				break;
 			case BUILDING_KIND_KNIGHT_HUT:
-				placeG[pBuilding->x + 2][pBuilding->y] = 237 + 2;
+				placeG[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY] = 237 + 2;
 				break;
 			case BUILDING_KIND_COUNT:
 				break;
@@ -442,16 +442,16 @@ int buildingNewMan(tBuilding *pBuilding, int Nr) {
 	if (i == 20)
 		return 0; // zla kolejnosc nie mozna zbudowac takiego goscia w tym budynku
 	int xx = 0, yy = 0;
-	if (place[pBuilding->x][pBuilding->y + 2]) {
-		for (int i1 = pBuilding->x - 1; i1 < pBuilding->x + 4; i1++)
-			for (int j1 = pBuilding->y - 1; j1 < pBuilding->y + 4; j1++)
+	if (place[pBuilding->sMapObject.ubX][pBuilding->sMapObject.ubY + 2]) {
+		for (int i1 = pBuilding->sMapObject.ubX - 1; i1 < pBuilding->sMapObject.ubX + 4; i1++)
+			for (int j1 = pBuilding->sMapObject.ubY - 1; j1 < pBuilding->sMapObject.ubY + 4; j1++)
 				if (!place[i1][j1]) {
 					xx = i1;
 					yy = j1;
 				}
 	} else {
-		xx = pBuilding->x;
-		yy = pBuilding->y + 2;
+		xx = pBuilding->sMapObject.ubX;
+		yy = pBuilding->sMapObject.ubY + 2;
 	}
 	if (!xx || !yy)
 		return 0;
@@ -459,13 +459,13 @@ int buildingNewMan(tBuilding *pBuilding, int Nr) {
 	moverSetIFF(&pBuilding->m[j], pBuilding->sMapObject.eTeam);
 
 	if (!i) {
-		pBuilding->m[j].xm = pBuilding->x;
-		pBuilding->m[j].ym = pBuilding->y + 2;
+		pBuilding->m[j].xm = pBuilding->sMapObject.ubX;
+		pBuilding->m[j].ym = pBuilding->sMapObject.ubY + 2;
 
 	} // stajnia dla krowy
 	if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
 		moverSetCommand(&pBuilding->m[j], 1);
-		moverSetEnd(&pBuilding->m[j], pBuilding->x - 2, pBuilding->y + 4);
+		moverSetEnd(&pBuilding->m[j], pBuilding->sMapObject.ubX - 2, pBuilding->sMapObject.ubY + 4);
 	}
 	else {
 		pBuilding->m[j].exp = g_eDifficulty * 30;

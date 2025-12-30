@@ -5,7 +5,7 @@ if(NOT AMIGA)
 	message(SEND_ERROR "This project only compiles for Amiga")
 endif()
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
 
 # ACE

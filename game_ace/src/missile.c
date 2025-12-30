@@ -245,10 +245,9 @@ void missileMove(tMissile *pMissile) {
 		if ((pMissile->type != 4) && (pMissile->type != 11) && (pMissile->type < 13)) {
 			if (!place[pMissile->xt][pMissile->yt]) {
 				if (pMissile->target != NULL && pMissile->target->eKind == MAP_OBJECT_KIND_MOVER) {
-					const tMover *tar = (tMover*)pMissile->target;
-					if (ABS(pMissile->xt - tar->x) < 2 && ABS(pMissile->yt - tar->y) < 2) {
-						pMissile->xt = tar->x;
-						pMissile->yt = tar->y;
+					if (ABS(pMissile->xt - pMissile->target->ubX) < 2 && ABS(pMissile->yt - pMissile->target->ubY) < 2) {
+						pMissile->xt = pMissile->target->ubX;
+						pMissile->yt = pMissile->target->ubY;
 						if (g_eDifficulty)
 							attack[pMissile->xt][pMissile->yt] += (pMissile->damage >> 1);
 						else
@@ -269,7 +268,7 @@ void missileMove(tMissile *pMissile) {
 		//   Msg.Y = pMissile->yt;
 		// }
 		if (pMissile->type == 7 || pMissile->type == 5 || pMissile->type == 1) {
-			if (place[pMissile->xt][pMissile->yt] == &g_sMapObjTree)
+			if (place[pMissile->xt][pMissile->yt] && place[pMissile->xt][pMissile->yt]->eKind == MAP_OBJECT_KIND_TREE)
 				pMissile->dx = 1;
 			else
 				pMissile->dx = 2;

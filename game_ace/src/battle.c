@@ -988,7 +988,7 @@ static void battleInitOldLevel(UWORD uwLevel) {
 			}
 			if (z == 'r') {
 				placeG[i][j] = PICTURE_KIND_WALL_0;
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			} //??
 			//--------most-------------------
@@ -1009,39 +1009,39 @@ static void battleInitOldLevel(UWORD uwLevel) {
 			if (z == '8')
 				placeG[i][j] = PICTURE_KIND_BRIDGE_7;
 			// ---------drzewa ---------------
-			if (z == 'A' && drzewa < 2000) {
+			if (z == 'A' && drzewa < MAP_OBJECT_TREES_MAX) {
 				placeG[i][j] = PICTURE_KIND_TREE_0_BOTTOM;
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			}
-			if (z == 'B' && drzewa < 2000) {
+			if (z == 'B' && drzewa < MAP_OBJECT_TREES_MAX) {
 				placeG[i][j] = PICTURE_KIND_TREE_1_BOTTOM;
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			}
-			if (z == 'C' && drzewa < 2000) {
+			if (z == 'C' && drzewa < MAP_OBJECT_TREES_MAX) {
 				placeG[i][j] = PICTURE_KIND_TREE_2_BOTTOM;
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			}
-			if (z == 'D' && drzewa < 2000) {
+			if (z == 'D' && drzewa < MAP_OBJECT_TREES_MAX) {
 				placeG[i][j] = PICTURE_KIND_TREE_3_BOTTOM;
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			}
-			if (z == 'E' && drzewa < 2000) {
+			if (z == 'E' && drzewa < MAP_OBJECT_TREES_MAX) {
 				placeG[i][j] = PICTURE_KIND_TREE_4_BOTTOM;
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			}
-			if (z == 'F' && drzewa < 2000) {
+			if (z == 'F' && drzewa < MAP_OBJECT_TREES_MAX) {
 				placeG[i][j] = PICTURE_KIND_TREE_5_BOTTOM;
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			}
-			if (z == 'G' && drzewa < 2000) {
+			if (z == 'G' && drzewa < MAP_OBJECT_TREES_MAX) {
 				placeG[i][j] = PICTURE_KIND_TREE_6_BOTTOM;
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			}
 			//---- PASTWISKO I MIEJSCE ZBIORKI
@@ -1445,13 +1445,13 @@ static void battleInitNewLevel(UWORD uwLevel) {
 			}
 			if (placeG[i][j] > 265 && placeG[i][j] < 278) // palisada
 			{
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			}
 			// ---------drzewa ---------------
 			if ((placeG[i][j] > 112 && placeG[i][j] < 120) ||
 					placeG[i][j] == 71 || placeG[i][j] == 73) {
-				place[i][j] = &g_sMapObjTree;
+				place[i][j] = mapObjectInitTree(drzewa, i, j);
 				drzewa++;
 			}
 

@@ -18,7 +18,6 @@ typedef enum tBuildingKind {
 typedef struct tBuilding {
   tMapObject sMapObject;
   int exist;
-  int x, y;
   int faza;
   tBuildingKind type;
   int hp;

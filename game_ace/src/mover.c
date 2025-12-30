@@ -305,19 +305,19 @@ static void NewCow(tMover *oldcow) {
 
   for (int i = 2; i < 38; i++) {
     if (!(castle[side].m[i].exist)) {
-      place[oldcow->x][oldcow->y] = 0;
-      oldcow->exist = 0;
-      moverInit(&castle[side].m[i], oldcow->type, oldcow->x, oldcow->y, 1, 10);
+      place[oldcow->sMapObject.ubX][oldcow->sMapObject.ubY] = 0;
+      oldcow->exist = MOVER_EXIST_NONE;
+      moverInit(&castle[side].m[i], oldcow->type, oldcow->sMapObject.ubX, oldcow->sMapObject.ubY, 1, 10);
       moverSetIFF(&castle[side].m[i], side + 1);
       castle[side].m[i].hp = oldcow->hp;
       castle[side].m[i].maxhp = oldcow->maxhp;
       castle[side].m[i].udder = oldcow->udder;
-      castle[side].m[i].xm = castle[side].m[i].x + 3;
-      castle[side].m[i].ym = castle[side].m[i].y + 3;
-      castle[side].m[i].xp = castle[side].m[i].x;
-      castle[side].m[i].yp = castle[side].m[i].y;
-      castle[side].m[i].xe = castle[side].m[i].x;
-      castle[side].m[i].ye = castle[side].m[i].y;
+      castle[side].m[i].xm = castle[side].m[i].sMapObject.ubX + 3;
+      castle[side].m[i].ym = castle[side].m[i].sMapObject.ubY + 3;
+      castle[side].m[i].xp = castle[side].m[i].sMapObject.ubX;
+      castle[side].m[i].yp = castle[side].m[i].sMapObject.ubY;
+      castle[side].m[i].xe = castle[side].m[i].sMapObject.ubX;
+      castle[side].m[i].ye = castle[side].m[i].sMapObject.ubY;
       castle[side].m[i].dx = castle[side].m[i].dx;
       castle[side].m[i].dy = castle[side].m[i].dy;
       moverShow(&castle[side].m[i]);
@@ -338,19 +338,19 @@ static void NewCow(tMover *oldcow) {
           // strcpy(Msg.msg,"Przepisuje krowe do obory");
           // Msg.licznik=200;
 
-          place[oldcow->x][oldcow->y] = 0;
-          oldcow->exist = 0;
-          moverInit(&castle[side].b[bi].m[bmi], oldcow->type, oldcow->x, oldcow->y, 1, 10);
+          place[oldcow->sMapObject.ubX][oldcow->sMapObject.ubY] = 0;
+          oldcow->exist = MOVER_EXIST_NONE;
+          moverInit(&castle[side].b[bi].m[bmi], oldcow->type, oldcow->sMapObject.ubX, oldcow->sMapObject.ubY, 1, 10);
           moverSetIFF(&castle[side].b[bi].m[bmi], side + 1);
           castle[side].b[bi].m[bmi].hp = oldcow->hp;
           castle[side].b[bi].m[bmi].maxhp = oldcow->maxhp;
           castle[side].b[bi].m[bmi].udder = oldcow->udder;
-          castle[side].b[bi].m[bmi].xm = castle[side].m[bi].x + 3;
-          castle[side].b[bi].m[bmi].ym = castle[side].m[bi].y + 3;
-          castle[side].b[bi].m[bmi].xp = castle[side].m[bi].x;
-          castle[side].b[bi].m[bmi].yp = castle[side].m[bi].y;
-          castle[side].b[bi].m[bmi].xe = castle[side].m[bi].x;
-          castle[side].b[bi].m[bmi].ye = castle[side].m[bi].y;
+          castle[side].b[bi].m[bmi].xm = castle[side].m[bi].sMapObject.ubX + 3;
+          castle[side].b[bi].m[bmi].ym = castle[side].m[bi].sMapObject.ubY + 3;
+          castle[side].b[bi].m[bmi].xp = castle[side].m[bi].sMapObject.ubX;
+          castle[side].b[bi].m[bmi].yp = castle[side].m[bi].sMapObject.ubY;
+          castle[side].b[bi].m[bmi].xe = castle[side].m[bi].sMapObject.ubX;
+          castle[side].b[bi].m[bmi].ye = castle[side].m[bi].sMapObject.ubY;
           castle[side].b[bi].m[bmi].dx = castle[side].m[bi].dx;
           castle[side].b[bi].m[bmi].dy = castle[side].m[bi].dy;
           moverShow(&castle[side].b[bi].m[bmi]);
@@ -430,15 +430,15 @@ static void FindShed(int k, int *xm, int *ym) {
   int i;
   for (i = 0; i < CASTLE_BUILIDNGS_MAX; i++) {
     if (castle[k].b[i].type == 2 && castle[k].b[i].exist == 1) {
-      *xm = castle[k].b[i].x;
-      *ym = castle[k].b[i].y + 2;
+      *xm = castle[k].b[i].sMapObject.ubX;
+      *ym = castle[k].b[i].sMapObject.ubY + 2;
     }
   }
   for (i = 0; i < CASTLE_BUILIDNGS_MAX; i++) {
-    if (!place[castle[k].b[i].x][castle[k].b[i].y + 1] &&
+    if (!place[castle[k].b[i].sMapObject.ubX][castle[k].b[i].sMapObject.ubY + 1] &&
         castle[k].b[i].type == 2 && castle[k].b[i].exist == 1) {
-      *xm = castle[k].b[i].x;
-      *ym = castle[k].b[i].y + 2;
+      *xm = castle[k].b[i].sMapObject.ubX;
+      *ym = castle[k].b[i].sMapObject.ubY + 2;
     }
   }
 }
@@ -564,12 +564,12 @@ static void FindHolyPlace(int *xe, int *ye) {
 #pragma region methods
 
 void moverSetStart(tMover *pMover, int x0, int y0) {
-  pMover->x = x0;
-  pMover->y = y0;
+  pMover->sMapObject.ubX = x0;
+  pMover->sMapObject.ubY = y0;
 }
 
 void moverDisable(tMover *pMover) {
-  pMover->exist = 0;
+  pMover->exist = MOVER_EXIST_NONE;
   pMover->missile.exist = 0;
   pMover->wybrany = 0;
   pMover->ispath = 0;
@@ -597,7 +597,7 @@ void moverInit(tMover *pMover, int eMoverKind, int x1, int y1, int c, int d) {
   pMover->xm = x1;
   pMover->ym = y1;
   pMover->maxhp = pMover->hp;
-  pMover->exist = 1;
+  pMover->exist = MOVER_EXIST_ALIVE;
   pMover->dx = 0;
   pMover->dy = 0;
   pMover->phase = 0;
@@ -613,7 +613,7 @@ void moverConstruct(tMover *pMover) {
   pMover->ispath = 0;
   pMover->dx = 0;
   pMover->dy = 0;
-  pMover->exist = 0;
+  pMover->exist = MOVER_EXIST_NONE;
   pMover->wybrany = 0;
   pMover->missile.exist = 0;
   pMover->maxdelay = 5;
@@ -621,7 +621,7 @@ void moverConstruct(tMover *pMover) {
 
 // Probably not needed since everything is allocated upfront
 void moverDestruct(tMover *pMover) {
-  pMover->exist = 0;
+  pMover->exist = MOVER_EXIST_NONE;
   pMover->missile.exist = 0;
   pMover->wybrany = 0;
 }
@@ -661,7 +661,7 @@ void moverSetCommand(tMover *pMover, int Nr) {
     pMover->ispath = 0;
   if (Nr == 5)
     pMover->mainTarget = 0;
-  if (pMover->type && Nr == 123 && (pMover->x & 1))
+  if (pMover->type && Nr == 123 && (pMover->sMapObject.ubX & 1))
     return;
   pMover->commandN = Nr;
 }
@@ -720,19 +720,19 @@ void moverLabeling(tMover *pMover) {
         }
       }
     }
-  } while ((Place[pMover->x][pMover->y] == 1000) && (stopk != startk));
+  } while ((Place[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 1000) && (stopk != startk));
 
-  if (Place[pMover->x][pMover->y] == 1000) // 1 ruch w kierunku
+  if (Place[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 1000) // 1 ruch w kierunku
   {
     if (!pMover->type)
       return;
     int ddx, ddy;
-    ddx = pMover->x - pMover->xe;
+    ddx = pMover->sMapObject.ubX - pMover->xe;
     if (ddx < 0)
       ddx = -1;
     if (ddx > 0)
       ddx = 1;
-    ddy = pMover->y - pMover->ye;
+    ddy = pMover->sMapObject.ubY - pMover->ye;
     if (ddy < 0)
       ddy = -1;
     if (ddy > 0)
@@ -747,8 +747,8 @@ void moverLabeling(tMover *pMover) {
     return;
   }
 
-  i = pMover->x;
-  j = pMover->y;
+  i = pMover->sMapObject.ubX;
+  j = pMover->sMapObject.ubY;
   Place[i][j] = 1000;
   min = 1000;
   BYTE mini, minj;
@@ -885,7 +885,7 @@ void moverMove(tMover *pMover) {
     pMover->ye = 1;
   if (pMover->ye >= WORLD_SIZE_Y)
     pMover->ye = WORLD_SIZE_Y - 1;
-  if ((pMover->x == pMover->xe) && (pMover->y == pMover->ye)) {
+  if ((pMover->sMapObject.ubX == pMover->xe) && (pMover->sMapObject.ubY == pMover->ye)) {
     pMover->commandN = 0;
     if (!pMover->type && pMover->command == 3) {
       pMover->command = 1;
@@ -898,36 +898,36 @@ void moverMove(tMover *pMover) {
     pMover->commandN = 10;
     return;
   }
-  place[pMover->x][pMover->y] = 0;
+  place[pMover->sMapObject.ubX][pMover->sMapObject.ubY] = 0;
   if (!pMover->ispath)
     moverLabeling(pMover);
 
-  place[pMover->x][pMover->y] = &pMover->sMapObject;
+  place[pMover->sMapObject.ubX][pMover->sMapObject.ubY] = &pMover->sMapObject;
   if (!pMover->ispath) {
     if (!pMover->type) {
       tMover *mov;
-      if (place[pMover->x - 1][pMover->y - 1]) {
-        mov = moverTryGetAt(pMover->x - 1, pMover->y - 1);
+      if (place[pMover->sMapObject.ubX - 1][pMover->sMapObject.ubY - 1]) {
+        mov = moverTryGetAt(pMover->sMapObject.ubX - 1, pMover->sMapObject.ubY - 1);
         if (mov != NULL) {
-          moverSetEnd(mov, pMover->x - 5, pMover->y - 5);
+          moverSetEnd(mov, pMover->sMapObject.ubX - 5, pMover->sMapObject.ubY - 5);
           moverSetCommand(mov, 1);
           // strcpy(Msg.msg,"Posun sie z -1 -1 !!!");
           /// Msg.licznik=20;
         }
       }
-      if (place[pMover->x + 1][pMover->y + 1]) {
-        mov = moverTryGetAt(pMover->x + 1, pMover->y + 1);
+      if (place[pMover->sMapObject.ubX + 1][pMover->sMapObject.ubY + 1]) {
+        mov = moverTryGetAt(pMover->sMapObject.ubX + 1, pMover->sMapObject.ubY + 1);
         if (mov != NULL) {
-          moverSetEnd(mov, pMover->x + 5, pMover->y + 5);
+          moverSetEnd(mov, pMover->sMapObject.ubX + 5, pMover->sMapObject.ubY + 5);
           moverSetCommand(mov, 1);
           // strcpy(Msg.msg,"Posun sie z 1 1 !!!");
           // Msg.licznik=20;
         }
       }
-      if (place[pMover->x - 1][pMover->y + 1]) {
-        mov = moverTryGetAt(pMover->x - 1, pMover->y + 1);
+      if (place[pMover->sMapObject.ubX - 1][pMover->sMapObject.ubY + 1]) {
+        mov = moverTryGetAt(pMover->sMapObject.ubX - 1, pMover->sMapObject.ubY + 1);
         if (mov != NULL) {
-          moverSetEnd(mov, pMover->x - 5, pMover->y + 5);
+          moverSetEnd(mov, pMover->sMapObject.ubX - 5, pMover->sMapObject.ubY + 5);
           moverSetCommand(mov, 1);
           // strcpy(Msg.msg,"Posun sie z -1 1 !!!");
           // Msg.licznik=20;
@@ -935,12 +935,12 @@ void moverMove(tMover *pMover) {
       }
       pMover->drange++;
       if (pMover->drange > 14) {
-        if (placeG[pMover->x][pMover->y] != 163) {
-          pMover->xe = pMover->x;
-          pMover->ye = pMover->y;
+        if (placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY] != 163) {
+          pMover->xe = pMover->sMapObject.ubX;
+          pMover->ye = pMover->sMapObject.ubY;
           if (pMover->udder < 100) {
-            pMover->xp = pMover->x;
-            pMover->yp = pMover->y;
+            pMover->xp = pMover->sMapObject.ubX;
+            pMover->yp = pMover->sMapObject.ubY;
           }
         }
         pMover->drange = 0;
@@ -956,19 +956,19 @@ void moverMove(tMover *pMover) {
   pMover->dx = pMover->path[pMover->ispath - 1][0];
   pMover->dy = pMover->path[pMover->ispath - 1][1];
 
-  if (place[pMover->x - pMover->dx][pMover->y - pMover->dy] != 0) {
-    if ((pMover->type) && (pMover->x - pMover->xe < 2) && (pMover->x - pMover->xe > -2) && (pMover->y - pMover->ye < 2) &&
-        (pMover->y - pMover->ye > -2)) {
+  if (place[pMover->sMapObject.ubX - pMover->dx][pMover->sMapObject.ubY - pMover->dy] != 0) {
+    if ((pMover->type) && (pMover->sMapObject.ubX - pMover->xe < 2) && (pMover->sMapObject.ubX - pMover->xe > -2) && (pMover->sMapObject.ubY - pMover->ye < 2) &&
+        (pMover->sMapObject.ubY - pMover->ye > -2)) {
       pMover->commandN = 0;
     }
     if (!pMover->type) {
       // if(Msg.dzwiek<8){Msg.dzwiek=8;Msg.X=x;Msg.Y=y;}
-      if (placeG[pMover->x][pMover->y] != 163) {
-        pMover->xe = pMover->x;
-        pMover->ye = pMover->y;
+      if (placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY] != 163) {
+        pMover->xe = pMover->sMapObject.ubX;
+        pMover->ye = pMover->sMapObject.ubY;
         if (pMover->udder < 100) {
-          pMover->xp = pMover->x;
-          pMover->yp = pMover->y;
+          pMover->xp = pMover->sMapObject.ubX;
+          pMover->yp = pMover->sMapObject.ubY;
         }
       }
       pMover->ispath = 0;
@@ -985,13 +985,13 @@ void moverMove(tMover *pMover) {
   }
   pMover->ispath--;
   moverHide(pMover);
-  pMover->x -= pMover->dx;
-  pMover->y -= pMover->dy;
+  pMover->sMapObject.ubX -= pMover->dx;
+  pMover->sMapObject.ubY -= pMover->dy;
   moverShow(pMover);
   pMover->delay = pMover->maxdelay;
-  // if(placeG[pMover->x][pMover->y]>34&&placeG[pMover->x][pMover->y]<46)delay-=2; //przyspieszenie na drodze
+  // if(placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY]>34&&placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY]<46)delay-=2; //przyspieszenie na drodze
   pMover->inmove = 1;
-  if (pMover->x == pMover->xe && pMover->y == pMover->ye) {
+  if (pMover->sMapObject.ubX == pMover->xe && pMover->sMapObject.ubY == pMover->ye) {
     pMover->ispath = 0;
   }
 }
@@ -1008,14 +1008,14 @@ int moverLookAround(tMover *pMover) {
 
   if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->type == MOVER_KIND_FARMER)
   {
-    FindCow(pMover->x, pMover->y, &pMover->xe, &pMover->ye);
-    if (pMover->xe != pMover->x || pMover->y != pMover->ye) {
+    FindCow(pMover->sMapObject.ubX, pMover->sMapObject.ubY, &pMover->xe, &pMover->ye);
+    if (pMover->xe != pMover->sMapObject.ubX || pMover->sMapObject.ubY != pMover->ye) {
       pMover->target = place[pMover->xe][pMover->ye];
       pMover->commandN = 2;
       return 1;
     }
 
-    if (pMover->x != pMover->xm || pMover->y != pMover->ym) {
+    if (pMover->sMapObject.ubX != pMover->xm || pMover->sMapObject.ubY != pMover->ym) {
       pMover->xe = pMover->xm;
       pMover->ye = pMover->ym;
       pMover->commandN = 1;
@@ -1034,8 +1034,8 @@ int moverLookAround(tMover *pMover) {
   if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->hp > (pMover->maxhp - 20))
   {
     k = pMover->s_range + pMover->drange;
-    for (i = pMover->x - k; i <= pMover->x + k && i < WORLD_SIZE_X - 1; i++) {
-      for (j = pMover->y - k + 1; j <= pMover->y + k - 1 && j < WORLD_SIZE_Y - 1; j++) {
+    for (i = pMover->sMapObject.ubX - k; i <= pMover->sMapObject.ubX + k && i < WORLD_SIZE_X - 1; i++) {
+      for (j = pMover->sMapObject.ubY - k + 1; j <= pMover->sMapObject.ubY + k - 1 && j < WORLD_SIZE_Y - 1; j++) {
         if(place[i][j] && place[i][j]->eKind == MAP_OBJECT_KIND_MOVER) {
           if(place[i][j]->eTeam == MAP_OBJECT_TEAM_PLAYER) {
             NoOfEnemies++;
@@ -1048,7 +1048,7 @@ int moverLookAround(tMover *pMover) {
     }
 
     if (NoOfEnemies > 2 && NoOfOurs == 1) {
-      FindEnemy(pMover->x, pMover->y, &pMover->xe, &pMover->ye, 1);
+      FindEnemy(pMover->sMapObject.ubX, pMover->sMapObject.ubY, &pMover->xe, &pMover->ye, 1);
       pMover->commandN = 1; // move
       return 0;
     }
@@ -1057,10 +1057,10 @@ int moverLookAround(tMover *pMover) {
   const tMapObject *pOther = 0;
   tMapObjectTeam eEnemyTeam = pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER ? MAP_OBJECT_TEAM_CPU : MAP_OBJECT_TEAM_PLAYER;
   for (k = 1; k <= pMover->s_range + pMover->drange; k++) {
-    UBYTE ubStartX = MAX(0, pMover->x - k);
-    UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, pMover->x + k);
-    UBYTE ubStartY = MAX(0, pMover->y - k);
-    UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, pMover->y + k);
+    UBYTE ubStartX = MAX(0, pMover->sMapObject.ubX - k);
+    UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, pMover->sMapObject.ubX + k);
+    UBYTE ubStartY = MAX(0, pMover->sMapObject.ubY - k);
+    UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, pMover->sMapObject.ubY + k);
     for (i = ubStartX; i <= ubEndX; i++)
       for (j = ubStartY; j <= ubEndY; j++) {
         if (place[i][j] && place[i][j] != &pMover->sMapObject) {
@@ -1089,10 +1089,10 @@ int moverLookAround(tMover *pMover) {
   }
 
   for (k = 1; k <= pMover->s_range + pMover->drange; k++) {
-    UBYTE ubStartX = MAX(0, pMover->x - k);
-    UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, pMover->x + k);
-    UBYTE ubStartY = MAX(0, pMover->y - k);
-    UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, pMover->y + k);
+    UBYTE ubStartX = MAX(0, pMover->sMapObject.ubX - k);
+    UBYTE ubEndX = MIN(WORLD_SIZE_X - 1, pMover->sMapObject.ubX + k);
+    UBYTE ubStartY = MAX(0, pMover->sMapObject.ubY - k);
+    UBYTE ubEndY = MIN(WORLD_SIZE_Y - 1, pMover->sMapObject.ubY + k);
     for (i = ubStartX; i <= ubEndX; i++) {
       for (j = ubStartY; j <= ubEndY; j++) {
         if (place[i][j] && place[i][j] != &pMover->sMapObject) {
@@ -1110,26 +1110,26 @@ int moverLookAround(tMover *pMover) {
 }
 
 int moverLokateTarget(tMover *pMover) {
-  int i, j;
-  if (!pMover->target)
-    return 0;
-  if (place[pMover->xe][pMover->ye] == pMover->target)
+  if (place[pMover->xe][pMover->ye] == pMover->target) {
     return 1;
-  for (i = 1; i < WORLD_SIZE_X - 1; i++)
-    for (j = 1; j < WORLD_SIZE_Y - 1; j++) {
-      if (place[i][j] == pMover->target) {
-        pMover->xe = i;
-        pMover->ye = j;
-        return 1;
-      }
-    }
+  }
+
+  // Check if target is still valid
+  UBYTE xe = pMover->target->ubX;
+  UBYTE ye = pMover->target->ubY;
+  if (place[xe][ye] == pMover->target) {
+    pMover->xe = xe;
+    pMover->ye = ye;
+    return 1;
+  }
+
   return 0;
 }
 
 int moverDistance(tMover *pMover) {
   int maxx, maxy;
-  maxx = pMover->x - pMover->xe;
-  maxy = pMover->y - pMover->ye;
+  maxx = pMover->sMapObject.ubX - pMover->xe;
+  maxy = pMover->sMapObject.ubY - pMover->ye;
   if (maxx < 0)
     maxx = -maxx;
   if (maxy < 0)
@@ -1184,8 +1184,8 @@ void moverAttack(tMover *pMover) {
         moverSetCommand(oldcow, 123); // zmiana
       }
 
-      pMover->dx = pMover->x - pMover->xe;
-      pMover->dy = pMover->y - pMover->ye;
+      pMover->dx = pMover->sMapObject.ubX - pMover->xe;
+      pMover->dy = pMover->sMapObject.ubY - pMover->ye;
       if (pMover->dx > 1)
         pMover->dx = 1;
       if (pMover->dx < 0)
@@ -1205,20 +1205,20 @@ void moverAttack(tMover *pMover) {
       pMover->delay = pMover->maxdelay;
       return;
     }
-    pMover->dx = pMover->x - pMover->xe;
-    pMover->dy = pMover->y - pMover->ye;
+    pMover->dx = pMover->sMapObject.ubX - pMover->xe;
+    pMover->dy = pMover->sMapObject.ubY - pMover->ye;
     if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->type == MOVER_KIND_PRIESTESS && pMover->magic < 11) {
-      moverSetEnd(pMover, pMover->x + (pMover->dx * 3), pMover->y + (pMover->dy * 3));
+      moverSetEnd(pMover, pMover->sMapObject.ubX + (pMover->dx * 3), pMover->sMapObject.ubY + (pMover->dy * 3));
       moverMove(pMover);
       return;
     }
     if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->type == MOVER_KIND_MAGE && pMover->magic < 11) {
-      moverSetEnd(pMover, pMover->x + (pMover->dx * 3), pMover->y + (pMover->dy * 3));
+      moverSetEnd(pMover, pMover->sMapObject.ubX + (pMover->dx * 3), pMover->sMapObject.ubY + (pMover->dy * 3));
       moverMove(pMover);
       return;
     }
     if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->type == MOVER_KIND_PRIEST && pMover->magic < 21) {
-      moverSetEnd(pMover, pMover->x + (pMover->dx * 3), pMover->y + (pMover->dy * 3));
+      moverSetEnd(pMover, pMover->sMapObject.ubX + (pMover->dx * 3), pMover->sMapObject.ubY + (pMover->dy * 3));
       moverMove(pMover);
       return;
     } // ucieczka
@@ -1259,9 +1259,9 @@ void moverAttack(tMover *pMover) {
       pMover->magic -= 20;
 
     int baseDamage = pMover->damage;
-    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && place[pMover->xe][pMover->ye] == &g_sMapObjTree) // was comparing to 800, doesn't make sense
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && place[pMover->xe][pMover->ye] && place[pMover->xe][pMover->ye]->eKind == MAP_OBJECT_KIND_TREE) // was comparing to 800, doesn't make sense
       baseDamage += 20;
-    missileInit(&pMover->missile, pMover->x, pMover->y, pMover->xe, pMover->ye, baseDamage + ddamage[pMover->exp >> 4], pMover->type);
+    missileInit(&pMover->missile, pMover->sMapObject.ubX, pMover->sMapObject.ubY, pMover->xe, pMover->ye, baseDamage + ddamage[pMover->exp >> 4], pMover->type);
 
     if ((pMover->type == 4 || pMover->type == 11) && pMover->target->eTeam == MAP_OBJECT_TEAM_TREE) {
       pMover->mainTarget = 0;
@@ -1283,8 +1283,8 @@ void moverAttack(tMover *pMover) {
       pMover->dy = 1;
     if (pMover->dy < 0)
       pMover->dy = -1;
-    if (!placeN[pMover->x][pMover->y])
-      placeN[pMover->x][pMover->y] = 1;
+    if (!placeN[pMover->sMapObject.ubX][pMover->sMapObject.ubY])
+      placeN[pMover->sMapObject.ubX][pMover->sMapObject.ubY] = 1;
     if (!placeN[pMover->xe][pMover->ye])
       placeN[pMover->xe][pMover->ye] = 1;
 
@@ -1322,8 +1322,8 @@ void moverRepare(tMover *pMover) {
       pMover->delay = pMover->maxdelay;
       return;
     }
-    pMover->dx = pMover->x - pMover->xe;
-    pMover->dy = pMover->y - pMover->ye;
+    pMover->dx = pMover->sMapObject.ubX - pMover->xe;
+    pMover->dy = pMover->sMapObject.ubY - pMover->ye;
     pMover->delay = pMover->maxdelay;
     pMover->inattack = 1;
     if (pMover->dx > 1)
@@ -1340,8 +1340,8 @@ void moverRepare(tMover *pMover) {
       placeN[pMover->xe][pMover->ye]++;
     // if (Msg.dzwiek < 2) {
     //   Msg.dzwiek = 1;
-    //   Msg.X = pMover->x;
-    //   Msg.Y = pMover->y;
+    //   Msg.X = pMover->sMapObject.ubX;
+    //   Msg.Y = pMover->sMapObject.ubY;
     // }
     return;
   }
@@ -1350,33 +1350,14 @@ void moverRepare(tMover *pMover) {
   moverMove(pMover);
 }
 
-void moverRun(tMover *pMover) {
-  if (pMover->type)
-    moverRun1(pMover);
-  else
-    moverRun2(pMover);
-}
-
-void moverRun1(tMover *pMover) // rycerze
-{
-  if (!pMover->exist)
-    return;
-  if (pMover->exist == 2 && pMover->delay < 1) {
-    pMover->exist = 0;
-    return;
-  }
-  if (pMover->exist == 2) {
-    pMover->delay--;
-    return;
-  } // trup
-
-  if (attack[pMover->x][pMover->y]) {
+static void moverRunNonCow(tMover *pMover) {
+  if (attack[pMover->sMapObject.ubX][pMover->sMapObject.ubY]) {
     int dem;
     if (pMover->marmour)
-      attack[pMover->x][pMover->y] = 0;
-    if (attack[pMover->x][pMover->y] > 0) {
-      dem = (int)attack[pMover->x][pMover->y] - pMover->armour - darmour[pMover->exp >> 4];
-      attack[pMover->x][pMover->y] = 0;
+      attack[pMover->sMapObject.ubX][pMover->sMapObject.ubY] = 0;
+    if (attack[pMover->sMapObject.ubX][pMover->sMapObject.ubY] > 0) {
+      dem = (int)attack[pMover->sMapObject.ubX][pMover->sMapObject.ubY] - pMover->armour - darmour[pMover->exp >> 4];
+      attack[pMover->sMapObject.ubX][pMover->sMapObject.ubY] = 0;
       if (dem <= 0)
         dem = 1;
       if (!pMover->mainTarget)
@@ -1385,10 +1366,10 @@ void moverRun1(tMover *pMover) // rycerze
       if ((pMover->command == 1 || pMover->command == 8) && pMover->type != 10 &&
           placeG[pMover->xe][pMover->ye] != 256 && (pMover->hp > (pMover->maxhp >> 1)))
         pMover->commandN = 0;        // zatrzymaj idacych!
-      if (placeN[pMover->x][pMover->y] > 60) // uciekaj z ognia
+      if (placeN[pMover->sMapObject.ubX][pMover->sMapObject.ubY] > 60) // uciekaj z ognia
       {
-        for (int ii = pMover->x - 1; ii <= pMover->x + 1; ii++) {
-          for (int jj = pMover->y - 1; jj <= pMover->y + 1; jj++) {
+        for (int ii = pMover->sMapObject.ubX - 1; ii <= pMover->sMapObject.ubX + 1; ii++) {
+          for (int jj = pMover->sMapObject.ubY - 1; jj <= pMover->sMapObject.ubY + 1; jj++) {
             if (ii > 0 && jj > 0 && ii < WORLD_SIZE_X - 1 && jj < WORLD_SIZE_Y - 1) {
               if (!(place[ii][jj]) && (placeN[ii][jj] < 2)) {
                 pMover->xe = ii;
@@ -1409,8 +1390,9 @@ void moverRun1(tMover *pMover) // rycerze
         pMover->ShowHit = 5;
         if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU)
           pMover->drange = 6;
-      } else {
-        pMover->exist = 2;
+      }
+      else {
+        pMover->exist = MOVER_EXIST_ROT;
         pMover->hp = 0;
         pMover->dx = 0;
         pMover->dy = 0;
@@ -1421,16 +1403,16 @@ void moverRun1(tMover *pMover) // rycerze
         // int kk = 35 + pMover->type * 11;
         // if (Msg.dzwiek < kk) {
         //   Msg.dzwiek = kk;
-        //   Msg.X = pMover->x;
-        //   Msg.Y = pMover->y;
+        //   Msg.X = pMover->sMapObject.ubX;
+        //   Msg.Y = pMover->sMapObject.ubY;
         // }
         return;
       }
       if (pMover->hp < ((UBYTE)g_eDifficulty >> 4) && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && pMover->command != 1) //&&diff
       { // jezeli chory to udaj sie do swiatyni na leczenie
-        int xl = pMover->x, yl = pMover->y;
+        int xl = pMover->sMapObject.ubX, yl = pMover->sMapObject.ubY;
         FindHolyPlace(&xl, &yl);
-        if (xl != pMover->x || yl != pMover->y) {
+        if (xl != pMover->sMapObject.ubX || yl != pMover->sMapObject.ubY) {
           moverSetEnd(pMover, xl, yl);
           moverSetCommand(pMover, 1);
         }
@@ -1443,12 +1425,13 @@ void moverRun1(tMover *pMover) // rycerze
 
   if (pMover->delay)
     return; // wyjdz jezeli nie koniec ruchu
+
   if (pMover->drange)
     pMover->drange--;
 
-  if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && !pMover->command && placeG[pMover->x][pMover->y] == 163) //??? nie blokuj obory
+  if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && !pMover->command && placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 163) //??? nie blokuj obory
   {
-    moverSetEnd(pMover, pMover->x + 2, pMover->y - 3);
+    moverSetEnd(pMover, pMover->sMapObject.ubX + 2, pMover->sMapObject.ubY - 3);
     moverSetCommand(pMover, 1);
   }
   /*   if(hp<5+(diff>>4)&&IFF==2&&!drange&&command!=1)//&&diff
@@ -1469,13 +1452,13 @@ void moverRun1(tMover *pMover) // rycerze
          }
      }*/
   if (pMover->hp == pMover->maxhp && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU && !pMover->command &&
-      placeG[pMover->x][pMover->y] == 256) { // wyleczony odsun sie z miejsca leczenia
-    moverSetEnd(pMover, pMover->x + 5, pMover->y + 5);
+      placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 256) { // wyleczony odsun sie z miejsca leczenia
+    moverSetEnd(pMover, pMover->sMapObject.ubX + 5, pMover->sMapObject.ubY + 5);
     moverSetCommand(pMover, 1);
   }
   pMover->inattack = 0;
   pMover->phase = 0;
-  if (placeG[pMover->x][pMover->y] == 256 && pMover->hp < pMover->maxhp) {
+  if (placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 256 && pMover->hp < pMover->maxhp) {
     pMover->hp += 4; // leczenie w swietym miejscu
     if (pMover->hp > pMover->maxhp)
       pMover->hp = pMover->maxhp;
@@ -1518,11 +1501,11 @@ void moverRun1(tMover *pMover) // rycerze
     if (place[pMover->xe][pMover->ye] || pMover->xe < 1 || pMover->ye < 1 || pMover->xe > WORLD_SIZE_X - 2 || pMover->ye > WORLD_SIZE_X - 2)
       pMover->xe += 3; // 7
     if (place[pMover->xe][pMover->ye] || pMover->xe < 1 || pMover->ye < 1 || pMover->xe > WORLD_SIZE_X - 2 || pMover->ye > WORLD_SIZE_X - 2) {
-      pMover->xe = pMover->x;
-      pMover->ye = pMover->y;
+      pMover->xe = pMover->sMapObject.ubX;
+      pMover->ye = pMover->sMapObject.ubY;
     }
-    pMover->x = pMover->xe;
-    pMover->y = pMover->ye;
+    pMover->sMapObject.ubX = pMover->xe;
+    pMover->sMapObject.ubY = pMover->ye;
     moverShow(pMover);
     pMover->inattack = 1;
     pMover->delay = pMover->maxdelay;
@@ -1542,7 +1525,7 @@ void moverRun1(tMover *pMover) // rycerze
     } // jezeli nic nie robi to rozejzec sie
     break;
   case 1:
-    if (pMover->x == pMover->xe && pMover->y == pMover->ye) {
+    if (pMover->sMapObject.ubX == pMover->xe && pMover->sMapObject.ubY == pMover->ye) {
       pMover->commandN = 0;
       pMover->inmove = 0;
       return;
@@ -1601,8 +1584,8 @@ void moverRun1(tMover *pMover) // rycerze
         pMover->marmour = 200;
       // if (Msg.dzwiek < 16) {
       //   Msg.dzwiek = 10;
-      //   Msg.X = pMover->x;
-      //   Msg.Y = pMover->y;
+      //   Msg.X = pMover->sMapObject.ubX;
+      //   Msg.Y = pMover->sMapObject.ubY;
       // }
     }
     if (pMover->magic > 24 && pMover->type == 4) { // widzenie
@@ -1611,14 +1594,14 @@ void moverRun1(tMover *pMover) // rycerze
       pMover->marmour = 5;
       // if (Msg.dzwiek < 12) {
       //   Msg.dzwiek = 11;
-      //   Msg.X = pMover->x;
-      //   Msg.Y = pMover->y;
+      //   Msg.X = pMover->sMapObject.ubX;
+      //   Msg.Y = pMover->sMapObject.ubY;
       // }
       int xx, yy, i, j;
       for (i = 1; i < WORLD_SIZE_X; i++)
         for (j = 1; j < WORLD_SIZE_Y; j++) {
-          xx = ABS(pMover->x - i);
-          yy = ABS(pMover->y - j);
+          xx = ABS(pMover->sMapObject.ubX - i);
+          yy = ABS(pMover->sMapObject.ubY - j);
           if (xx + yy < 18 && yy < 14 && xx < 14 && !placeN[i][j])
             placeN[i][j] = 1;
         }
@@ -1642,7 +1625,7 @@ void moverRun1(tMover *pMover) // rycerze
       pMover->commandN = 0;
       return;
     }
-    FindEnemy(pMover->x, pMover->y, &pMover->xe, &pMover->ye, 2);
+    FindEnemy(pMover->sMapObject.ubX, pMover->sMapObject.ubY, &pMover->xe, &pMover->ye, 2);
     pMover->target = place[pMover->xe][pMover->ye];
     if (pMover->xe == 32 && pMover->ye == 32)
       pMover->target = 0;
@@ -1667,7 +1650,7 @@ int moverMilk(tMover *pMover) {
     return 0;
   if (pMover->exist != 1)
     return 0;
-  if (placeG[pMover->x][pMover->y - 1] != 160)
+  if (placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY - 1] != 160)
     return 0;
 
   pMover->udder--;
@@ -1685,9 +1668,9 @@ void moverFindGrass(tMover *pMover) {
 
   for (int range = 1; range < 5; range++) {
     max = 0;
-    if (pMover->x & 1) {
-      for (int i = pMover->x - range; i <= pMover->x + range; i++)
-        for (int j = pMover->y - range; j <= pMover->y + range; j++)
+    if (pMover->sMapObject.ubX & 1) {
+      for (int i = pMover->sMapObject.ubX - range; i <= pMover->sMapObject.ubX + range; i++)
+        for (int j = pMover->sMapObject.ubY - range; j <= pMover->sMapObject.ubY + range; j++)
           if (i > 0 && j > 0 && i < WORLD_SIZE_X - 1 && j < WORLD_SIZE_Y - 1)
             if (place[i][j] == 0 && placeG[i][j] > max && placeG[i][j] < 9) {
               max = placeG[i][j];
@@ -1695,8 +1678,8 @@ void moverFindGrass(tMover *pMover) {
               maxy = j;
             }
     } else {
-      for (int i = pMover->x + range; i >= pMover->x - range; i--)
-        for (int j = pMover->y + range; j >= pMover->y - range; j--)
+      for (int i = pMover->sMapObject.ubX + range; i >= pMover->sMapObject.ubX - range; i--)
+        for (int j = pMover->sMapObject.ubY + range; j >= pMover->sMapObject.ubY - range; j--)
           if (i > 0 && j > 0 && i < WORLD_SIZE_X - 1 && j < WORLD_SIZE_Y - 1)
             if (place[i][j] == 0 && placeG[i][j] > max && placeG[i][j] < 9) {
               max = placeG[i][j];
@@ -1714,7 +1697,7 @@ void moverFindGrass(tMover *pMover) {
 }
 
 void moverGraze(tMover *pMover) {
-  int grass = placeG[pMover->x][pMover->y];
+  int grass = placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY];
   pMover->inmove = 0;
 
   if (!grass || grass > 8) {
@@ -1726,7 +1709,7 @@ void moverGraze(tMover *pMover) {
   pMover->udder += grass;
   if (pMover->udder > 100)
     pMover->udder = 100;
-  placeG[pMover->x][pMover->y]--;
+  placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY]--;
   if (pMover->udder >= 100) {
     int k = 0;
     if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU)
@@ -1742,25 +1725,20 @@ void moverGraze(tMover *pMover) {
   pMover->delay = pMover->maxdelay;
 }
 
-void moverRun2(tMover *pMover) // krowy
-{                   // command 1-idz na pastwisko 2-harwestuj
-  // 3-wracaj 4- oddaj mleko 5-uciekaj
-  if (!pMover->exist)
-    return;
-  if (pMover->exist == 2 && pMover->delay < 1) {
-    pMover->exist = 0;
-    return;
-  }
-  if (pMover->exist == 2) {
-    pMover->delay--;
-    return;
-  }
+static void moverRunCow(tMover *pMover) // krowy
+{
+  // command
+  // 1-idz na pastwisko
+  // 2-harwestuj
+  // 3-wracaj
+  // 4- oddaj mleko
+  // 5-uciekaj
 
-  if (attack[pMover->x][pMover->y]) {
+  if (attack[pMover->sMapObject.ubX][pMover->sMapObject.ubY]) {
     int dem;
     pMover->commandN = 5; // ucieczka
-    dem = attack[pMover->x][pMover->y] - pMover->armour;
-    attack[pMover->x][pMover->y] = 0;
+    dem = attack[pMover->sMapObject.ubX][pMover->sMapObject.ubY] - pMover->armour;
+    attack[pMover->sMapObject.ubX][pMover->sMapObject.ubY] = 0;
     if (dem > 0)
       pMover->hp -= dem;
     if (dem > 4)
@@ -1768,7 +1746,7 @@ void moverRun2(tMover *pMover) // krowy
     else
       pMover->ShowHit = 3;
     if (pMover->hp <= 0) {
-      pMover->exist = 2;
+      pMover->exist = MOVER_EXIST_NONE;
       pMover->dx = 0;
       pMover->dy = 0;
       pMover->delay = 200;
@@ -1777,8 +1755,8 @@ void moverRun2(tMover *pMover) // krowy
       pMover->inmove = 0;
       // if (Msg.dzwiek < 8) {
       //   Msg.dzwiek = 8;
-      //   Msg.X = pMover->x;
-      //   Msg.Y = pMover->y;
+      //   Msg.X = pMover->sMapObject.ubX;
+      //   Msg.Y = pMover->sMapObject.ubY;
       // }
       return;
     }
@@ -1790,11 +1768,11 @@ void moverRun2(tMover *pMover) // krowy
 
   pMover->inattack = 0;
   pMover->phase = 0;
-  if (placeG[pMover->x][pMover->y] == 256 && pMover->hp < pMover->maxhp)
+  if (placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 256 && pMover->hp < pMover->maxhp)
     pMover->hp++; // leczenie w swietym miejscu
   pMover->command = pMover->commandN;
-  if (pMover->command == 1 && pMover->x == pMover->xe && pMover->y == pMover->ye) {
-    if (pMover->x == pMover->xm && pMover->y == pMover->ym) {
+  if (pMover->command == 1 && pMover->sMapObject.ubX == pMover->xe && pMover->sMapObject.ubY == pMover->ye) {
+    if (pMover->sMapObject.ubX == pMover->xm && pMover->sMapObject.ubY == pMover->ym) {
       pMover->commandN = 4; // daj sie doic
       pMover->inmove = 0;
       return;
@@ -1831,7 +1809,7 @@ void moverRun2(tMover *pMover) // krowy
     moverGraze(pMover);
     return;
   } // jezeli nic nie robi to rozejzec sie
-  if (pMover->command == 3 && pMover->x == pMover->xm && pMover->y == pMover->ym) {
+  if (pMover->command == 3 && pMover->sMapObject.ubX == pMover->xm && pMover->sMapObject.ubY == pMover->ym) {
     pMover->commandN = 4;
     pMover->inmove = 0;
     return;
@@ -1851,15 +1829,15 @@ void moverRun2(tMover *pMover) // krowy
     if (placeG[pMover->xm][pMover->ym - 1] != 160) {
       for (int i = 0; i < 20; i++) {
         if (castle[k].b[i].type == 2 && castle[k].b[i].exist == 1) {
-          pMover->xm = castle[k].b[i].x;
-          pMover->ym = castle[k].b[i].y + 2;
+          pMover->xm = castle[k].b[i].sMapObject.ubX;
+          pMover->ym = castle[k].b[i].sMapObject.ubY + 2;
         }
       }
     }
     pMover->xe = pMover->xm;
     pMover->ye = pMover->ym;
     pMover->commandN = 1;
-    if (pMover->x == pMover->xm && pMover->y == pMover->ym) {
+    if (pMover->sMapObject.ubX == pMover->xm && pMover->sMapObject.ubY == pMover->ym) {
       pMover->xe = pMover->xp;
       pMover->ye = pMover->yp;
     }
@@ -1868,6 +1846,29 @@ void moverRun2(tMover *pMover) // krowy
   pMover->inmove = 0;
   pMover->commandN = 2;
   pMover->delay = pMover->maxdelay;
+}
+
+void moverRun(tMover *pMover) {
+  switch(pMover->exist) {
+    case MOVER_EXIST_NONE:
+      return;
+    case MOVER_EXIST_ROT:
+      if(pMover->delay < 1) {
+        pMover->exist = MOVER_EXIST_NONE;
+      }
+      else {
+        pMover->delay--;
+      }
+      break;
+    case MOVER_EXIST_ALIVE:
+      if (pMover->type) {
+        moverRunNonCow(pMover);
+      }
+      else {
+        moverRunCow(pMover);
+      }
+      break;
+  }
 }
 
 void moverSetEnd(tMover *pMover, int x0, int y0) {
@@ -1953,27 +1954,27 @@ void moverPrepare(tMover *pMover, int x0, int y0, int typ) {
         pMover->dy = 1;
     }
   }
-  if (pMover->x < (x0 - 1) || pMover->y < (y0 - 1) || pMover->x > (x0 + 17) || pMover->y > (y0 + 14))
+  if (pMover->sMapObject.ubX < (x0 - 1) || pMover->sMapObject.ubY < (y0 - 1) || pMover->sMapObject.ubX > (x0 + 17) || pMover->sMapObject.ubY > (y0 + 14))
     pMover->visible = 0; // ze wzgledu na LookUpTable
   else
     pMover->visible = 1;
   if (pMover->visible) {
     if (pMover->inmove == 1) {
       if (pMover->dx > 0)
-        pMover->xr = Xe[pMover->x - x0 + 1] + (int)shiftX[pMover->type][pMover->delay] - 16;
+        pMover->xr = Xe[pMover->sMapObject.ubX - x0 + 1] + (int)shiftX[pMover->type][pMover->delay] - 16;
       if (pMover->dx < 0)
-        pMover->xr = Xe[pMover->x - x0 + 1] - (int)shiftX[pMover->type][pMover->delay] - 16;
+        pMover->xr = Xe[pMover->sMapObject.ubX - x0 + 1] - (int)shiftX[pMover->type][pMover->delay] - 16;
       if (!pMover->dx)
-        pMover->xr = Xe[pMover->x - x0 + 1] - 16;
+        pMover->xr = Xe[pMover->sMapObject.ubX - x0 + 1] - 16;
       if (pMover->dy > 0)
-        pMover->yr = Ye[pMover->y - y0 + 1] + (int)shiftY[pMover->type][pMover->delay] - 14;
+        pMover->yr = Ye[pMover->sMapObject.ubY - y0 + 1] + (int)shiftY[pMover->type][pMover->delay] - 14;
       if (pMover->dy < 0)
-        pMover->yr = Ye[pMover->y - y0 + 1] - (int)shiftY[pMover->type][pMover->delay] - 14;
+        pMover->yr = Ye[pMover->sMapObject.ubY - y0 + 1] - (int)shiftY[pMover->type][pMover->delay] - 14;
       if (!pMover->dy)
-        pMover->yr = Ye[pMover->y - y0 + 1] - 14;
+        pMover->yr = Ye[pMover->sMapObject.ubY - y0 + 1] - 14;
     } else {
-      pMover->xr = Xe[pMover->x - x0 + 1] - 16;
-      pMover->yr = Ye[pMover->y - y0 + 1] - 14;
+      pMover->xr = Xe[pMover->sMapObject.ubX - x0 + 1] - 16;
+      pMover->yr = Ye[pMover->sMapObject.ubY - y0 + 1] - 14;
     }
     if (pMover->inattack && pMover->phase > 2 &&
         (pMover->type == 1 || pMover->type == 5 || (pMover->type > 6 && pMover->type < 10))) {
@@ -1996,7 +1997,7 @@ void moverPrepare(tMover *pMover, int x0, int y0, int typ) {
 
 void moverShowS(tMover *pMover) {
   int k;
-  if (!pMover->exist || !pMover->visible || !placeN[pMover->x][pMover->y])
+  if (!pMover->exist || !pMover->visible || !placeN[pMover->sMapObject.ubX][pMover->sMapObject.ubY])
     return;
 
   if (pMover->exist == 2) {
@@ -2083,7 +2084,7 @@ void moverShowS(tMover *pMover) {
   if (pMover->marmour) {
     gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &picture[278 + (pMover->marmour & 3)]);
   }
-  if (placeG[pMover->x][pMover->y] == 256 && pMover->hp < pMover->maxhp) {
+  if (placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 256 && pMover->hp < pMover->maxhp) {
     PutImageChange13h(pMover->xr, pMover->yr, &picture[282 + (pMover->delay & 1)], 1, Red, LightBlue);
   }
 
@@ -2097,18 +2098,18 @@ void moverShowS(tMover *pMover) {
 
 void moverShow(tMover *pMover) {
   int i, j;
-  place[pMover->x][pMover->y] = &pMover->sMapObject;
+  place[pMover->sMapObject.ubX][pMover->sMapObject.ubY] = &pMover->sMapObject;
   if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
     for (i = -pMover->s_range; i <= pMover->s_range; i++) {
-      if (pMover->x + i > 0 && pMover->x + i < WORLD_SIZE_X)
+      if (pMover->sMapObject.ubX + i > 0 && pMover->sMapObject.ubX + i < WORLD_SIZE_X)
         for (j = -pMover->s_range; j <= pMover->s_range; j++) {
-          if (pMover->y + j > 0 && pMover->y + j < WORLD_SIZE_Y && !(placeN[pMover->x + i][pMover->y + j])) {
+          if (pMover->sMapObject.ubY + j > 0 && pMover->sMapObject.ubY + j < WORLD_SIZE_Y && !(placeN[pMover->sMapObject.ubX + i][pMover->sMapObject.ubY + j])) {
             if ((i != -pMover->s_range || j != -pMover->s_range) &&
                 (i != -pMover->s_range || j != pMover->s_range) &&
                 (i != pMover->s_range || j != -pMover->s_range) &&
                 (i != pMover->s_range || j != pMover->s_range)) // bez rogow
             {
-              placeN[pMover->x + i][pMover->y + j] |= 1;
+              placeN[pMover->sMapObject.ubX + i][pMover->sMapObject.ubY + j] |= 1;
             }
           }
         }
@@ -2117,7 +2118,7 @@ void moverShow(tMover *pMover) {
 }
 
 void moverHide(tMover *pMover) {
-	place[pMover->x][pMover->y] = 0;
+	place[pMover->sMapObject.ubX][pMover->sMapObject.ubY] = 0;
 }
 
 int moverOK(const tMover *pMover) {
