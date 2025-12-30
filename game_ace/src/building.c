@@ -102,17 +102,21 @@ void buildingRun(tBuilding *pBuilding) {
 	int i, j, dd = 0;
 	if (!pBuilding->exist)
 		return;
+
 	// odbudowa
-	if (pBuilding->hp < pBuilding->maxhp)
-		for (i = pBuilding->sMapObject.ubX; i < pBuilding->sMapObject.ubX + 3; i++)
+	if (pBuilding->hp < pBuilding->maxhp) {
+		for (i = pBuilding->sMapObject.ubX; i < pBuilding->sMapObject.ubX + 3; i++) {
 			for (j = pBuilding->sMapObject.ubY; j < pBuilding->sMapObject.ubY + 3; j++) {
-				if (placeN[i][j] > 219) {
-					dd += (placeN[i][j] - 219) * 2;
-					if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU)
+				if (placeN[i][j] >= 220) {
+					dd += (placeN[i][j] - 220 + 1) * 2;
+					if (pBuilding->sMapObject.eTeam == MAP_OBJECT_TEAM_CPU) {
 						dd += 3;
+					}
 					placeN[i][j] = 1;
 				}
 			}
+		}
+	}
 
 	if (dd) {
 		pBuilding->hp += dd;
@@ -196,17 +200,17 @@ void buildingRun(tBuilding *pBuilding) {
 		pBuilding->hp -= dd;
 		if (pBuilding->hp <= 0) {
 			pBuilding->hp = 0;
-			j = 0;
-			do {
+
+			for(j = 0; j < 3; ++j) {
 				for (i = 0; i < 3; i++) {
-					placeG[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = 257 + i + j * 3; // ruina
-					if (pBuilding->type != 6 || i != 1 || j != 2)
+					placeG[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = PICTURE_KIND_RUIN_0 + i + j * 3; // ruina
+					if (pBuilding->type != BUILDING_KIND_KNIGHT_HUT || i != 1 || j != 2)
 						if (i || j != 2)
 							place[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = 0;
 					placeN[pBuilding->sMapObject.ubX + i][pBuilding->sMapObject.ubY + j] = 88;
 				}
-				j++;
-			} while (j < 3);
+			}
+
 			placeN[pBuilding->sMapObject.ubX + 2][pBuilding->sMapObject.ubY + 2] = 100;
 			placeN[pBuilding->sMapObject.ubX][pBuilding->sMapObject.ubY] = 81;
 			placeN[pBuilding->sMapObject.ubX][pBuilding->sMapObject.ubY + 1] = 95;
@@ -224,21 +228,22 @@ void buildingRun(tBuilding *pBuilding) {
 
 	if (pBuilding->exist != 1)
 		return;
-	if (pBuilding->hp < pBuilding->maxhp)
-		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 1;
-	if (pBuilding->hp < pBuilding->maxhp / 2)
-		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 74;
-	if (pBuilding->hp < pBuilding->maxhp / 4)
-		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 78;
+
 	if (pBuilding->hp < pBuilding->maxhp / 8)
 		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 100;
+	else if (pBuilding->hp < pBuilding->maxhp / 4)
+		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 78;
+	else if (pBuilding->hp < pBuilding->maxhp / 2)
+		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 74;
+	else if (pBuilding->hp < pBuilding->maxhp)
+		placeN[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY + 1] = 1;
 
 	if (++pBuilding->faza > 4)
 		pBuilding->faza = 0;
 
 	// Animate buildings
 	// TODO: create table with dx/dy/tile1/tile3 per building type
-	if (pBuilding->exist == 1 && pBuilding->faza == 1)
+	if (pBuilding->faza == 1) {
 		switch (pBuilding->type) {
 			case BUILDING_KIND_UNK:
 				placeG[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY] = 137 + 9;
@@ -261,7 +266,8 @@ void buildingRun(tBuilding *pBuilding) {
 			case BUILDING_KIND_COUNT:
 				break;
 		}
-	if (pBuilding->exist == 1 && pBuilding->faza == 3)
+	}
+	else if (pBuilding->faza == 3) {
 		switch (pBuilding->type) {
 			case BUILDING_KIND_UNK:
 				placeG[pBuilding->sMapObject.ubX + 1][pBuilding->sMapObject.ubY] = 137 + 1;
@@ -284,6 +290,7 @@ void buildingRun(tBuilding *pBuilding) {
 			case BUILDING_KIND_COUNT:
 				break;
 		}
+	}
 }
 
 void buildingPrepare(tBuilding *pBuilding, int X, int Y, int typ) {
