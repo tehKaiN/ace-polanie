@@ -83,8 +83,8 @@ void worldShowPlace(UWORD uwLeftX, UWORD uwTopY) {
 					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[PICTURE_KIND_FIREPLACE_SMALL]);
 					gfxDrawImageMaskedClipped(uwScreenX, uwScreenY, &fire[4 + ((fireCounter + ubX + ubY) & 3)]);
 				} // duze ognisko
-				else if (placeG[ubX][ubY] <= PICTURE_KIND_GADGET_BURNT_TREE_4)
-					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[2]); // podstawa pod rzewa wypalone
+				else if (placeG[ubX][ubY] <= PICTURE_KIND_GADGET_BURNT_TREE_2_BOTTOM)
+					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[PICTURE_KIND_GRASS_2]); // podstawa pod drzewa wypalone
 				else if (placeG[ubX][ubY] <= PICTURE_KIND_WATER_12)
 					gfxDrawImageNoMask(uwScreenX, uwScreenY, &picture[placeG[ubX][ubY] + (waterCounter * 13)]); // woda
 				else if (PICTURE_KIND_WALL_0 <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_WALL_11)
@@ -168,22 +168,27 @@ void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
   for (UBYTE ubY = uwTopY; ubY < uwTopY + WORLD_WINDOW_SIZE_Y + 1; ubY++) {
     for (UBYTE ubX = uwLeftX; ubX < uwLeftX + WORLD_WINDOW_SIZE_X; ubX++) {
       if (placeN[ubX][ubY]) {
-        if (placeG[ubX][ubY] > 112 && placeG[ubX][ubY] < 120) // drzewo zywe
+        if (PICTURE_KIND_TREE_0_BOTTOM <= placeG[ubX][ubY] && placeG[ubX][ubY] <= PICTURE_KIND_TREE_6_BOTTOM) // drzewo zywe
         {
           if (placeN[ubX][ubY] < 190) {
             if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 8, Ye[ubY - uwTopY], &picture[placeG[ubX][ubY]]); // drzewo dol
             if (ubY > uwTopY)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX] - 8, Ye[ubY - 1 - uwTopY], &picture[placeG[ubX][ubY] + 7]); //
+
             // fire gora
-            if (ubY > uwTopY && placeN[ubX][ubY] > 74 && placeN[ubX][ubY] < 91)
+
+            if (ubY > uwTopY && 75 <= placeN[ubX][ubY] && placeN[ubX][ubY] <= 90)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY] + 8, &fire[(fireCounter + ubX + ubY + 1) & 3]); // fire big
-            if (ubY > uwTopY && placeN[ubX][ubY] > 70 && placeN[ubX][ubY] < 75)
-              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY] - 7, &fire[8 + ((fireCounter + ubX + ubY) & 3)]); // fire small
-            if (ubY > uwTopY && placeN[ubX][ubY] > 70 && placeN[ubX][ubY] < 75)
-              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY] + 4, &fire[(fireCounter + ubX + ubY) & 3]); // fire big
+            else if (ubY > uwTopY && 71 <= placeN[ubX][ubY] && placeN[ubX][ubY] <= 74) {
+							UBYTE ubFireFrame = (fireCounter + ubX + ubY) & 3;
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY] - 7, &fire[8 + (ubFireFrame)]); // fire small
+              gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY] + 4, &fire[ubFireFrame]); // fire big
+						}
           }
-          if (placeN[ubX][ubY] > 194 && placeN[ubX][ubY] < 201) { // drzewo brazowe
+					// drzewo brazowe
+          if (195 <= placeN[ubX][ubY] && placeN[ubX][ubY] <= 200) {
+						// 1 faza przewrotu
             if (ubY > uwTopY) {
               gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - 1 - uwTopY], &tree[4]); //
               if (ubX > uwLeftX)
@@ -191,16 +196,17 @@ void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
             }
             if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[6]); //
-          }                                                  // 1 faza przewrotu
-          if (placeN[ubX][ubY] > 190 && placeN[ubX][ubY] < 195) {
+          }
+          else if (190 < placeN[ubX][ubY] && placeN[ubX][ubY] < 195) {
+						// 2 faza przewrotu
             if (ubX > uwLeftX)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[3]); //
             if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - uwTopY], &tree[2]); //
-          } // 2 faza przewrotu
+          }
         }
 
-        if (placeG[ubX][ubY] == 71 || placeG[ubX][ubY] == 73) // drzewo spalone
+        if (placeG[ubX][ubY] == PICTURE_KIND_GADGET_BURNT_TREE_1_BOTTOM || placeG[ubX][ubY] == PICTURE_KIND_GADGET_BURNT_TREE_2_BOTTOM) // drzewo spalone
         {
           if (placeN[ubX][ubY] < 190) {
             if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
@@ -208,7 +214,9 @@ void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
             if (ubY > uwTopY)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - 1 - uwTopY], &picture[placeG[ubX][ubY] - 1]); //
           }
-          if (placeN[ubX][ubY] > 194 && placeN[ubX][ubY] < 201) { // drzewo brazowe
+
+          if (195 <= placeN[ubX][ubY] && placeN[ubX][ubY] <= 200) { // drzewo brazowe
+						// 1 faza przewrotu
             if (ubY > uwTopY) {
               gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - 1 - uwTopY], &tree[11]); //
               if (ubX > uwLeftX)
@@ -216,32 +224,35 @@ void worldShowTrees(UWORD uwLeftX, UWORD uwTopY) {
             }
             if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[13]); //
-          } // 1 faza przewrotu
-          if (placeN[ubX][ubY] > 190 && placeN[ubX][ubY] < 195) {
+          }
+          else if (190 < placeN[ubX][ubY] && placeN[ubX][ubY] < 195) {
+						// 2 faza przewrotu
             if (ubX > uwLeftX)
               gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &tree[10]); //
             if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y)
               gfxDrawImageMaskedClipped(Xe[ubX - 1 - uwLeftX], Ye[ubY - uwTopY], &tree[9]); //
-          } // 2 faza przewrotu
+          }
         }
 
         ///////////// fire /////////////
-        if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y && placeN[ubX][ubY] > 90 && placeN[ubX][ubY] < 101) // fire big
-        {
-          gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[((fireCounter + ubX + ubY) & 3)]);
-        }
-        if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y && placeN[ubX][ubY] > 72 && placeN[ubX][ubY] < 91) // fire med
-        {
-          if (placeG[ubX][ubY] < 113 || placeG[ubX][ubY] > 119)
-            gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[12]);
-          gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[4 + ((fireCounter + ubX + ubY) & 3)]);
-        }
-        if (ubY < uwTopY + WORLD_WINDOW_SIZE_Y && placeN[ubX][ubY] >= 70 && placeN[ubX][ubY] < 73) // fire small
-        {
-          if (placeG[ubX][ubY] < 113 || placeG[ubX][ubY] > 119)
-            gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[12]);
-          gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[8 + ((fireCounter + ubX + ubY) & 3)]);
-        }
+				if(ubY < uwTopY + WORLD_WINDOW_SIZE_Y) {
+					if (90 < placeN[ubX][ubY] && placeN[ubX][ubY] <= 100) // fire big
+					{
+						gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[((fireCounter + ubX + ubY) & 3)]);
+					}
+					if (72 < placeN[ubX][ubY] && placeN[ubX][ubY] <= 90) // fire med
+					{
+						if (placeG[ubX][ubY] < 113 || placeG[ubX][ubY] > 119)
+							gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[12]);
+						gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[4 + ((fireCounter + ubX + ubY) & 3)]);
+					}
+					if (70 <= placeN[ubX][ubY] && placeN[ubX][ubY] <= 72) // fire small
+					{
+						if (placeG[ubX][ubY] < 113 || placeG[ubX][ubY] > 119)
+							gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[12]);
+						gfxDrawImageMaskedClipped(Xe[ubX - uwLeftX], Ye[ubY - uwTopY], &fire[8 + ((fireCounter + ubX + ubY) & 3)]);
+					}
+				}
       }
     }
   }
