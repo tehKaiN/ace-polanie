@@ -174,45 +174,45 @@ static void battleShowPanel(int iff, int co, UWORD uwMax, UWORD uwFood, int ubPr
 		case WHAT_SHED:
 			// odbudowa +krowa
 			if (uwMax >= 450 && uwFood)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(4) + 1, &movers[0][MOVER_KIND_COW][1][1]);
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(4) + 1, &g_pMoverFrames[MOVER_KIND_COW][0][1][1]);
 			if (uwMax >= 1250 && uwFood && g_uwLevel > PASTUCH_LEV)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &movers[0][MOVER_KIND_FARMER][1][1]);
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &g_pMoverFrames[MOVER_KIND_FARMER][0][1][1]);
 			break;
 		case WHAT_HUT:
 			// odbudowa +procarz+dzida+koszary2
 			if (uwMax >= 1050)
 				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(1) + 1, &buttons[BUTTON_KIND_WARRIOR_HUT]); // koszary2
 			if (uwMax >= 650 && uwFood)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(3) + 1, &movers[0][MOVER_KIND_HUNTER][1][1]);
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(3) + 1, &g_pMoverFrames[MOVER_KIND_HUNTER][0][1][1]);
 			if (uwMax >= 450 && uwFood)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(4) + 1, &movers[0][MOVER_KIND_AXE][1][1]);
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(4) + 1, &g_pMoverFrames[MOVER_KIND_AXE][0][1][1]);
 			break;
 		case WHAT_MAGE_HUT:
 			// odbudowa +babcia+kaplan
 			if (uwMax >= 1250 && uwFood && g_uwLevel > MAG_LEV)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &movers[0][MOVER_KIND_MAGE][1][1]); // mag
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &g_pMoverFrames[MOVER_KIND_MAGE][0][1][1]); // mag
 			if (uwMax >= 1050 && uwFood)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(1) + 1, &movers[0][MOVER_KIND_PRIEST][1][1]); // kaplan
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(1) + 1, &g_pMoverFrames[MOVER_KIND_PRIEST][0][1][1]); // kaplan
 			if (uwMax >= 650 && uwFood)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(3) + 1, &movers[0][MOVER_KIND_PRIESTESS][1][1]); // druidka
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(3) + 1, &g_pMoverFrames[MOVER_KIND_PRIESTESS][0][1][1]); // druidka
 			break;
 		case WHAT_WARRIOR_HUT:
 			// odbudowa +miecz+luk+akademia
 			if (uwMax >= 1050)
 				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(1) + 1, &buttons[BUTTON_KIND_KNIGHT_HUT]); // dom bohatera
 			if (uwMax >= 850 && uwFood)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(2) + 1, &movers[0][MOVER_KIND_PIKE][1][1]); // luk
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(2) + 1, &g_pMoverFrames[MOVER_KIND_PIKE][0][1][1]); // luk
 			if (uwMax >= 650 && uwFood)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(3) + 1, &movers[0][MOVER_KIND_SWORD][1][1]); // miecz
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(3) + 1, &g_pMoverFrames[MOVER_KIND_SWORD][0][1][1]); // miecz
 			if (uwMax >= 250)
 				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(5) + 1, &buttons[BUTTON_KIND_WALL]); // palisada
 			break;
 		case WHAT_KNIGHT_HUT:
 			// odbudowa +wodz
 			if (uwMax >= 1250 && uwFood && g_uwLevel > KUSZNIK_LEV)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &movers[0][MOVER_KIND_XBOW][1][1]);
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(0) + 1, &g_pMoverFrames[MOVER_KIND_XBOW][0][1][1]);
 			if (uwMax >= 1050 && uwFood)
-				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(1) + 1, &movers[0][MOVER_KIND_KNIGHT][1][1]);
+				gfxDrawImageMaskedClipped(PANEL_BUTTON_X + 1, PANEL_BUTTON_Y(1) + 1, &g_pMoverFrames[MOVER_KIND_KNIGHT][0][1][1]);
 			break;
 	}
 

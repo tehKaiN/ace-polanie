@@ -26,7 +26,7 @@ void gfxCopyBackToFront(void) {
 	blitCopyAligned(g_pVpManager->pBack, 0, 100, g_pVpManager->pFront, 0, 100, 320, 100);
 }
 
-void gfxDrawImageNoMask(WORD wX, WORD wY, tImage *pImage) {
+void gfxDrawImageNoMask(WORD wX, WORD wY, const tImage *pImage) {
   if (wX < 0 || wY < 0) {
     logWrite("ERR: gfxDrawImageNoMask() has negative coords");
 	}
@@ -49,7 +49,7 @@ void gfxDrawImageNoMask(WORD wX, WORD wY, tImage *pImage) {
 	blitCopy(pImage->pBitmap, 0, pImage->uwOffsY, pDest, wX, wY, uwWidth, uwHeight, MINTERM_COOKIE);
 }
 
-void gfxDrawImageMaskedClipped(WORD wX, WORD wY, tImage *pImage) {
+void gfxDrawImageMaskedClipped(WORD wX, WORD wY, const tImage *pImage) {
   if (wX < 0 || wY < 0) {
     return;
 	}

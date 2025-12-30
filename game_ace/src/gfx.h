@@ -55,9 +55,9 @@ void Rectangle13h(UWORD uwX1, UWORD uwY1, UWORD uwX2, UWORD uwY2, UBYTE ubColor)
 
 void gfxCopyBackToFront(void);
 
-void gfxDrawImageNoMask(WORD wX, WORD wY, tImage *pImage);
+void gfxDrawImageNoMask(WORD wX, WORD wY, const tImage *pImage);
 
-void gfxDrawImageMaskedClipped(WORD wX, WORD wY, tImage *pImage);
+void gfxDrawImageMaskedClipped(WORD wX, WORD wY, const tImage *pImage);
 
 void gfxSetClippingArea(UWORD uwX1, UWORD uwY1, UWORD uwX2, UWORD uwY2);
 

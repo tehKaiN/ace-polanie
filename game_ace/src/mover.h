@@ -36,6 +36,8 @@ typedef enum tMoverKind {
 	MOVER_KIND_COUNT = 13
 } tMoverKind;
 
+typedef tImage tMoverFrameset[MOVER_PHASE_COUNT][3][3]; // phase, dx, dy
+
 typedef struct tMover {
   tMapObject sMapObject;
   int xr, yr;
@@ -65,6 +67,7 @@ typedef struct tMover {
   int s_range;
   int a_range;
   const tMapObject *target;
+  const tMoverFrameset *pFrameset;
   int ShowHit;
   int delay, maxdelay;
   int ispath;
@@ -105,5 +108,5 @@ void moverGraze(tMover *pMover); // pasienie sie
 void moverAttack(tMover *pMover);
 int moverDistance(tMover *pMover);
 
-extern tImage movers[MOVER_PHASE_COUNT][MOVER_KIND_COUNT][3][3]; // faza:typ:dx:dy
+extern tMoverFrameset g_pMoverFrames[MOVER_KIND_COUNT];
 extern int PlaceUsed;

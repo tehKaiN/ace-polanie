@@ -134,11 +134,11 @@ static void moverNarrowCreate(tBitmapPair *pBmPair, const char *szDataPath, tMov
 	for(UBYTE ubPhase = 0; ubPhase < MOVER_PHASE_COUNT; ++ubPhase) {
 		for(UBYTE ubX = 0; ubX < 3; ++ubX) {
 			for(UBYTE ubY = 0; ubY < 3; ++ubY) {
-				movers[ubPhase][eKind][ubX][ubY].pBitmap = pBmPair->pFrames;
-				movers[ubPhase][eKind][ubX][ubY].pMask = pBmPair->pMasks;
-				movers[ubPhase][eKind][ubX][ubY].uwWidth = 16;
-				movers[ubPhase][eKind][ubX][ubY].uwHeight = 14;
-				movers[ubPhase][eKind][ubX][ubY].uwOffsY = uwOffsY;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].pBitmap = pBmPair->pFrames;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].pMask = pBmPair->pMasks;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].uwWidth = 16;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].uwHeight = 14;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].uwOffsY = uwOffsY;
 				uwOffsY += 14;
 				++ubFrameIndex;
 			}
@@ -163,11 +163,11 @@ static void moverMixedCreate(tMixedBitmaps *pMixed, const char *szName, tMoverKi
 	for(UBYTE ubPhase = 0; ubPhase < MOVER_PHASE_ACTION1; ++ubPhase) {
 		for(UBYTE ubX = 0; ubX < 3; ++ubX) {
 			for(UBYTE ubY = 0; ubY < 3; ++ubY) {
-				movers[ubPhase][eKind][ubX][ubY].pBitmap = pMixed->sPairNarrow.pFrames;
-				movers[ubPhase][eKind][ubX][ubY].pMask = pMixed->sPairNarrow.pMasks;
-				movers[ubPhase][eKind][ubX][ubY].uwWidth = 16;
-				movers[ubPhase][eKind][ubX][ubY].uwHeight = 14;
-				movers[ubPhase][eKind][ubX][ubY].uwOffsY = uwOffsY;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].pBitmap = pMixed->sPairNarrow.pFrames;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].pMask = pMixed->sPairNarrow.pMasks;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].uwWidth = 16;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].uwHeight = 14;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].uwOffsY = uwOffsY;
 				uwOffsY += 14;
 				++ubFrameIndex;
 			}
@@ -179,11 +179,11 @@ static void moverMixedCreate(tMixedBitmaps *pMixed, const char *szName, tMoverKi
 		ubFrameIndex = 0;
 		for(UBYTE ubX = 0; ubX < 3; ++ubX) {
 			for(UBYTE ubY = 0; ubY < 3; ++ubY) {
-				movers[ubPhase][eKind][ubX][ubY].pBitmap = pMixed->sPairWide.pFrames;
-				movers[ubPhase][eKind][ubX][ubY].pMask = pMixed->sPairWide.pMasks;
-				movers[ubPhase][eKind][ubX][ubY].uwWidth = pWideSizes[ubFrameIndex].ubX;
-				movers[ubPhase][eKind][ubX][ubY].uwHeight = pWideSizes[ubFrameIndex].ubY;
-				movers[ubPhase][eKind][ubX][ubY].uwOffsY = uwOffsY;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].pBitmap = pMixed->sPairWide.pFrames;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].pMask = pMixed->sPairWide.pMasks;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].uwWidth = pWideSizes[ubFrameIndex].ubX;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].uwHeight = pWideSizes[ubFrameIndex].ubY;
+				g_pMoverFrames[eKind][ubPhase][ubX][ubY].uwOffsY = uwOffsY;
 				uwOffsY += pWideSizes[ubFrameIndex].ubY;
 				++ubFrameIndex;
 			}
@@ -583,6 +583,7 @@ void moverInit(tMover *pMover, int eMoverKind, int x1, int y1, int c, int d) {
   pMover->wybrany = 0;
   pMover->exp = 0;
   pMover->type = eMoverKind;
+  pMover->pFrameset = &g_pMoverFrames[eMoverKind]; // TODO: team color bitmaps
 
   pMover->s_range = Udata[eMoverKind].s_range;
   pMover->a_range = Udata[eMoverKind].a_range;
@@ -984,10 +985,12 @@ void moverMove(tMover *pMover) {
     return;
   }
   pMover->ispath--;
+
   moverHide(pMover);
   pMover->sMapObject.ubX -= pMover->dx;
   pMover->sMapObject.ubY -= pMover->dy;
   moverShow(pMover);
+
   pMover->delay = pMover->maxdelay;
   // if(placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY]>34&&placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY]<46)delay-=2; //przyspieszenie na drodze
   pMover->inmove = 1;
@@ -1478,6 +1481,7 @@ static void moverRunNonCow(tMover *pMover) {
   if (pMover->command == 10) // teleport
   {
     pMover->commandN = 0;
+
     moverHide(pMover);
     if (place[pMover->xe][pMover->ye] || pMover->xe < 1 || pMover->ye < 1 || pMover->xe > WORLD_SIZE_X - 2 || pMover->ye > WORLD_SIZE_X - 2)
       pMover->xe += 3; //=0
@@ -1502,6 +1506,7 @@ static void moverRunNonCow(tMover *pMover) {
     pMover->sMapObject.ubX = pMover->xe;
     pMover->sMapObject.ubY = pMover->ye;
     moverShow(pMover);
+
     pMover->inattack = 1;
     pMover->delay = pMover->maxdelay;
     pMover->command = pMover->commandN;
@@ -1990,37 +1995,78 @@ void moverPrepare(tMover *pMover, int x0, int y0, int typ) {
   }
 }
 
-void moverShowS(tMover *pMover) {
-  int k;
-  if (!pMover->exist || !pMover->visible || !placeN[pMover->sMapObject.ubX][pMover->sMapObject.ubY])
-    return;
+static void moverShowRot(tMover *pMover) {
+  UBYTE ubStage;
+  if (pMover->delay < 70)
+    ubStage = 0;
+  else if (pMover->delay < 200)
+    ubStage = 1;
+  else
+    ubStage = 2;
 
-  if (pMover->exist == 2) {
-    k = 2;
-    if (pMover->delay < 200)
-      k = 1;
-    if (pMover->delay < 70)
-      k = 0; // k-faza rozkladu typ-typ postaci
-    if (k) {
-      if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
-        gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &movers[5 - k][pMover->type][1][1]);
-      }
-      else {
-        PutImageChange13h(pMover->xr, pMover->yr, &movers[5 - k][pMover->type][1][1], 1, color1, color2);
-      }
-    } else {
-      k = 0;
-      if (pMover->type == 8)
-        k = 2;
-      if (!pMover->type)
-        k = 1;
-      if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
-        gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &dead[k]);
-      }
-      else {
-        PutImageChange13h(pMover->xr, pMover->yr, &dead[k], 1, color1, color2);
-      }
+  if (ubStage) {
+    // 1st phase - use mover-specific frames
+    gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &(*pMover->pFrameset)[5 - ubStage][1][1]);
+  }
+  else {
+    // 2nd phasae - use generic dead frames
+    if (pMover->type == MOVER_KIND_BEAR)
+      ubStage = 2;
+    else if (pMover->type == MOVER_KIND_COW)
+      ubStage = 1;
+    else
+      ubStage = 0;
+
+    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
+      gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &dead[ubStage]);
     }
+    else {
+      PutImageChange13h(pMover->xr, pMover->yr, &dead[ubStage], 1, color1, color2);
+    }
+  }
+}
+
+static void moverShowSelection(tMover *pMover) {
+  int a = 0, b = 0;
+  if (pMover->inattack && pMover->phase > 2 &&
+      (pMover->type == 1 || pMover->type == 5 || pMover->type == 7 || pMover->type == 8 || pMover->type == 9)) {
+    if (pMover->dy > 0)
+      b = 7;
+    if (pMover->dx > 0)
+      a = 8;
+  }
+
+  int color = LightGreen;
+  if (pMover->hp < (pMover->maxhp >> 1))
+    color = Yellow;
+  if (pMover->hp < (pMover->maxhp >> 2))
+    color = LightRed;
+  Bar13h(pMover->xr + a + 1, pMover->yr + b - 2, pMover->xr + a + 15, pMover->yr + b, Black);
+  int hh = (pMover->hp * 14 / pMover->maxhp);
+  if (!hh)
+    hh = 1;
+  Bar13h(pMover->xr + a + 1, pMover->yr + b - 2, pMover->xr + a + 1 + hh, pMover->yr + b, color);
+  if (pMover->magic && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
+    hh = (pMover->magic * 14 / dmagic[pMover->exp >> 4]);
+    Bar13h(pMover->xr + a + 16, pMover->yr + b + 14 - hh, pMover->xr + a + 17, pMover->yr + b + 14, LightBlue);
+  }
+  if (!pMover->type && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
+    hh = ((pMover->udder * 14) / 100);
+    if (pMover->udder < 4)
+      hh = 0;
+
+    if (hh)
+      Bar13h(pMover->xr + a + 16, pMover->yr + b + 14 - hh, pMover->xr + a + 17, pMover->yr + b + 14, White);
+  }
+}
+
+void moverShowS(tMover *pMover) {
+  if (!pMover->exist || !pMover->visible || !placeN[pMover->sMapObject.ubX][pMover->sMapObject.ubY]) {
+    return;
+  }
+
+  if (pMover->exist == MOVER_EXIST_ROT) {
+    moverShowRot(pMover);
     return;
   }
 
@@ -2029,56 +2075,19 @@ void moverShowS(tMover *pMover) {
   }
 
   if (pMover->wybrany) {
-    int a = 0, b = 0;
-    if (pMover->inattack && pMover->phase > 2 &&
-        (pMover->type == 1 || pMover->type == 5 || pMover->type == 7 || pMover->type == 8 || pMover->type == 9)) {
-      if (pMover->dy > 0)
-        b = 7;
-      if (pMover->dx > 0)
-        a = 8;
-    }
-
-    int color = LightGreen;
-    if (pMover->hp < (pMover->maxhp >> 1))
-      color = Yellow;
-    if (pMover->hp < (pMover->maxhp >> 2))
-      color = LightRed;
-    Bar13h(pMover->xr + a + 1, pMover->yr + b - 2, pMover->xr + a + 15, pMover->yr + b, Black);
-    int hh = (pMover->hp * 14 / pMover->maxhp);
-    if (!hh)
-      hh = 1;
-    Bar13h(pMover->xr + a + 1, pMover->yr + b - 2, pMover->xr + a + 1 + hh, pMover->yr + b, color);
-    if (pMover->magic && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
-      hh = (pMover->magic * 14 / dmagic[pMover->exp >> 4]);
-      Bar13h(pMover->xr + a + 16, pMover->yr + b + 14 - hh, pMover->xr + a + 17, pMover->yr + b + 14, LightBlue);
-    }
-    if (!pMover->type && pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
-      hh = ((pMover->udder * 14) / 100);
-      if (pMover->udder < 4)
-        hh = 0;
-
-      if (hh)
-        Bar13h(pMover->xr + a + 16, pMover->yr + b + 14 - hh, pMover->xr + a + 17, pMover->yr + b + 14, White);
-    }
-  }
-
-  if (!pMover->dx && !pMover->dy) {
-    pMover->dy = 1;
+    moverShowSelection(pMover);
   }
 
   // There was a flipped draw of mover image here, it's gone now.
   // Beware: mover dx and dy are in reverse orientation as frames!
-  if (movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy].pBitmap) {
-    if (pMover->sMapObject.eTeam == MAP_OBJECT_TEAM_PLAYER) {
-      gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy]);
-    }
-    else {
-      PutImageChange13h(pMover->xr, pMover->yr, &movers[pMover->phase][pMover->type][1 - pMover->dx][1 - pMover->dy], 1, color1, color2);
-    }
+  if ((*pMover->pFrameset)[pMover->phase][1 - pMover->dx][1 - pMover->dy].pBitmap) {
+    gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &(*pMover->pFrameset)[pMover->phase][1 - pMover->dx][1 - pMover->dy]);
   }
+
   if (pMover->marmour) {
     gfxDrawImageMaskedClipped(pMover->xr, pMover->yr, &picture[278 + (pMover->marmour & 3)]);
   }
+
   if (placeG[pMover->sMapObject.ubX][pMover->sMapObject.ubY] == 256 && pMover->hp < pMover->maxhp) {
     PutImageChange13h(pMover->xr, pMover->yr, &picture[282 + (pMover->delay & 1)], 1, Red, LightBlue);
   }
@@ -2122,5 +2131,5 @@ int moverOK(const tMover *pMover) {
 
 #pragma endregion
 
-tImage movers[MOVER_PHASE_COUNT][MOVER_KIND_COUNT][3][3]; // faza:typ:dx:dy
+tMoverFrameset g_pMoverFrames[MOVER_KIND_COUNT];
 int PlaceUsed;
