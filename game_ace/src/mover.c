@@ -311,7 +311,7 @@ static void NewCow(int nr) {
       oldcow->exist = 0;
       moverInit(&castle[side].m[i], oldcow->type, oldcow->x, oldcow->y, 1, 10);
       moverSetIFF(&castle[side].m[i], side + 1);
-      moverSetNr(&castle[side].m[i], i + ((side + 1) << 8) + 200);
+      moverSetNr(&castle[side].m[i], i + ((side + 1) * 256) + 200);
       castle[side].m[i].hp = oldcow->hp;
       castle[side].m[i].maxhp = oldcow->maxhp;
       castle[side].m[i].udder = oldcow->udder;
@@ -333,35 +333,35 @@ static void NewCow(int nr) {
       return;
     }
   }
-  for (UBYTE i = 0; i < CASTLE_BUILIDNGS_MAX; i++)
-    for (UBYTE j = 0; j < BUILDING_MOVERS_MAX; j++) {
-      if (castle[side].b[i].type == 2 && castle[side].b[i].exist == 1)
-        if (!(castle[side].b[i].m[j].exist)) {
+  for (UBYTE bi = 0; bi < CASTLE_BUILIDNGS_MAX; bi++)
+    for (UBYTE bmi = 0; bmi < BUILDING_MOVERS_MAX; bmi++) {
+      if (castle[side].b[bi].type == 2 && castle[side].b[bi].exist == 1)
+        if (!(castle[side].b[bi].m[bmi].exist)) {
           // strcpy(Msg.msg,"Przepisuje krowe do obory");
           // Msg.licznik=200;
 
           place[oldcow->x][oldcow->y] = 0;
           oldcow->exist = 0;
-          moverInit(&castle[side].b[i].m[j], oldcow->type, oldcow->x, oldcow->y, 1, 10);
-          moverSetIFF(&castle[side].b[i].m[j], side + 1);
-          moverSetNr(&castle[side].b[i].m[j], i * 10 + j + 4 + ((side + 1) << 8));
-          castle[side].b[i].m[j].hp = oldcow->hp;
-          castle[side].b[i].m[j].maxhp = oldcow->maxhp;
-          castle[side].b[i].m[j].udder = oldcow->udder;
-          castle[side].b[i].m[j].xm = castle[side].m[i].x + 3;
-          castle[side].b[i].m[j].ym = castle[side].m[i].y + 3;
-          castle[side].b[i].m[j].xp = castle[side].m[i].x;
-          castle[side].b[i].m[j].yp = castle[side].m[i].y;
-          castle[side].b[i].m[j].xe = castle[side].m[i].x;
-          castle[side].b[i].m[j].ye = castle[side].m[i].y;
-          castle[side].b[i].m[j].dx = castle[side].m[i].dx;
-          castle[side].b[i].m[j].dy = castle[side].m[i].dy;
-          moverShow(&castle[side].b[i].m[j]);
+          moverInit(&castle[side].b[bi].m[bmi], oldcow->type, oldcow->x, oldcow->y, 1, 10);
+          moverSetIFF(&castle[side].b[bi].m[bmi], side + 1);
+          moverSetNr(&castle[side].b[bi].m[bmi], bi * 10 + bmi + 4 + ((side + 1) * 256));
+          castle[side].b[bi].m[bmi].hp = oldcow->hp;
+          castle[side].b[bi].m[bmi].maxhp = oldcow->maxhp;
+          castle[side].b[bi].m[bmi].udder = oldcow->udder;
+          castle[side].b[bi].m[bmi].xm = castle[side].m[bi].x + 3;
+          castle[side].b[bi].m[bmi].ym = castle[side].m[bi].y + 3;
+          castle[side].b[bi].m[bmi].xp = castle[side].m[bi].x;
+          castle[side].b[bi].m[bmi].yp = castle[side].m[bi].y;
+          castle[side].b[bi].m[bmi].xe = castle[side].m[bi].x;
+          castle[side].b[bi].m[bmi].ye = castle[side].m[bi].y;
+          castle[side].b[bi].m[bmi].dx = castle[side].m[bi].dx;
+          castle[side].b[bi].m[bmi].dy = castle[side].m[bi].dy;
+          moverShow(&castle[side].b[bi].m[bmi]);
           if (side) {
-            castle[side].b[i].m[j].xp = xpastw;
-            castle[side].b[i].m[j].yp = ypastw;
-            castle[side].b[i].m[j].xe = xpastw;
-            castle[side].b[i].m[j].ye = ypastw;
+            castle[side].b[bi].m[bmi].xp = xpastw;
+            castle[side].b[bi].m[bmi].yp = ypastw;
+            castle[side].b[bi].m[bmi].xe = xpastw;
+            castle[side].b[bi].m[bmi].ye = ypastw;
           }
           return;
         }
