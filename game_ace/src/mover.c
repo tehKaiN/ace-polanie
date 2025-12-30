@@ -693,7 +693,6 @@ void moverLabeling(tMover *pMover) {
       } else
         Place[i][j] = 9999;
 
-  Place[pMover->xe][pMover->ye] = 0;
   startk = 0;
   stopk = 0;
   i = pMover->xe;
